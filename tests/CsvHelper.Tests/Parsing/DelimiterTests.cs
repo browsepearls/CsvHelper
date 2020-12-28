@@ -25,7 +25,8 @@ namespace CsvHelper.Tests.Parsing
 				stream.Position = 0;
 
 				parser.Configuration.Delimiter = "&|$";
-				var line = parser.Read();
+				parser.Read();
+				var line = parser.Record;
 
 				Assert.AreEqual(3, line.Length);
 				Assert.AreEqual("1", line[0]);
@@ -44,7 +45,8 @@ namespace CsvHelper.Tests.Parsing
 			{
 				parser.Configuration.Delimiter = "\0";
 
-				var line = parser.Read();
+				parser.Read();
+				var line = parser.Record;
 
 				Assert.AreEqual(3, line.Length);
 				Assert.AreEqual("1", line[0]);

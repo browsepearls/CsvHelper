@@ -816,9 +816,9 @@ namespace CsvHelper.Tests.Parsing
 
 				parser.Configuration.TrimOptions = TrimOptions.InsideQuotes;
 				parser.Configuration.EnableRawRecord = true;
-				var record = parser.Read();
+				parser.Read();
 
-				Assert.AreEqual("a b c", record[0]);
+				Assert.AreEqual("a b c", parser.Record[0]);
 				Assert.AreEqual(line, parser.Context.RawRecord);
 			}
 		}
