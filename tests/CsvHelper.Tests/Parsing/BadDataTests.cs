@@ -81,9 +81,9 @@ namespace CsvHelper.Tests.Parsing
 				stream.Position = 0;
 
 				parser.Configuration.IgnoreQuotes = true;
-				var record = parser.Read();
+				parser.Read();
 
-				Assert.AreEqual("2\"two", record[1]);
+				Assert.AreEqual("2\"two", parser[1]);
 			}
 		}
 

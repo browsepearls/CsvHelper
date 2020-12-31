@@ -227,11 +227,8 @@ namespace CsvHelper
 		{
 			// Don't forget about the async method below!
 
-			do
-			{
-				context.Record = parser.Read();
-			}
-			while (context.Record != null && Configuration.ShouldSkipRecord(context.Record));
+			while (parser.Read() && Configuration.ShouldSkipRecord(parser.Record)) { }
+			context.Record = parser.Record;
 
 			context.CurrentIndex = -1;
 			context.HasBeenRead = true;
@@ -262,11 +259,8 @@ namespace CsvHelper
 		/// <returns>True if there are more records, otherwise false.</returns>
 		public virtual async Task<bool> ReadAsync()
 		{
-			do
-			{
-				context.Record = await parser.ReadAsync().ConfigureAwait(false);
-			}
-			while (context.Record != null && Configuration.ShouldSkipRecord(context.Record));
+			while (parser.Read() && Configuration.ShouldSkipRecord(parser.Record)) { }
+			context.Record = parser.Record;
 
 			context.CurrentIndex = -1;
 			context.HasBeenRead = true;
@@ -1290,7 +1284,7 @@ namespace CsvHelper
 			}
 		}
 
-#if NET47 || NETSTANDARD
+#if !NET45
 		/// <summary>
 		/// Gets all the records in the CSV file and
 		/// converts each to <see cref="System.Type"/> T. The Read method

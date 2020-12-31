@@ -65,7 +65,7 @@ namespace CsvHelper.Tests.Reading
 			Assert.ThrowsException<ObjectDisposedException>(() => records.ToList());
 		}
 
-#if NETCOREAPP
+#if !NET45
 		[TestMethod]
 		public async Task GetRecordsAsyncGeneric_Disposed_ThrowsObjectDisposedExceptionTest()
 		{

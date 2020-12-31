@@ -14,6 +14,40 @@ namespace CsvHelper
 	public interface IParser : IDisposable
 	{
 		/// <summary>
+		/// Gets the number of fields for the current row.
+		/// </summary>
+		int Count { get; }
+
+		/// <summary>
+		/// Gets the field at the specified index for the current row.
+		/// </summary>
+		/// <param name="index">The index.</param>
+		/// <returns>The field.</returns>
+		string this[int index] { get; }
+
+		/// <summary>
+		/// Gets the record for the current row. Note:
+		/// It is much more efficient to only get the fields you need. If
+		/// you need all fields, then use this.
+		/// </summary>
+		string[] Record { get; }
+
+		/// <summary>
+		/// Gets the raw record for the current row.
+		/// </summary>
+		string RawRecord { get; }
+
+		/// <summary>
+		/// Gets the CSV row the parser is currently on.
+		/// </summary>
+		int Row { get; }
+
+		/// <summary>
+		/// Gets the raw row the parser is currently on.
+		/// </summary>
+		int RawRow { get; }
+
+		/// <summary>
 		/// Gets the reading context.
 		/// </summary>
 		ReadingContext Context { get; }
@@ -24,20 +58,15 @@ namespace CsvHelper
 		IParserConfiguration Configuration { get; }
 
 		/// <summary>
-		/// Gets the <see cref="FieldReader"/>.
-		/// </summary>
-		IFieldReader FieldReader { get; }
-
-		/// <summary>
 		/// Reads a record from the CSV file.
 		/// </summary>
-		/// <returns>A <see cref="T:String[]" /> of fields for the record read.</returns>
-		string[] Read();
+		/// <returns>True if there are more records to read, otherwise false.</returns>
+		bool Read();
 
 		/// <summary>
 		/// Reads a record from the CSV file asynchronously.
 		/// </summary>
-		/// <returns>A <see cref="T:String[]" /> of fields for the record read.</returns>
-		Task<string[]> ReadAsync();
+		/// <returns>True if there are more records to read, otherwise false.</returns>
+		Task<bool> ReadAsync();
 	}
 }

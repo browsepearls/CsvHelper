@@ -21,36 +21,43 @@ namespace CsvHelper.Tests.Mocks
 
 		public IParserConfiguration Configuration { get; }
 
-		public IFieldReader FieldReader
-		{
-			get
-			{
-				throw new NotImplementedException();
-			}
-		}
+		public int Count => context.Record.Length;
+
+		public string[] Record => context.Record;
+
+		public string RawRecord => context.RawRecord;
+
+		public int Row => context.Row;
+
+		public int RawRow => context.RawRow;
+
+		public string this[int index] => throw new NotImplementedException();
 
 		public ParserMock()
 		{
-			context = new ReadingContext(new StringReader(string.Empty), new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture), false);
+			context = new ReadingContext(new StringReader(string.Empty), new CsvConfiguration(CultureInfo.InvariantCulture), false);
 			rows = new Queue<string[]>();
 		}
 
 		public ParserMock(Queue<string[]> rows)
 		{
-			context = new ReadingContext(new StringReader(string.Empty), new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture), false);
+			context = new ReadingContext(new StringReader(string.Empty), new CsvConfiguration(CultureInfo.InvariantCulture), false);
 			this.rows = rows;
 		}
 
-		public string[] Read()
+		public bool Read()
 		{
 			context.Row++;
-			return rows.Dequeue();
+			context.Record = rows.Dequeue();
+
+			return rows.Count > 0;
 		}
 
-		public Task<string[]> ReadAsync()
+		public Task<bool> ReadAsync()
 		{
 			context.Row++;
-			return Task.FromResult(rows.Dequeue());
+
+			return Task.FromResult(rows.Count > 0);
 		}
 
 		public void Add(params string[] row)

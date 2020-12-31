@@ -25,13 +25,13 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual( "1,2\r\n", parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( "1,2\r\n", parser.Context.RawRecord );
 
 				parser.Read();
-				Assert.AreEqual( "3,4\r\n", parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( "3,4\r\n", parser.Context.RawRecord );
 
 				parser.Read();
-				Assert.AreEqual( string.Empty, parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( string.Empty, parser.Context.RawRecord );
 			}
 		}
 
@@ -49,13 +49,13 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual( "1,2\r", parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( "1,2\r", parser.Context.RawRecord );
 
 				parser.Read();
-				Assert.AreEqual( "3,4\r", parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( "3,4\r", parser.Context.RawRecord );
 
 				parser.Read();
-				Assert.AreEqual( string.Empty, parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( string.Empty, parser.Context.RawRecord );
 			}
 		}
 
@@ -73,13 +73,13 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual( "1,2\n", parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( "1,2\n", parser.Context.RawRecord );
 
 				parser.Read();
-				Assert.AreEqual( "3,4\n", parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( "3,4\n", parser.Context.RawRecord );
 
 				parser.Read();
-				Assert.AreEqual( string.Empty, parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( string.Empty, parser.Context.RawRecord );
 			}
 		}
 
@@ -99,13 +99,13 @@ namespace CsvHelper.Tests
 				parser.Configuration.Delimiter = ";;";
 
 				parser.Read();
-				Assert.AreEqual( "1;;2\r", parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( "1;;2\r", parser.Context.RawRecord );
 
 				parser.Read();
-				Assert.AreEqual( "3;;4\r", parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( "3;;4\r", parser.Context.RawRecord );
 
 				parser.Read();
-				Assert.AreEqual( string.Empty, parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( string.Empty, parser.Context.RawRecord );
 			}
 		}
 
@@ -125,13 +125,13 @@ namespace CsvHelper.Tests
 				parser.Configuration.BufferSize = 1;
 
 				parser.Read();
-				Assert.AreEqual( "1,2\r\n", parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( "1,2\r\n", parser.Context.RawRecord );
 
 				parser.Read();
-				Assert.AreEqual( "3,4\r\n", parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( "3,4\r\n", parser.Context.RawRecord );
 
 				parser.Read();
-				Assert.AreEqual( string.Empty, parser.FieldReader.Context.RawRecord );
+				Assert.AreEqual( string.Empty, parser.Context.RawRecord );
 			}
 		}
 	}

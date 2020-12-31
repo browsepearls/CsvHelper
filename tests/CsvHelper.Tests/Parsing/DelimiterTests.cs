@@ -25,12 +25,12 @@ namespace CsvHelper.Tests.Parsing
 				stream.Position = 0;
 
 				parser.Configuration.Delimiter = "&|$";
-				var line = parser.Read();
+				parser.Read();
 
-				Assert.AreEqual(3, line.Length);
-				Assert.AreEqual("1", line[0]);
-				Assert.AreEqual("2&3", line[1]);
-				Assert.AreEqual("4", line[2]);
+				Assert.AreEqual(3, parser.Count);
+				Assert.AreEqual("1", parser[0]);
+				Assert.AreEqual("2&3", parser[1]);
+				Assert.AreEqual("4", parser[2]);
 			}
 		}
 
@@ -44,12 +44,12 @@ namespace CsvHelper.Tests.Parsing
 			{
 				parser.Configuration.Delimiter = "\0";
 
-				var line = parser.Read();
+				parser.Read();
 
-				Assert.AreEqual(3, line.Length);
-				Assert.AreEqual("1", line[0]);
-				Assert.AreEqual("2", line[1]);
-				Assert.AreEqual("3", line[2]);
+				Assert.AreEqual(3, parser.Count);
+				Assert.AreEqual("1", parser[0]);
+				Assert.AreEqual("2", parser[1]);
+				Assert.AreEqual("3", parser[2]);
 			}
 		}
 
@@ -62,11 +62,11 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Configuration.Delimiter = "!#";
-				var row = parser.Read();
+				parser.Read();
 
-				Assert.AreEqual("1", row[0]);
-				Assert.AreEqual("2!", row[1]);
-				Assert.AreEqual("3", row[2]);
+				Assert.AreEqual("1", parser[0]);
+				Assert.AreEqual("2!", parser[1]);
+				Assert.AreEqual("3", parser[2]);
 			}
 		}
 	}

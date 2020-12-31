@@ -2,11 +2,16 @@
 // This file is a part of CsvHelper and is dual licensed under MS-PL and Apache 2.0.
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
 using CsvHelper.Configuration;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CsvHelper.Performance
@@ -15,25 +20,54 @@ namespace CsvHelper.Performance
 	{
 		static void Main(string[] args)
 		{
-			//WriteField(50, 1000000);
-			//WriteRecords(1000000);
+			//Test(); return;
 
-			//Parse();
-			//ReadGetField();
-			ReadGetRecords();
-			//ReadGetRecordsAsync().Wait();
+			//WriteField(50, 1_000_000, false);
+			//WriteRecords(1_000_000);
 
-			Console.ReadKey();
+			for (var i = 0; i < 10; i++)
+			{
+				//LumenworksParse();
+				//SoftCircuitsParse();
+				//StefanBertelsParse();
+				//StackParse();
+				StackParse2();
+				//CsvHelperParse(false);
+
+				//ReadGetField();
+				//ReadGetRecords();
+				//ReadGetRecordsAsync().Wait();
+
+				Console.WriteLine();
+			}
+
+			//BenchmarkRunner.Run<Benchmarks>();
+		}
+
+		static void Test()
+		{
+			var s = new StringBuilder();
+			s.Append("Id,Name\r\n");
+			s.Append("1,one\r\n");
+			using (var reader = new StringReader(s.ToString()))
+			using (var parser = new StackParser2(reader))
+			{
+				while (parser.Read())
+				{
+					var record = parser.Record;
+				}
+			}
 		}
 
 		static string GetFilePath()
 		{
 			var homePath = Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
 			var filePath = Path.Combine(homePath, "Documents", "performance.csv");
+
 			return filePath;
 		}
 
-		static void WriteField(int columns = 50, int rows = 2000000)
+		static void WriteField(int columns = 50, int rows = 2_000_000, bool quoteAllFields = false)
 		{
 			Console.WriteLine("Writing using WriteField");
 			var stopwatch = new Stopwatch();
@@ -41,8 +75,13 @@ namespace CsvHelper.Performance
 
 			using (var stream = File.Create(GetFilePath()))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvWriter(writer))
+			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
+				if (quoteAllFields)
+				{
+					csv.Configuration.ShouldQuote = (field, context) => true;
+				}
+
 				for (var column = 1; column <= columns; column++)
 				{
 					csv.WriteField($"Column{column}");
@@ -53,7 +92,7 @@ namespace CsvHelper.Performance
 				{
 					for (var column = 1; column <= columns; column++)
 					{
-						csv.WriteField(column);
+						csv.WriteField($"{row:N0}_{column}");
 					}
 					csv.NextRecord();
 				}
@@ -63,7 +102,7 @@ namespace CsvHelper.Performance
 			Console.WriteLine(stopwatch.Elapsed);
 		}
 
-		static void WriteRecords(int rows = 2000000)
+		static void WriteRecords(int rows = 2_000_000)
 		{
 			Console.WriteLine("Writing using WriteRecords");
 			var stopwatch = new Stopwatch();
@@ -71,8 +110,10 @@ namespace CsvHelper.Performance
 
 			using (var stream = File.Create(GetFilePath()))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvWriter(writer))
+			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
+				//csv.Configuration.ShouldQuote = (field, context) => true;
+
 				var records = new List<Columns50>();
 				for (var i = 0; i < rows; i++)
 				{
@@ -139,19 +180,76 @@ namespace CsvHelper.Performance
 			Console.WriteLine(stopwatch.Elapsed);
 		}
 
-		static void Parse()
+		static void CsvHelperParse(bool writeToConsole = false)
 		{
-			Console.WriteLine("Parsing");
+			Console.WriteLine("CsvHelper parsing");
 			var stopwatch = new Stopwatch();
 			stopwatch.Start();
 
 			using (var stream = File.OpenRead(GetFilePath()))
 			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvParser(reader))
+			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				string[] row;
-				while ((row = parser.Read()) != null)
+				while (parser.Read())
 				{
+					//for (var i = 0; i < parser.Length; i++)
+					//{
+					//	Console.WriteLine(parser[i]);
+					//}
+					//Console.WriteLine();
+
+					//if (writeToConsole)
+					//{
+					//	Console.WriteLine($"{parser.Row.ToString("N0")}: {parser.RawRecord}");
+					//}
+				}
+			}
+
+			stopwatch.Stop();
+			Console.WriteLine(stopwatch.Elapsed);
+		}
+
+		static void StackParse()
+		{
+			Console.WriteLine("CsvHelper span parsing");
+			var stopwatch = new Stopwatch();
+			stopwatch.Start();
+
+			using (var stream = File.OpenRead(GetFilePath()))
+			using (var reader = new StreamReader(stream))
+			using (var parser = new CsvStackParser(reader, CultureInfo.InvariantCulture))
+			{
+				parser.Configuration.BufferSize = 1024 * 2;
+				while (parser.Read())
+				{
+				}
+			}
+
+			stopwatch.Stop();
+			Console.WriteLine(stopwatch.Elapsed);
+		}
+
+		static void StackParse2()
+		{
+			Console.WriteLine("CsvHelper span parsing");
+			var stopwatch = new Stopwatch();
+			stopwatch.Start();
+
+			using (var stream = File.OpenRead(GetFilePath()))
+			using (var reader = new StreamReader(stream))
+			using (var parser = new StackParser2(reader))
+			{
+				var i = 0;
+				while (parser.Read())
+				{
+					//var record = parser.Record;
+					//Console.WriteLine(string.Join(",", parser.Record));
+					if (i == 1_000_000)
+					{
+						Console.WriteLine(string.Join(",", parser.Record));
+					}
+
+					i++;
 				}
 			}
 
@@ -167,7 +265,7 @@ namespace CsvHelper.Performance
 
 			using (var stream = File.OpenRead(GetFilePath()))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvReader(reader))
+			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
 				// Read header.
 				csv.Read();
@@ -193,7 +291,7 @@ namespace CsvHelper.Performance
 
 			using (var stream = File.OpenRead(GetFilePath()))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvReader(reader))
+			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
 				var records = csv.GetRecords<Columns50>();
 				foreach (var record in records)
@@ -213,11 +311,76 @@ namespace CsvHelper.Performance
 
 			using (var stream = File.OpenRead(GetFilePath()))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvReader(reader))
+			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
 				while (await csv.ReadAsync())
 				{
 					var record = csv.GetRecord<Columns50>();
+				}
+			}
+
+			stopwatch.Stop();
+			Console.WriteLine(stopwatch.Elapsed);
+		}
+
+		static void LumenworksParse()
+		{
+			Console.WriteLine("Lumenworks parsing");
+			var stopwatch = new Stopwatch();
+			stopwatch.Start();
+
+			using (var stream = File.OpenRead(GetFilePath()))
+			using (var reader = new StreamReader(stream))
+			using (var csv = new LumenWorks.Framework.IO.Csv.CsvReader(reader))
+			{
+				var fieldCount = csv.FieldCount;
+				var headers = csv.GetFieldHeaders();
+				while (csv.ReadNextRecord())
+				{
+					var row = new string[fieldCount];
+					for (var i = 0; i < fieldCount; i++)
+					{
+						row[i] = csv[i];
+					}
+				}
+			}
+
+			stopwatch.Stop();
+			Console.WriteLine(stopwatch.Elapsed);
+		}
+
+		static void SoftCircuitsParse()
+		{
+			Console.WriteLine("SoftCircuits parsing");
+			var stopwatch = new Stopwatch();
+			stopwatch.Start();
+
+			using (var stream = File.OpenRead(GetFilePath()))
+			using (var csv = new SoftCircuits.CsvParser.CsvReader(stream))
+			{
+				string[] row = null;
+				while (csv.ReadRow(ref row))
+				{
+				}
+			}
+
+			stopwatch.Stop();
+			Console.WriteLine(stopwatch.Elapsed);
+		}
+
+		static void StefanBertelsParse()
+		{
+			Console.WriteLine("Stefan Bertels parsing");
+			var stopwatch = new Stopwatch();
+			stopwatch.Start();
+
+			using (var stream = File.OpenRead(GetFilePath()))
+			using (var reader = new StreamReader(stream))
+			{
+				var csv = new StefanBertelsParser(reader, false);
+
+				foreach (var context in csv.Read())
+				{
 				}
 			}
 
@@ -299,6 +462,37 @@ namespace CsvHelper.Performance
 			public int Column48 { get; set; }
 			public int Column49 { get; set; }
 			public int Column50 { get; set; }
+		}
+	}
+
+	public class Benchmarks
+	{
+		private string s = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+
+		public Benchmarks()
+		{
+		}
+
+		[Benchmark]
+		public void A()
+		{
+			var memory = new Memory<char>(s.ToCharArray());
+			var slice = memory.Span.Slice(0);
+			for (var i = 0; i < s.Length; i++)
+			{
+				var c = slice[i];
+			}
+		}
+
+		[Benchmark]
+		public void B()
+		{
+			var memory = new Memory<char>(s.ToCharArray());
+			for (var i = 0; i < s.Length; i++)
+			{
+				var slice = memory.Span.Slice(0);
+				var c = slice[i];
+			}
 		}
 	}
 }

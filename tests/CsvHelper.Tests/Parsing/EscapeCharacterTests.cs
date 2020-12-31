@@ -19,8 +19,8 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Configuration.Escape = '|';
-				var record = parser.Read();
-				Assert.AreEqual("\"a\"", record[0]);
+				parser.Read();
+				Assert.AreEqual("\"a\"", parser[0]);
 			}
 		}
 
@@ -31,8 +31,8 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Configuration.Escape = '|';
-				var record = parser.Read();
-				Assert.AreEqual("\"a\"", record[0]);
+				parser.Read();
+				Assert.AreEqual("\"a\"", parser[0]);
 			}
 		}
 
@@ -44,8 +44,8 @@ namespace CsvHelper.Tests.Parsing
 			{
 				parser.Configuration.Escape = '|';
 				parser.Configuration.TrimOptions = TrimOptions.Trim;
-				var record = parser.Read();
-				Assert.AreEqual("\"a\"", record[0]);
+				parser.Read();
+				Assert.AreEqual("\"a\"", parser[0]);
 			}
 		}
 
@@ -57,8 +57,8 @@ namespace CsvHelper.Tests.Parsing
 			{
 				parser.Configuration.Escape = '|';
 				parser.Configuration.TrimOptions = TrimOptions.InsideQuotes;
-				var record = parser.Read();
-				Assert.AreEqual("\"a\"", record[0]);
+				parser.Read();
+				Assert.AreEqual("\"a\"", parser[0]);
 			}
 		}
 
@@ -70,8 +70,8 @@ namespace CsvHelper.Tests.Parsing
 			{
 				parser.Configuration.Escape = '|';
 				parser.Configuration.TrimOptions = TrimOptions.Trim | TrimOptions.InsideQuotes;
-				var record = parser.Read();
-				Assert.AreEqual("\"a\"", record[0]);
+				parser.Read();
+				Assert.AreEqual("\"a\"", parser[0]);
 			}
 		}
 

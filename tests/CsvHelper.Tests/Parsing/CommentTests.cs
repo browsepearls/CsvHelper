@@ -32,9 +32,9 @@ namespace CsvHelper.Tests.Parsing
 				stream.Position = 0;
 
 				parser.Read();
-				var line = parser.Read();
-				Assert.AreEqual("3", line[0]);
-				Assert.AreEqual("4", line[1]);
+				parser.Read();
+				Assert.AreEqual("3", parser[0]);
+				Assert.AreEqual("4", parser[1]);
 			}
 		}
 
