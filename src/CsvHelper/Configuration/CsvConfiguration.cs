@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
@@ -155,6 +156,16 @@ namespace CsvHelper.Configuration
 		public virtual Func<ReadingContext, int, string> GetDynamicPropertyName { get; set; } = ConfigurationFunctions.GetDynamicPropertyName;
 
 		/// <summary>
+		/// Parses the raw field into a string.
+		/// </summary>
+		public virtual ParseFieldFunc ParseField { get; set; } = ConfigurationFunctions.ParseField;
+
+		/// <summary>
+		/// Parses the raw quoted field into a string.
+		/// </summary>
+		public virtual ParseFieldFunc ParseQuotedField { get; set; } = ConfigurationFunctions.ParseQuotedField;
+
+		/// <summary>
 		/// Gets or sets a value indicating whether references
 		/// should be ignored when auto mapping. True to ignore
 		/// references, otherwise false. Default is false.
@@ -165,6 +176,12 @@ namespace CsvHelper.Configuration
 		/// Gets or sets the field trimming options.
 		/// </summary>
 		public virtual TrimOptions TrimOptions { get; set; }
+
+		/// <summary>
+		/// Characters considered whitespace.
+		/// Used when trimming fields.
+		/// </summary>
+		public virtual char[] WhiteSpaceChars { get; set; } = new char[] { ' ', '\t' };
 
 		/// <summary>
 		/// Gets or sets the delimiter used to separate fields.

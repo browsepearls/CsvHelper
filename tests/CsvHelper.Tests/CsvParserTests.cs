@@ -69,6 +69,7 @@ namespace CsvHelper.Tests
 			var reader = new StreamReader(stream);
 
 			var parser = new CsvParser(reader, CultureInfo.InvariantCulture);
+			parser.Configuration.IgnoreBlankLines = true;
 
 			var count = 0;
 			while (parser.Read())
@@ -119,7 +120,6 @@ namespace CsvHelper.Tests
 
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture) { BufferSize = 2000 };
 			var parser = new CsvParser(reader, config);
-			parser.Configuration.Delimiter = ",";
 
 			Assert.IsTrue(parser.Read());
 			Assert.AreEqual("one", parser[0]);
@@ -145,9 +145,11 @@ namespace CsvHelper.Tests
 			stream.Position = 0;
 			var reader = new StreamReader(stream);
 
-			var parser = new CsvParser(reader, CultureInfo.InvariantCulture);
-			parser.Configuration.Delimiter = ",";
-			parser.Configuration.BadDataFound = null;
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				BadDataFound = null,
+			};
+			var parser = new CsvParser(reader, config);
 
 			Assert.IsTrue(parser.Read());
 			Assert.AreEqual(" one ", parser[0]);
@@ -198,6 +200,8 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
+				parser.Configuration.IgnoreBlankLines = true;
+
 				writer.Write("\r");
 				writer.Flush();
 				stream.Position = 0;
@@ -453,7 +457,11 @@ namespace CsvHelper.Tests
 			stream.Position = 0;
 			var reader = new StreamReader(stream);
 
-			var parser = new CsvParser(reader, CultureInfo.InvariantCulture) { Configuration = { AllowComments = true } };
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				AllowComments = true,
+			};
+			var parser = new CsvParser(reader, config);
 			parser.Configuration.Delimiter = ",";
 
 			parser.Read();
@@ -493,11 +501,16 @@ namespace CsvHelper.Tests
 			stream.Position = 0;
 			var reader = new StreamReader(stream);
 
-			var parser = new CsvParser(reader, CultureInfo.InvariantCulture) { Configuration = { AllowComments = true, Comment = '*' } };
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				AllowComments = true,
+				Comment = '*',
+			};
+			var parser = new CsvParser(reader, config);
 			parser.Configuration.Delimiter = ",";
 
 			parser.Read();
-			var record = parser.Read();
+			parser.Read();
 			Assert.AreEqual("seven", parser[0]);
 		}
 
@@ -511,7 +524,11 @@ namespace CsvHelper.Tests
 			stream.Position = 0;
 			var reader = new StreamReader(stream);
 
-			var parser = new CsvParser(reader, CultureInfo.InvariantCulture) { Configuration = { Delimiter = "\t" } };
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				Delimiter = "\t",
+			};
+			var parser = new CsvParser(reader, config);
 
 			Assert.IsTrue(parser.Read());
 			Assert.AreEqual("one", parser[0]);
@@ -529,7 +546,11 @@ namespace CsvHelper.Tests
 			stream.Position = 0;
 			var reader = new StreamReader(stream);
 
-			var parser = new CsvParser(reader, CultureInfo.InvariantCulture) { Configuration = { Quote = '\'' } };
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				Quote = '\''
+			};
+			var parser = new CsvParser(reader, config);
 			parser.Configuration.Delimiter = ",";
 
 			Assert.IsTrue(parser.Read());

@@ -20,7 +20,9 @@ namespace CsvHelper.Performance
 	{
 		static void Main(string[] args)
 		{
-			//Test(); return;
+			//BenchmarkRunner.Run<Benchmarks>(); return;
+
+			Test(); return;
 
 			//WriteField(50, 1_000_000, false);
 			//WriteRecords(1_000_000);
@@ -31,7 +33,7 @@ namespace CsvHelper.Performance
 				//SoftCircuitsParse();
 				//StefanBertelsParse();
 				//StackParse();
-				StackParse2();
+				//StackParse2();
 				//CsvHelperParse(false);
 
 				//ReadGetField();
@@ -40,17 +42,20 @@ namespace CsvHelper.Performance
 
 				Console.WriteLine();
 			}
-
-			//BenchmarkRunner.Run<Benchmarks>();
 		}
 
 		static void Test()
 		{
 			var s = new StringBuilder();
-			s.Append("Id,Name\r\n");
-			s.Append("1,one\r\n");
+			s.Append(" \" Id \" , \"  Name \"  \r\n");
+			s.Append("1,one");
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				BufferSize = 2048,
+				TrimOptions = TrimOptions.InsideQuotes,
+			};
 			using (var reader = new StringReader(s.ToString()))
-			using (var parser = new StackParser2(reader))
+			using (var parser = new CsvParser(reader, config))
 			{
 				while (parser.Read())
 				{
@@ -237,17 +242,18 @@ namespace CsvHelper.Performance
 
 			using (var stream = File.OpenRead(GetFilePath()))
 			using (var reader = new StreamReader(stream))
-			using (var parser = new StackParser2(reader))
+			using (var parser = new StackParser2(reader, new CsvConfiguration(CultureInfo.InvariantCulture)))
 			{
 				var i = 0;
 				while (parser.Read())
 				{
 					//var record = parser.Record;
-					//Console.WriteLine(string.Join(",", parser.Record));
-					if (i == 1_000_000)
-					{
-						Console.WriteLine(string.Join(",", parser.Record));
-					}
+					Console.WriteLine(string.Join(",", parser.Record));
+					System.Threading.Thread.Sleep(300);
+					//if (i == 1_000_000)
+					//{
+					//	Console.WriteLine(string.Join(",", parser.Record));
+					//}
 
 					i++;
 				}
@@ -467,32 +473,109 @@ namespace CsvHelper.Performance
 
 	public class Benchmarks
 	{
-		private string s = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-
-		public Benchmarks()
-		{
-		}
+		private const int LOOPS = 100_000;
 
 		[Benchmark]
 		public void A()
 		{
-			var memory = new Memory<char>(s.ToCharArray());
-			var slice = memory.Span.Slice(0);
-			for (var i = 0; i < s.Length; i++)
+			var isQuoted = false;
+			var config = new Config();
+			for (var i = 0; i < LOOPS; i++)
 			{
-				var c = slice[i];
+				isQuoted = !isQuoted;
+				var value = new ReadOnlyRefStruct(isQuoted, config);
+				Method(value);
 			}
 		}
 
 		[Benchmark]
 		public void B()
 		{
-			var memory = new Memory<char>(s.ToCharArray());
-			for (var i = 0; i < s.Length; i++)
+			var isQuoted = false;
+			var config = new Config();
+			for (var i = 0; i < LOOPS; i++)
 			{
-				var slice = memory.Span.Slice(0);
-				var c = slice[i];
+				isQuoted = !isQuoted;
+				var value = new Record
+				{
+					IsQuoted = isQuoted,
+					Config = config,
+				};
+				Method(value);
 			}
+		}
+
+		[Benchmark]
+		public void C()
+		{
+			var isQuoted = false;
+			var config = new Config();
+			var value = new Class
+			{
+				Config = config,
+			};
+			for (var i = 0; i < LOOPS; i++)
+			{
+				isQuoted = !isQuoted;
+				value.IsQuoted = isQuoted;
+				Method(value);
+			}
+		}
+
+		private void Method(ReadOnlyRefStruct value)
+		{
+			if (value.Config.Trim)
+			{
+				Console.WriteLine("NOOP");
+			}
+		}
+
+		private void Method(Record value)
+		{
+			if (value.Config.Trim)
+			{
+				Console.WriteLine("NOOP");
+			}
+		}
+
+		private void Method(Class value)
+		{
+			if (value.Config.Trim)
+			{
+				Console.WriteLine("NOOP");
+			}
+		}
+
+		private class Config
+		{
+			public bool Trim { get; set; }
+		}
+
+		private readonly ref struct ReadOnlyRefStruct
+		{
+			public bool IsQuoted { get; }
+
+			public Config Config { get; }
+
+			public ReadOnlyRefStruct(bool isQuoted, Config config)
+			{
+				IsQuoted = isQuoted;
+				Config = config;
+			}
+		}
+
+		private record Record
+		{
+			public bool IsQuoted { get; init; }
+
+			public Config Config { get; init; }
+		}
+
+		private class Class
+		{
+			public bool IsQuoted { get; set; }
+
+			public Config Config { get; set; }
 		}
 	}
 }

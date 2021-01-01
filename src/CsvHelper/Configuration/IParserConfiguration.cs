@@ -95,5 +95,21 @@ namespace CsvHelper.Configuration
 		/// Gets or sets the field trimming options.
 		/// </summary>
 		TrimOptions TrimOptions { get; set; }
+
+		/// <summary>
+		/// Parses the raw field into a string.
+		/// </summary>
+		ParseFieldFunc ParseField { get; set; }
+
+		/// <summary>
+		/// Parses the raw quoted field into a string.
+		/// </summary>
+		ParseFieldFunc ParseQuotedField { get; set; }
+
+		/// <summary>
+		/// Characters considered whitespace.
+		/// Used when trimming fields.
+		/// </summary>
+		char[] WhiteSpaceChars { get; set; }
 	}
 }

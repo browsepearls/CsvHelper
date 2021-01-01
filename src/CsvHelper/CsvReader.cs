@@ -45,7 +45,7 @@ namespace CsvHelper
 		/// </summary>
 		/// <param name="reader">The reader.</param>
 		/// <param name="culture">The culture.</param>
-		public CsvReader(TextReader reader, CultureInfo culture) : this(new CsvParser(reader, new Configuration.CsvConfiguration(culture), false)) { }
+		public CsvReader(TextReader reader, CultureInfo culture) : this(new CsvParser(reader, new CsvConfiguration(culture), false)) { }
 
 		/// <summary>
 		/// Creates a new CSV reader using the given <see cref="TextReader" />.
@@ -53,7 +53,7 @@ namespace CsvHelper
 		/// <param name="reader">The reader.</param>
 		/// <param name="culture">The culture.</param>
 		/// <param name="leaveOpen">true to leave the reader open after the CsvReader object is disposed, otherwise false.</param>
-		public CsvReader(TextReader reader, CultureInfo culture, bool leaveOpen) : this(new CsvParser(reader, new Configuration.CsvConfiguration(culture), leaveOpen)) { }
+		public CsvReader(TextReader reader, CultureInfo culture, bool leaveOpen) : this(new CsvParser(reader, new CsvConfiguration(culture), leaveOpen)) { }
 
 		/// <summary>
 		/// Creates a new CSV reader using the given <see cref="TextReader" /> and

@@ -3,9 +3,12 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using System;
+using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace CsvHelper.Configuration
@@ -165,6 +168,181 @@ namespace CsvHelper.Configuration
 			header = context.ReaderConfiguration.PrepareHeaderForMatch(header, fieldIndex);
 
 			return header;
+		}
+
+		/// <summary>
+		/// Parses the field.
+		/// </summary>
+		/// <param name="span">The span.</param>
+		/// <param name="options">The context.</param>
+		/// <returns>The parsed field.</returns>
+		public static string ParseField(Span<char> span, ParseFieldOptions options)
+		{
+			var start = 0;
+			var end = span.Length - 1;
+
+			if ((options.TrimOptions & TrimOptions.Trim) == TrimOptions.Trim)
+			{
+				Trim(span, ref start, ref end, options.WhiteSpaceChars);
+			}
+
+			var length = end - start + 1;
+
+			return span.Slice(start, length).ToString();
+		}
+
+		/// <summary>
+		/// Parses the quoted field.
+		/// </summary>
+		/// <param name="span">The span.</param>
+		/// <param name="options">The context.</param>
+		/// <returns>The parsed field.</returns>
+		public static string ParseQuotedField(Span<char> span, ParseFieldOptions options)
+		{
+			var start = 0;
+			var end = span.Length - 1;
+
+			// Trim the whitespace.
+			if ((options.TrimOptions & TrimOptions.Trim) == TrimOptions.Trim)
+			{
+				Trim(span, ref start, ref end, options.WhiteSpaceChars);
+			}
+
+			if (span[start] == options.Quote && span[end] == options.Quote && start < end)
+			{
+				// Trim quotes.
+				start++;
+				end--;
+			}
+			else
+			{
+				options.BadDataFound?.Invoke(options.Context);
+			}
+
+			// Trim the whitespace inside the quotes.
+			if ((options.TrimOptions & TrimOptions.InsideQuotes) == TrimOptions.InsideQuotes)
+			{
+				Trim(span, ref start, ref end, options.WhiteSpaceChars);
+			}
+
+			// Remove the escape characters.
+			var totalLength = 0;
+			var length = 0;
+			var inEscape = false;
+			var position = start - 1;
+			var segmentStart = start;
+			var segments = new List<Segment>();
+			while (position < end)
+			{
+				position++;
+
+				var c = span[position];
+
+				if (inEscape)
+				{
+					inEscape = false;
+					segmentStart = position;
+
+					if (c != options.Quote)
+					{
+						options.BadDataFound?.Invoke(options.Context);
+					}
+
+					continue;
+				}
+
+				if (c == options.Escape)
+				{
+					inEscape = true;
+					length = position - segmentStart;
+					totalLength += length;
+
+					if (length > 0)
+					{
+						segments.Add(new Segment
+						{
+							Start = segmentStart,
+							Length = length,
+						});
+					}
+				}
+			}
+
+			if (inEscape)
+			{
+				options.BadDataFound?.Invoke(options.Context);
+			}
+
+			length = position - segmentStart + 1;
+			totalLength += length;
+
+			segments.Add(new Segment
+			{
+				Start = segmentStart,
+				Length = length,
+			});
+
+			var combinedPosition = 0;
+			Span<char> combined = stackalloc char[totalLength];
+			for (var i = 0; i < segments.Count; i++)
+			{
+				span.Slice(segments[i].Start, segments[i].Length).CopyTo(combined.Slice(combinedPosition));
+				combinedPosition += segments[i].Length;
+			}
+
+			return combined.ToString();
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static void Trim(Span<char> span, ref int start, ref int end, params char[] trimChars)
+		{
+			// Trim start.
+			for (var i = start; i <= end; i++)
+			{
+				if (ArrayContains(trimChars, span[i]))
+				{
+					start++;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			// Trim end.
+			for (var i = end; i >= start; i--)
+			{
+				if (ArrayContains(trimChars, span[i]))
+				{
+					end--;
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static bool ArrayContains(char[] array, char c)
+		{
+			for (var i = 0; i < array.Length; i++)
+			{
+				if (array[i] == c)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		[DebuggerDisplay("Start = {Start}, Length = {Length}")]
+		private readonly struct Segment
+		{
+			public int Start { get; init; }
+
+			public int Length { get; init; }
 		}
 	}
 }

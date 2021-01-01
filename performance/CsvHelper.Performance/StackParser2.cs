@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CsvHelper.Configuration;
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
@@ -37,18 +38,18 @@ namespace CsvHelper.Performance
 
 				for (var i = 0; i < fields.Count; i++)
 				{
-					record[i] = memoryOwner.Memory.Slice(fields[i].Start, fields[i].Length).Span.ToString();
+					var start = fields[i].Start + rowStartPosition;
+					record[i] = memoryOwner.Memory.Slice(start, fields[i].Length).Span.ToString();
 				}
 
 				return record;
 			}
 		}
 
-		public StackParser2(TextReader reader)
+		public StackParser2(TextReader reader, CsvConfiguration configuration)
 		{
 			this.reader = reader;
-			//bufferSize = 2;
-			bufferSize = 1024;
+			bufferSize = configuration.BufferSize;
 		}
 
 		public bool Read()
