@@ -856,13 +856,15 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void DoNotIgnoreBlankLinesTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				IgnoreBlankLines = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
-				csv.Configuration.IgnoreBlankLines = false;
 				csv.Configuration.RegisterClassMap<SimpleMap>();
 
 				writer.WriteLine("Id,Name");

@@ -25,7 +25,7 @@ namespace CsvHelper.Tests.Mocks
 
 		public string[] Record => context.Record;
 
-		public string RawRecord => context.RawRecord;
+		public Span<char> RawRecord => Span<char>.Empty;
 
 		public int Row => context.Row;
 

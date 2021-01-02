@@ -32,7 +32,12 @@ namespace CsvHelper
 		private readonly PreDequoteFieldFunc preDequoteField;
 		private readonly DequoteFieldFunc dequoteField;
 		private readonly PostDequoteFieldFunc postDequoteField;
+		private readonly bool countBytes;
+		private readonly Encoding encoding;
+		private readonly bool ignoreQuotes;
 
+		private long charCount;
+		private long byteCount;
 		private int bufferSize = -1;
 		private IMemoryOwner<char> memoryOwner;
 		private bool disposed;
@@ -41,6 +46,12 @@ namespace CsvHelper
 		private int memoryPosition = -1;
 		private int rowStartPosition; // Position in memory.
 		private int fieldStartPosition; // Position in memory.
+		private int row;
+		private int rawRow;
+
+		public long CharPosition => charCount;
+
+		public long BytePosition => byteCount;
 
 		/// <summary>
 		/// Gets the number of fields for the current row.
@@ -50,12 +61,12 @@ namespace CsvHelper
 		/// <summary>
 		/// Gets the CSV row the parser is currently on.
 		/// </summary>
-		public int Row { get; private set; }
+		public int Row => row;
 
 		/// <summary>
 		/// Gets the raw row the parser is currently on.
 		/// </summary>
-		public int RawRow { get; private set; }
+		public int RawRow => rawRow;
 
 		/// <summary>
 		/// Gets the record for the current row.
@@ -66,6 +77,11 @@ namespace CsvHelper
 		{
 			get
 			{
+				if (fields.Count == 0)
+				{
+					return null;
+				}
+
 				var record = new string[fields.Count];
 
 				for (var i = 0; i < fields.Count; i++)
@@ -80,7 +96,7 @@ namespace CsvHelper
 		/// <summary>
 		/// Gets the raw record for the current row.
 		/// </summary>
-		public string RawRecord => memoryOwner.Memory.Slice(rowStartPosition, memoryPosition + 1 - rowStartPosition).Span.ToString();
+		public Span<char> RawRecord => memoryOwner.Memory.Slice(rowStartPosition, memoryPosition + 1 - rowStartPosition).Span;
 
 		/// <summary>
 		/// Gets the reading context.
@@ -169,6 +185,9 @@ namespace CsvHelper
 			preDequoteField = configuration.PreDequoteField;
 			dequoteField = configuration.DequoteField;
 			postDequoteField = configuration.PostDequoteField;
+			countBytes = configuration.CountBytes;
+			encoding = configuration.Encoding;
+			ignoreQuotes = configuration.IgnoreQuotes;
 
 			Configuration = configuration;
 		}
@@ -181,13 +200,12 @@ namespace CsvHelper
 		/// </returns>
 		public bool Read()
 		{
+			fields.Clear();
+
 			if (charsRead == 0)
 			{
 				return false;
 			}
-
-			Row++;
-			fields.Clear();
 
 			Span<char> span = Span<char>.Empty;
 			if (memoryPosition > -1)
@@ -203,9 +221,12 @@ namespace CsvHelper
 			var inDelimiter = false;
 			var delimiterPosition = 0;
 			var inComment = false;
+			var c = '\0';
+			var cPrev = '\0';
 
 			while (true)
 			{
+				charCount++;
 				memoryPosition++;
 				spanPosition++;
 
@@ -217,15 +238,31 @@ namespace CsvHelper
 					{
 						// EOF
 
+						if (row == 0)
+						{
+							row++;
+						}
+
+						if (rawRow == 0)
+						{
+							rawRow++;
+						}
+
+						if (countBytes)
+						{
+							byteCount += encoding.GetByteCount(RawRecord);
+						}
+
 						if (inLineEnding && memoryPosition - 1 == rowStartPosition && ignoreBlankLines)
 						{
 							// Ignore line.
 							return false;
 						}
 
-						if (fieldStartPosition < memoryPosition)
+						//if (fields.Count > 0)
+						if (rowStartPosition < memoryPosition)
 						{
-							// There is still a field that needs to be stored.
+							// Add the last field.
 
 							var lineEndingChars = inLineEnding ? 1 : 0;
 
@@ -248,7 +285,13 @@ namespace CsvHelper
 					spanPosition = 0;
 				}
 
-				var c = span[spanPosition];
+				cPrev = c;
+				c = span[spanPosition];
+
+				if (c == '\r' || c == '\n' && cPrev != '\r')
+				{
+					rawRow++;
+				}
 
 				if (inLineEnding)
 				{
@@ -298,6 +341,11 @@ namespace CsvHelper
 							memoryPosition--;
 						}
 
+						if (countBytes)
+						{
+							byteCount += encoding.GetByteCount(RawRecord);
+						}
+
 						return true;
 					}
 				}
@@ -339,7 +387,7 @@ namespace CsvHelper
 					continue;
 				}
 
-				if (c == quote)
+				if (c == quote && !ignoreQuotes)
 				{
 					inQuotes = !inQuotes;
 					isQuoted = true;
@@ -382,14 +430,14 @@ namespace CsvHelper
 				}
 				else if (c == '\r')
 				{
-					RawRow++;
+					row++;
 					inLineEnding = true;
 
 					continue;
 				}
 				else if (c == '\n')
 				{
-					RawRow++;
+					row++;
 
 					if (inComment)
 					{
@@ -419,6 +467,11 @@ namespace CsvHelper
 						Start = fieldStartPosition - rowStartPosition,
 						Length = memoryPosition - fieldStartPosition,
 					});
+
+					if (countBytes)
+					{
+						byteCount += encoding.GetByteCount(RawRecord);
+					}
 
 					return true;
 				}

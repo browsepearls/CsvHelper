@@ -602,14 +602,15 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void CharReadTotalTest()
 		{
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				AllowComments = true
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
-				parser.Configuration.AllowComments = true;
-
 				// This is a breakdown of the char counts.
 				// Read() will read up to the first line end char
 				// and any more on the line will get read with the next read.
@@ -640,19 +641,19 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual(9, parser.Context.CharPosition);
+				Assert.AreEqual(9, parser.CharPosition);
 
 				parser.Read();
-				Assert.AreEqual(16, parser.Context.CharPosition);
+				Assert.AreEqual(16, parser.CharPosition);
 
 				parser.Read();
-				Assert.AreEqual(19, parser.Context.CharPosition);
+				Assert.AreEqual(19, parser.CharPosition);
 
 				parser.Read();
-				Assert.AreEqual(40, parser.Context.CharPosition);
+				Assert.AreEqual(40, parser.CharPosition);
 
 				parser.Read();
-				Assert.AreEqual(57, parser.Context.CharPosition);
+				Assert.AreEqual(57, parser.CharPosition);
 
 				Assert.IsFalse(parser.Read());
 			}
@@ -661,14 +662,15 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void StreamSeekingUsingCharPositionTest()
 		{
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				AllowComments = true
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
-				parser.Configuration.AllowComments = true;
-
 				// This is a breakdown of the char counts.
 				// Read() will read up to the first line end char
 				// and any more on the line will get read with the next read.
@@ -745,7 +747,7 @@ namespace CsvHelper.Tests
 				while (parser.Read())
 				{
 					rowCount++;
-					Assert.AreEqual(rowCount, parser.Context.Row);
+					Assert.AreEqual(rowCount, parser.Row);
 				}
 			}
 		}
@@ -769,7 +771,7 @@ namespace CsvHelper.Tests
 				var rowCount = 1;
 				while (parser.Read())
 				{
-					Assert.AreEqual(rowCount, parser.Context.Row);
+					Assert.AreEqual(rowCount, parser.Row);
 					rowCount += 2;
 				}
 			}
@@ -778,13 +780,15 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void IgnoreBlankLinesRowCountTest()
 		{
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				IgnoreBlankLines = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
-				parser.Configuration.IgnoreBlankLines = true;
 				writer.WriteLine("1,a");
 				writer.WriteLine();
 				writer.WriteLine("3,c");
@@ -792,11 +796,11 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual(1, parser.Context.Row);
+				Assert.AreEqual(1, parser.Row);
 				Assert.AreEqual("1", parser[0]);
 
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual(3, parser.Context.Row);
+				Assert.AreEqual(3, parser.Row);
 				Assert.AreEqual("3", parser[0]);
 			}
 		}
@@ -804,13 +808,15 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void DoNotIgnoreBlankLinesRowCountTest()
 		{
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				IgnoreBlankLines = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
-				parser.Configuration.IgnoreBlankLines = false;
 				writer.WriteLine("1,a");
 				writer.WriteLine();
 				writer.WriteLine("3,c");
@@ -818,15 +824,15 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual(1, parser.Context.Row);
+				Assert.AreEqual(1, parser.Row);
 				Assert.AreEqual("1", parser[0]);
 
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual(2, parser.Context.Row);
+				Assert.AreEqual(2, parser.Row);
 				Assert.AreEqual(0, parser.Count);
 
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual(3, parser.Context.Row);
+				Assert.AreEqual(3, parser.Row);
 				Assert.AreEqual("3", parser[0]);
 			}
 		}
@@ -834,10 +840,14 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void RowCommentLinesTest()
 		{
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				AllowComments = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				writer.Write("1,2\r\n");
 				writer.Write("# comment 1\r\n");
@@ -847,11 +857,10 @@ namespace CsvHelper.Tests
 				writer.Flush();
 				stream.Position = 0;
 
-				parser.Configuration.AllowComments = true;
 				var rowCount = 1;
 				while (parser.Read())
 				{
-					Assert.AreEqual(rowCount, parser.Context.Row);
+					Assert.AreEqual(rowCount, parser.Row);
 					rowCount += 2;
 				}
 			}
@@ -881,47 +890,50 @@ namespace CsvHelper.Tests
 				Assert.AreEqual("1", parser[0]);
 				Assert.AreEqual("2\r\n2 continued\r\nend of 2", parser[1]);
 				Assert.AreEqual("3", parser[2]);
-				Assert.AreEqual(3, parser.Context.RawRow);
+				Assert.AreEqual(3, parser.RawRow);
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual("4", parser[0]);
 				Assert.AreEqual("5", parser[1]);
 				Assert.AreEqual("6", parser[2]);
-				Assert.AreEqual(4, parser.Context.RawRow);
+				Assert.AreEqual(4, parser.RawRow);
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual("7", parser[0]);
 				Assert.AreEqual("8\r\n8 continued\r\nend of 8", parser[1]);
 				Assert.AreEqual("9", parser[2]);
-				Assert.AreEqual(7, parser.Context.RawRow);
+				Assert.AreEqual(7, parser.RawRow);
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual("10", parser[0]);
 				Assert.AreEqual("11", parser[1]);
 				Assert.AreEqual("12", parser[2]);
-				Assert.AreEqual(8, parser.Context.RawRow);
+				Assert.AreEqual(8, parser.RawRow);
 			}
 		}
 
 		[TestMethod]
 		public void ByteCountTest()
 		{
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				CountBytes = true
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.CountBytes = true;
 				writer.Write("1,2\r\n");
 				writer.Write("3,4\r\n");
 				writer.Flush();
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual(5, parser.Context.BytePosition);
+				Assert.AreEqual(5, parser.BytePosition);
 
 				parser.Read();
-				Assert.AreEqual(10, parser.Context.BytePosition);
+				Assert.AreEqual(10, parser.BytePosition);
 
 				Assert.IsFalse(parser.Read());
 			}
@@ -930,10 +942,14 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ByteCountTestWithQuotedFields()
 		{
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				CountBytes = true
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				parser.Configuration.Delimiter = ",";
 				parser.Configuration.CountBytes = true;
@@ -943,10 +959,10 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual(7, parser.Context.BytePosition);
+				Assert.AreEqual(7, parser.BytePosition);
 
 				parser.Read();
-				Assert.AreEqual(14, parser.Context.BytePosition);
+				Assert.AreEqual(14, parser.BytePosition);
 
 				Assert.IsFalse(parser.Read());
 			}
@@ -955,24 +971,26 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ByteCountTestWithQuotedFieldsExtraQuote()
 		{
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				BadDataFound = null,
+				CountBytes = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.CountBytes = true;
-				parser.Configuration.BadDataFound = null;
-
 				writer.Write("1,\"2\" \" a\r\n");
 				writer.Write("\"3\",4\r\n");
 				writer.Flush();
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual(11, parser.Context.BytePosition);
+				Assert.AreEqual(11, parser.BytePosition);
 
 				parser.Read();
-				Assert.AreEqual(18, parser.Context.BytePosition);
+				Assert.AreEqual(18, parser.BytePosition);
 
 				Assert.IsFalse(parser.Read());
 			}
@@ -981,23 +999,25 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ByteCountTestWithQuotedFieldsEmptyQuotedField()
 		{
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				CountBytes = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
-				parser.Configuration.CountBytes = true;
 				writer.Write("1,\"\",2\r\n");
 				writer.Write("\"3\",4,\"5\"\r\n");
 				writer.Flush();
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual(8, parser.Context.BytePosition);
+				Assert.AreEqual(8, parser.BytePosition);
 
 				parser.Read();
-				Assert.AreEqual(19, parser.Context.BytePosition);
+				Assert.AreEqual(19, parser.BytePosition);
 
 				Assert.IsFalse(parser.Read());
 			}
@@ -1024,10 +1044,10 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual(9, parser.Context.BytePosition);
+				Assert.AreEqual(9, parser.BytePosition);
 
 				parser.Read();
-				Assert.AreEqual(20, parser.Context.BytePosition);
+				Assert.AreEqual(20, parser.BytePosition);
 
 				Assert.IsFalse(parser.Read());
 			}
@@ -1041,7 +1061,6 @@ namespace CsvHelper.Tests
 				CountBytes = true,
 				BufferSize = 4
 			};
-
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
@@ -1054,10 +1073,10 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual(10, parser.Context.BytePosition);
+				Assert.AreEqual(10, parser.BytePosition);
 
 				parser.Read();
-				Assert.AreEqual(25, parser.Context.BytePosition);
+				Assert.AreEqual(25, parser.BytePosition);
 
 				Assert.IsFalse(parser.Read());
 			}
@@ -1067,14 +1086,17 @@ namespace CsvHelper.Tests
 		public void ByteCountUsingCharWithMoreThanSingleByteTest()
 		{
 			var encoding = Encoding.Unicode;
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				CountBytes = true,
+				Encoding = encoding,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream, encoding))
 			using (var reader = new StreamReader(stream, encoding))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				//崔钟铉
-				parser.Configuration.CountBytes = true;
-				parser.Configuration.Encoding = encoding;
 				writer.Write("1,崔\r\n");
 				writer.Write("3,钟\r\n");
 				writer.Write("5,铉\r\n");
@@ -1082,13 +1104,13 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual(10, parser.Context.BytePosition);
+				Assert.AreEqual(10, parser.BytePosition);
 
 				parser.Read();
-				Assert.AreEqual(20, parser.Context.BytePosition);
+				Assert.AreEqual(20, parser.BytePosition);
 
 				parser.Read();
-				Assert.AreEqual(30, parser.Context.BytePosition);
+				Assert.AreEqual(30, parser.BytePosition);
 
 				Assert.IsFalse(parser.Read());
 			}
@@ -1098,16 +1120,17 @@ namespace CsvHelper.Tests
 		public void StreamSeekingUsingByteCountTest()
 		{
 			var encoding = Encoding.Unicode;
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				AllowComments = true,
+				CountBytes = true,
+				Encoding = encoding,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream, encoding))
 			using (var reader = new StreamReader(stream, encoding))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
-				parser.Configuration.CountBytes = true;
-				parser.Configuration.Encoding = encoding;
-				parser.Configuration.AllowComments = true;
-
 				// This is a breakdown of the char counts.
 				// Read() will read up to the first line end char
 				// and any more on the line will get read with the next read.
@@ -1142,25 +1165,25 @@ namespace CsvHelper.Tests
 				Assert.AreEqual("Name", parser[1]);
 
 				stream.Position = 0;
-				stream.Seek(parser.Context.BytePosition, SeekOrigin.Begin);
+				stream.Seek(parser.BytePosition, SeekOrigin.Begin);
 				record = parser.Read();
 				Assert.AreEqual("1", parser[0]);
 				Assert.AreEqual("one", parser[1]);
 
 				stream.Position = 0;
-				stream.Seek(parser.Context.BytePosition, SeekOrigin.Begin);
+				stream.Seek(parser.BytePosition, SeekOrigin.Begin);
 				record = parser.Read();
 				Assert.AreEqual("", parser[0]);
 				Assert.AreEqual("", parser[1]);
 
 				stream.Position = 0;
-				stream.Seek(parser.Context.BytePosition, SeekOrigin.Begin);
+				stream.Seek(parser.BytePosition, SeekOrigin.Begin);
 				record = parser.Read();
 				Assert.AreEqual("2", parser[0]);
 				Assert.AreEqual("two", parser[1]);
 
 				stream.Position = 0;
-				stream.Seek(parser.Context.BytePosition, SeekOrigin.Begin);
+				stream.Seek(parser.BytePosition, SeekOrigin.Begin);
 				record = parser.Read();
 				Assert.AreEqual("3", parser[0]);
 				Assert.AreEqual("three, four", parser[1]);
@@ -1175,7 +1198,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				// Already read:
 				// 1,2,3\r
 				// Seeked to this position.
@@ -1203,7 +1225,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
 				writer.Write("111,222,333\r\naaa,bbb,ccc\r\n");
 				writer.Flush();
 				stream.Position = 0;
@@ -1229,7 +1250,6 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				writer.WriteLine("1,\0,3");
 				writer.Flush();
 				stream.Position = 0;
@@ -1262,17 +1282,19 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ParseNoQuotesTest()
 		{
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				IgnoreQuotes = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
 				writer.WriteLine("one,\"two\",three \" four, \"five\" ");
 				writer.Flush();
 				stream.Position = 0;
 
-				parser.Configuration.IgnoreQuotes = true;
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual("one", parser[0]);
 				Assert.AreEqual("\"two\"", parser[1]);
@@ -1284,16 +1306,18 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void LastLineHasCommentTest()
 		{
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				AllowComments = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				writer.WriteLine("#comment");
 				writer.Flush();
 				stream.Position = 0;
-
-				parser.Configuration.AllowComments = true;
 
 				Assert.IsFalse(parser.Read());
 			}
@@ -1302,16 +1326,18 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void LastLineHasCommentNoEolTest()
 		{
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				AllowComments = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				writer.Write("#c");
 				writer.Flush();
 				stream.Position = 0;
-
-				parser.Configuration.AllowComments = true;
 
 				var record = parser.Read();
 
@@ -1322,14 +1348,15 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void DoNotIgnoreBlankLinesTest()
 		{
+			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				IgnoreBlankLines = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
-				parser.Configuration.IgnoreBlankLines = false;
-
 				writer.WriteLine("1,2,3");
 				writer.WriteLine(",,");
 				writer.WriteLine("");
@@ -1363,7 +1390,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StringReader("\"a\r\",b"))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				Assert.IsTrue(parser.Read());
 				CollectionAssert.AreEqual(new[] { "a\r", "b" }, parser.Record);
 				Assert.IsFalse(parser.Read());
@@ -1376,10 +1402,33 @@ namespace CsvHelper.Tests
 			using (var reader = new StringReader("\"a\n\",b"))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				Assert.IsTrue(parser.Read());
 				CollectionAssert.AreEqual(new[] { "a\n", "b" }, parser.Record);
 				Assert.IsFalse(parser.Read());
+			}
+		}
+
+		[TestMethod]
+		public void RowCountWithSingleLineAndNoLineEndingTest()
+		{
+			using (var reader = new StringReader("a,b"))
+			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			{
+				parser.Read();
+
+				Assert.AreEqual(1, parser.Row);
+			}
+		}
+
+		[TestMethod]
+		public void RawRowCountWithSingleLineAndNoLineEndingTest()
+		{
+			using (var reader = new StringReader("a,b"))
+			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			{
+				parser.Read();
+
+				Assert.AreEqual(1, parser.RawRow);
 			}
 		}
 	}

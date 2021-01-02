@@ -35,7 +35,7 @@ namespace CsvHelper
 		/// <summary>
 		/// Gets the raw record for the current row.
 		/// </summary>
-		string RawRecord { get; }
+		Span<char> RawRecord { get; }
 
 		/// <summary>
 		/// Gets the CSV row the parser is currently on.
