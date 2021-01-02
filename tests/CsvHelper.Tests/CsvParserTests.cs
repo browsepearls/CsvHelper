@@ -340,7 +340,6 @@ namespace CsvHelper.Tests
 			using (var streamWriter = new StreamWriter(memoryStream))
 			using (var parser = new CsvParser(streamReader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				streamWriter.WriteLine("\"\"\"\",\"two\",\"three\"");
 				streamWriter.Flush();
 				memoryStream.Position = 0;

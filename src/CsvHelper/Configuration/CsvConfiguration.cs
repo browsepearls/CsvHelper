@@ -156,14 +156,26 @@ namespace CsvHelper.Configuration
 		public virtual Func<ReadingContext, int, string> GetDynamicPropertyName { get; set; } = ConfigurationFunctions.GetDynamicPropertyName;
 
 		/// <summary>
-		/// Parses the raw field into a string.
+		/// Processes a raw field.
+		/// This method calls the field parsing pipeline.
+		/// PreDequote -> Dequote -> PostDequote
 		/// </summary>
-		public virtual ParseFieldFunc ParseField { get; set; } = ConfigurationFunctions.ParseField;
+		public virtual ProcessFieldFunc ProcessField { get; set; } = ConfigurationFunctions.ProcessField;
 
 		/// <summary>
-		/// Parses the raw quoted field into a string.
+		/// Processing that happens to a field before dequoting.
 		/// </summary>
-		public virtual ParseFieldFunc ParseQuotedField { get; set; } = ConfigurationFunctions.ParseQuotedField;
+		public virtual PreDequoteFieldFunc PreDequoteField { get; set; } = ConfigurationFunctions.PreDequoteField;
+
+		/// <summary>
+		/// Removes quoting from a field.
+		/// </summary>
+		public virtual DequoteFieldFunc DequoteField { get; set; } = ConfigurationFunctions.DequoteField;
+
+		/// <summary>
+		/// Processing that happens to a field after dequoting.
+		/// </summary>
+		public virtual PostDequoteFieldFunc PostDequoteField { get; set; } = ConfigurationFunctions.PostDequoteField;
 
 		/// <summary>
 		/// Gets or sets a value indicating whether references

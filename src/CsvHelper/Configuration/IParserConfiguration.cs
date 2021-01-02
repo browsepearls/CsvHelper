@@ -97,14 +97,26 @@ namespace CsvHelper.Configuration
 		TrimOptions TrimOptions { get; set; }
 
 		/// <summary>
-		/// Parses the raw field into a string.
+		/// Processes a raw field.
+		/// This function calls the field parsing pipeline.
+		/// PreDequote -> Dequote -> PostDequote
 		/// </summary>
-		ParseFieldFunc ParseField { get; set; }
+		ProcessFieldFunc ProcessField { get; set; }
 
 		/// <summary>
-		/// Parses the raw quoted field into a string.
+		/// Processing that happens to a field before dequoting.
 		/// </summary>
-		ParseFieldFunc ParseQuotedField { get; set; }
+		PreDequoteFieldFunc PreDequoteField { get; set; }
+
+		/// <summary>
+		/// Removes quoting from a field.
+		/// </summary>
+		DequoteFieldFunc DequoteField { get; set; }
+
+		/// <summary>
+		/// Processing that happens to a field after dequoting.
+		/// </summary>
+		PostDequoteFieldFunc PostDequoteField { get; set; }
 
 		/// <summary>
 		/// Characters considered whitespace.

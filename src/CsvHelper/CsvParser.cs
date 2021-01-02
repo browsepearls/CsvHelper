@@ -24,12 +24,14 @@ namespace CsvHelper
 		private readonly bool ignoreBlankLines;
 		private readonly char comment;
 		private readonly bool allowComments;
-		private readonly ParseFieldFunc parseField;
-		private readonly ParseFieldFunc parseQuotedField;
 		private readonly TrimOptions trimOptions;
 		private readonly char[] whiteSpaceChars;
 		private readonly ReadingContext context;
 		private readonly Action<ReadingContext> badDataFound;
+		private readonly ProcessFieldFunc processField;
+		private readonly PreDequoteFieldFunc preDequoteField;
+		private readonly DequoteFieldFunc dequoteField;
+		private readonly PostDequoteFieldFunc postDequoteField;
 
 		private int bufferSize = -1;
 		private IMemoryOwner<char> memoryOwner;
@@ -66,27 +68,9 @@ namespace CsvHelper
 			{
 				var record = new string[fields.Count];
 
-				var options = new ParseFieldOptions
-				{
-					BadDataFound = badDataFound,
-					Context = context,
-					Escape = escape,
-					Quote = quote,
-					TrimOptions = trimOptions,
-					WhiteSpaceChars = whiteSpaceChars,
-				};
-
 				for (var i = 0; i < fields.Count; i++)
 				{
-					var span = memoryOwner.Memory.Slice(fields[i].Start + rowStartPosition, fields[i].Length).Span;
-					if (fields[i].IsQuoted)
-					{
-						record[i] = parseQuotedField(span, options);
-					}
-					else
-					{
-						record[i] = parseField(span, options);
-					}
+					record[i] = this[i];
 				}
 
 				return record;
@@ -117,24 +101,24 @@ namespace CsvHelper
 		{
 			get
 			{
-				var options = new ParseFieldOptions
+				var options = new ProcessFieldOptions
 				{
 					BadDataFound = badDataFound,
 					Context = context,
 					Escape = escape,
+					IsQuoted = fields[index].IsQuoted,
 					Quote = quote,
 					TrimOptions = trimOptions,
 					WhiteSpaceChars = whiteSpaceChars,
+					PreDequote = preDequoteField,
+					Dequote = dequoteField,
+					PostDequote = postDequoteField,
 				};
 
-				if (fields[index].IsQuoted)
-				{
-					return parseQuotedField(memoryOwner.Memory.Slice(fields[index].Start + rowStartPosition, fields[index].Length).Span, options);
-				}
-				else
-				{
-					return parseField(memoryOwner.Memory.Slice(fields[index].Start + rowStartPosition, fields[index].Length).Span, options);
-				}
+				var span = memoryOwner.Memory.Slice(fields[index].Start + rowStartPosition, fields[index].Length).Span;
+				span = processField(span, options);
+
+				return span.ToString();
 			}
 		}
 
@@ -177,12 +161,14 @@ namespace CsvHelper
 			allowComments = configuration.AllowComments;
 			quote = configuration.Quote;
 			escape = configuration.Escape;
-			parseField = configuration.ParseField;
-			parseQuotedField = configuration.ParseQuotedField;
 			trimOptions = configuration.TrimOptions;
 			whiteSpaceChars = configuration.WhiteSpaceChars;
 			badDataFound = configuration.BadDataFound;
 			context = new ReadingContext(reader, configuration, leaveOpen);
+			processField = configuration.ProcessField;
+			preDequoteField = configuration.PreDequoteField;
+			dequoteField = configuration.DequoteField;
+			postDequoteField = configuration.PostDequoteField;
 
 			Configuration = configuration;
 		}

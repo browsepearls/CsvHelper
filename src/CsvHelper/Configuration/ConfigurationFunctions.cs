@@ -171,77 +171,78 @@ namespace CsvHelper.Configuration
 		}
 
 		/// <summary>
-		/// Parses the field.
+		/// Calls the field parsing pipeline and returns the output.
+		/// PreDequote -> Dequote -> PostDequote
 		/// </summary>
-		/// <param name="span">The span.</param>
-		/// <param name="options">The context.</param>
-		/// <returns>The parsed field.</returns>
-		public static string ParseField(Span<char> span, ParseFieldOptions options)
+		/// <returns>The processed field.</returns>
+		public static Span<char> ProcessField(Span<char> span, ProcessFieldOptions options)
 		{
-			var start = 0;
-			var end = span.Length - 1;
+			span = options.PreDequote(span, options);
+			span = options.Dequote(span, options);
+			span = options.PostDequote(span, options);
 
-			if ((options.TrimOptions & TrimOptions.Trim) == TrimOptions.Trim)
-			{
-				Trim(span, ref start, ref end, options.WhiteSpaceChars);
-			}
-
-			var length = end - start + 1;
-
-			return span.Slice(start, length).ToString();
+			return span;
 		}
 
 		/// <summary>
-		/// Parses the quoted field.
+		/// Trims the field if enabled.
 		/// </summary>
-		/// <param name="span">The span.</param>
-		/// <param name="options">The context.</param>
-		/// <returns>The parsed field.</returns>
-		public static string ParseQuotedField(Span<char> span, ParseFieldOptions options)
+		/// <returns>The processed field.</returns>
+		public static Span<char> PreDequoteField(Span<char> span, ProcessFieldOptions options)
 		{
-			var start = 0;
-			var end = span.Length - 1;
-
-			// Trim the whitespace.
-			if ((options.TrimOptions & TrimOptions.Trim) == TrimOptions.Trim)
+			if ((options.TrimOptions & TrimOptions.Trim) != TrimOptions.Trim)
 			{
-				Trim(span, ref start, ref end, options.WhiteSpaceChars);
+				return span;
 			}
 
-			if (span[start] == options.Quote && span[end] == options.Quote && start < end)
+			if ((options.TrimOptions & TrimOptions.Trim) == TrimOptions.Trim)
 			{
-				// Trim quotes.
-				start++;
-				end--;
+				span = Trim(span, options.WhiteSpaceChars);
+			}
+
+			return span;
+		}
+
+		/// <summary>
+		/// Removes quoting and escape chars from a field.
+		/// </summary>
+		/// <returns>The processed field.</returns>
+		public static Span<char> DequoteField(Span<char> span, ProcessFieldOptions options)
+		{
+			if (!options.IsQuoted)
+			{
+				return span;
+			}
+
+			// Remove the quotes from the ends.
+			if (span[0] == options.Quote && span[span.Length - 1] == options.Quote && span.Length > 1)
+			{
+				span = span.Slice(1, span.Length - 2);
 			}
 			else
 			{
 				options.BadDataFound?.Invoke(options.Context);
-			}
 
-			// Trim the whitespace inside the quotes.
-			if ((options.TrimOptions & TrimOptions.InsideQuotes) == TrimOptions.InsideQuotes)
-			{
-				Trim(span, ref start, ref end, options.WhiteSpaceChars);
+				// If BadDataFound doesn't throw, we don't want to remove the esacpe characters.
+				// Field isn't quoted properly, so leave it as is.
+
+				return span;
 			}
 
 			// Remove the escape characters.
 			var totalLength = 0;
 			var length = 0;
 			var inEscape = false;
-			var position = start - 1;
-			var segmentStart = start;
+			var segmentStart = 0;
 			var segments = new List<Segment>();
-			while (position < end)
+			for (var i = 0; i < span.Length; i++)
 			{
-				position++;
-
-				var c = span[position];
+				var c = span[i];
 
 				if (inEscape)
 				{
 					inEscape = false;
-					segmentStart = position;
+					segmentStart = i;
 
 					if (c != options.Quote)
 					{
@@ -254,7 +255,7 @@ namespace CsvHelper.Configuration
 				if (c == options.Escape)
 				{
 					inEscape = true;
-					length = position - segmentStart;
+					length = i - segmentStart;
 					totalLength += length;
 
 					if (length > 0)
@@ -273,7 +274,16 @@ namespace CsvHelper.Configuration
 				options.BadDataFound?.Invoke(options.Context);
 			}
 
-			length = position - segmentStart + 1;
+			if (segmentStart == 0)
+			{
+				// No escapes were found.
+				return span;
+			}
+
+			// Escapes were found. The span needs to be split up
+			// and reassembled into a new span.
+
+			length = span.Length - segmentStart;
 			totalLength += length;
 
 			segments.Add(new Segment
@@ -282,20 +292,42 @@ namespace CsvHelper.Configuration
 				Length = length,
 			});
 
+			var combined = new Span<char>(new char[totalLength]);
+
 			var combinedPosition = 0;
-			Span<char> combined = stackalloc char[totalLength];
 			for (var i = 0; i < segments.Count; i++)
 			{
 				span.Slice(segments[i].Start, segments[i].Length).CopyTo(combined.Slice(combinedPosition));
 				combinedPosition += segments[i].Length;
 			}
 
-			return combined.ToString();
+			return combined;
+		}
+
+		/// <summary>
+		/// Trims inside the quotes if enabled.
+		/// </summary>
+		public static Span<char> PostDequoteField(Span<char> span, ProcessFieldOptions options)
+		{
+			if (!options.IsQuoted)
+			{
+				return span;
+			}
+
+			if ((options.TrimOptions & TrimOptions.InsideQuotes) == TrimOptions.InsideQuotes)
+			{
+				span = Trim(span, options.WhiteSpaceChars);
+			}
+
+			return span;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private static void Trim(Span<char> span, ref int start, ref int end, params char[] trimChars)
+		private static Span<char> Trim(Span<char> span, params char[] trimChars)
 		{
+			var start = 0;
+			var end = span.Length - 1;
+
 			// Trim start.
 			for (var i = start; i <= end; i++)
 			{
@@ -321,6 +353,8 @@ namespace CsvHelper.Configuration
 					break;
 				}
 			}
+
+			return span.Slice(start, end - start + 1);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
