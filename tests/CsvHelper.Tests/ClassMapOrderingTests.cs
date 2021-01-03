@@ -40,7 +40,6 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				csv.Configuration.RegisterClassMap<ContainerClassMap>();
 				csv.WriteRecords(list);
 				writer.Flush();

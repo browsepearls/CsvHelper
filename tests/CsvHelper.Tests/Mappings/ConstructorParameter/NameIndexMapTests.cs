@@ -3,6 +3,7 @@ using CsvHelper.Tests.Mocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -75,15 +76,18 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 		[TestMethod]
 		public void GetRecords_WithParameterMap_NoHeader_CreatesRecords()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			var rows = new Queue<string[]>(new List<string[]>
 			{
 				new [] { "1", "one" },
 				null
 			});
-			using (var parser = new ParserMock(rows))
+			using (var parser = new ParserMock(config, rows))
 			using (var csv = new CsvReader(parser))
 			{
-				csv.Configuration.HasHeaderRecord = false;
 				csv.Configuration.RegisterClassMap<FooMap>();
 
 				// Can't read using names when no header is present.

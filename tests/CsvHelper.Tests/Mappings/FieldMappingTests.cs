@@ -19,18 +19,20 @@ namespace CsvHelper.Tests.Mappings
 		[TestMethod]
 		public void ReadPublicFieldsWithAutoMapTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MemberTypes = MemberTypes.Fields,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("IdField,NameField");
 				writer.WriteLine("1,one");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.MemberTypes = MemberTypes.Fields;
 				var records = csv.GetRecords<APublic>().ToList();
 
 				Assert.AreEqual(1, records.Count);
@@ -42,12 +44,15 @@ namespace CsvHelper.Tests.Mappings
 		[TestMethod]
 		public void WritePublicFieldsWithAutoMapTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MemberTypes = MemberTypes.Fields,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			using (var csv = new CsvWriter(writer, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				var list = new List<APublic>
 				{
 					new APublic
@@ -59,7 +64,6 @@ namespace CsvHelper.Tests.Mappings
 						}
 					}
 				};
-				csv.Configuration.MemberTypes = MemberTypes.Fields;
 				csv.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;
@@ -82,7 +86,6 @@ namespace CsvHelper.Tests.Mappings
 			using (var reader = new StreamReader(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("IdField,NameField");
 				writer.WriteLine("1,one");
 				writer.Flush();
@@ -105,7 +108,6 @@ namespace CsvHelper.Tests.Mappings
 			using (var reader = new StreamReader(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var list = new List<APublic>
 				{
 					new APublic
@@ -135,19 +137,21 @@ namespace CsvHelper.Tests.Mappings
 		[TestMethod]
 		public void ReadPrivateFieldsWithAutoMapTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MemberTypes = MemberTypes.Fields,
+				IncludePrivateMembers = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("idField,nameField");
 				writer.WriteLine("1,one");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.IncludePrivateMembers = true;
-				csv.Configuration.MemberTypes = MemberTypes.Fields;
 				var records = csv.GetRecords<APrivate>().ToList();
 
 				Assert.AreEqual(1, records.Count);
@@ -159,19 +163,21 @@ namespace CsvHelper.Tests.Mappings
 		[TestMethod]
 		public void WritePrivateFieldsWithAutoMapTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MemberTypes = MemberTypes.Fields,
+				IncludePrivateMembers = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			using (var csv = new CsvWriter(writer, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				var list = new List<APrivate>
 				{
 					new APrivate( 1, "one" )
 				};
 
-				csv.Configuration.IncludePrivateMembers = true;
-				csv.Configuration.MemberTypes = MemberTypes.Fields;
 				csv.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;
@@ -194,7 +200,6 @@ namespace CsvHelper.Tests.Mappings
 			using (var reader = new StreamReader(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("idField,nameField");
 				writer.WriteLine("1,one");
 				writer.Flush();
@@ -217,7 +222,6 @@ namespace CsvHelper.Tests.Mappings
 			using (var reader = new StreamReader(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var list = new List<APrivate>
 				{
 					new APrivate( 1, "one" )
@@ -240,18 +244,20 @@ namespace CsvHelper.Tests.Mappings
 		[TestMethod]
 		public void ReadPublicFieldsAndPropertiesWithAutoMapTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MemberTypes = MemberTypes.Properties | MemberTypes.Fields,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("IdField,NameField,IdProp,NameProp");
 				writer.WriteLine("1,one,2,two");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.MemberTypes = MemberTypes.Properties | MemberTypes.Fields;
 				var records = csv.GetRecords<APublic>().ToList();
 
 				Assert.AreEqual(1, records.Count);
@@ -263,12 +269,15 @@ namespace CsvHelper.Tests.Mappings
 		[TestMethod]
 		public void WritePublicFieldsAndPropertiesWithAutoMapTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MemberTypes = MemberTypes.Properties | MemberTypes.Fields,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			using (var csv = new CsvWriter(writer, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				var list = new List<APublic>
 				{
 					new APublic
@@ -282,7 +291,6 @@ namespace CsvHelper.Tests.Mappings
 						IdProp = 2
 					}
 				};
-				csv.Configuration.MemberTypes = MemberTypes.Properties | MemberTypes.Fields;
 				csv.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;

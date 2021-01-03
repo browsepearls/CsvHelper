@@ -41,18 +41,20 @@ namespace CsvHelper.Tests.TypeConversion
 		{
 			var options = new TypeConverterOptions { NumberStyles = NumberStyles.AllowThousands };
 
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csvReader = new CsvReader(reader, config))
 			{
-				csvReader.Configuration.Delimiter = ",";
 				writer.WriteLine("\"1,234\",\"5,678\"");
 				writer.Flush();
 				stream.Position = 0;
 
 				csvReader.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
-				csvReader.Configuration.HasHeaderRecord = false;
 				csvReader.Read();
 				Assert.AreEqual(1234, csvReader.GetField<int>(0));
 				Assert.AreEqual(5678, csvReader.GetField(typeof(int), 1));
@@ -64,18 +66,20 @@ namespace CsvHelper.Tests.TypeConversion
 		{
 			var options = new TypeConverterOptions { NumberStyles = NumberStyles.AllowThousands };
 
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csvReader = new CsvReader(reader, config))
 			{
-				csvReader.Configuration.Delimiter = ",";
 				writer.WriteLine("\"1,234\",\"5,678\"");
 				writer.Flush();
 				stream.Position = 0;
 
 				csvReader.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
-				csvReader.Configuration.HasHeaderRecord = false;
 				csvReader.GetRecords<Test>().ToList();
 			}
 		}
@@ -85,18 +89,20 @@ namespace CsvHelper.Tests.TypeConversion
 		{
 			var options = new TypeConverterOptions { NumberStyles = NumberStyles.AllowThousands };
 
+			var config = new CsvConfiguration(new CultureInfo("en-US"))
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csvReader = new CsvReader(reader, new CultureInfo("en-US")))
+			using (var csvReader = new CsvReader(reader, config))
 			{
-				csvReader.Configuration.Delimiter = ",";
 				writer.WriteLine("\"1,234\",\"$5,678\"");
 				writer.Flush();
 				stream.Position = 0;
 
 				csvReader.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
-				csvReader.Configuration.HasHeaderRecord = false;
 				csvReader.Configuration.RegisterClassMap<TestMap>();
 				csvReader.GetRecords<Test>().ToList();
 			}
@@ -107,12 +113,15 @@ namespace CsvHelper.Tests.TypeConversion
 		{
 			var options = new TypeConverterOptions { Formats = new string[] { "c" } };
 
+			var config = new CsvConfiguration(new CultureInfo("en-US"))
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csvWriter = new CsvWriter(writer, new CultureInfo("en-US")))
+			using (var csvWriter = new CsvWriter(writer, config))
 			{
-				csvWriter.Configuration.Delimiter = ",";
 				csvWriter.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
 				csvWriter.WriteField(1234);
 				csvWriter.NextRecord();
@@ -129,18 +138,20 @@ namespace CsvHelper.Tests.TypeConversion
 		{
 			var options = new TypeConverterOptions { Formats = new string[] { "c" } };
 
+			var config = new CsvConfiguration(new CultureInfo("en-US"))
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csvWriter = new CsvWriter(writer, new CultureInfo("en-US")))
+			using (var csvWriter = new CsvWriter(writer, config))
 			{
-				csvWriter.Configuration.Delimiter = ",";
 				var list = new List<Test>
 				{
 					new Test { Number = 1234, NumberOverridenInMap = 5678 },
 				};
 				csvWriter.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
-				csvWriter.Configuration.HasHeaderRecord = false;
 				csvWriter.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;
@@ -155,18 +166,20 @@ namespace CsvHelper.Tests.TypeConversion
 		{
 			var options = new TypeConverterOptions { Formats = new string[] { "c" } };
 
+			var config = new CsvConfiguration(new CultureInfo("en-US"))
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csvWriter = new CsvWriter(writer, new CultureInfo("en-US")))
+			using (var csvWriter = new CsvWriter(writer, config))
 			{
-				csvWriter.Configuration.Delimiter = ",";
 				var list = new List<Test>
 				{
 					new Test { Number = 1234, NumberOverridenInMap = 5678 },
 				};
 				csvWriter.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
-				csvWriter.Configuration.HasHeaderRecord = false;
 				csvWriter.Configuration.RegisterClassMap<TestMap>();
 				csvWriter.WriteRecords(list);
 				writer.Flush();

@@ -30,7 +30,6 @@ namespace CsvHelper.Tests.Issues
 				using (var reader = new StringReader(s.ToString()))
 				using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 				{
-					csv.Configuration.Delimiter = ",";
 					csv.Read();
 					csv.ReadHeader();
 					while (csv.Read())

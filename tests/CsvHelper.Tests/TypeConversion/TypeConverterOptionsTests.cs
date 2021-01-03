@@ -17,17 +17,19 @@ namespace CsvHelper.Tests.TypeConversion
 		[TestMethod]
 		public void GlobalNullValueTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine(",");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.HasHeaderRecord = false;
 				csv.Configuration.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add(string.Empty);
 				var records = csv.GetRecords<Test>().ToList();
 
@@ -39,17 +41,19 @@ namespace CsvHelper.Tests.TypeConversion
 		[TestMethod]
 		public void MappingNullValueTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine(",");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.HasHeaderRecord = false;
 				csv.Configuration.RegisterClassMap<TestMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
@@ -61,17 +65,19 @@ namespace CsvHelper.Tests.TypeConversion
 		[TestMethod]
 		public void GlobalAndMappingNullValueTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine(",");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.HasHeaderRecord = false;
 				csv.Configuration.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add("null");
 				csv.Configuration.RegisterClassMap<TestMap>();
 				var records = csv.GetRecords<Test>().ToList();

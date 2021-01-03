@@ -22,7 +22,6 @@ namespace CsvHelper.Tests.Mappings
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("P3,P1,P2");
 				writer.WriteLine("p3,p1,p2");
 				writer.Flush();
@@ -45,7 +44,6 @@ namespace CsvHelper.Tests.Mappings
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var list = new List<A>()
 				{
 					new A

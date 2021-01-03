@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using CsvHelper.Configuration;
 using CsvHelper.Tests.Mocks;
@@ -71,15 +72,18 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ConvertUsingTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			var queue = new Queue<string[]>();
 			queue.Enqueue(new[] { "1", "2" });
 			queue.Enqueue(new[] { "3", "4" });
 			queue.Enqueue(null);
 
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.HasHeaderRecord = false;
 			csvReader.Configuration.RegisterClassMap<ConvertUsingMap>();
 
 			var records = csvReader.GetRecords<TestClass>().ToList();
@@ -93,54 +97,37 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ConvertUsingCovarianceTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			var queue = new Queue<string[]>();
 			queue.Enqueue(new string[] { "1", "2" });
 			queue.Enqueue(null);
 
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.HasHeaderRecord = false;
 			csvReader.Configuration.RegisterClassMap<CovarianceClassMap>();
 
 			var records = csvReader.GetRecords<CovarianceClass>().ToList();
 		}
 
-		// Not possible anymore.
-		//[TestMethod]
-		//public void ConvertUsingContravarianceTest()
-		//{
-		//	var queue = new Queue<string[]>();
-		//	queue.Enqueue( new string[] { "1", "2" } );
-		//	queue.Enqueue( null );
-
-		//	var parserMock = new ParserMock( queue );
-
-		//	var csvReader = new CsvReader( parserMock );
-		//	csvReader.Configuration.HasHeaderRecord = false;
-
-		//	try
-		//	{
-		//		csvReader.Configuration.RegisterClassMap<ContravarianceClassMap>();
-		//		Assert.Fail();
-		//	}
-		//	catch( CsvConfigurationException )
-		//	{
-		//	}
-		//}
-
 		[TestMethod]
 		public void ConvertUsingBlockTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			var queue = new Queue<string[]>();
 			queue.Enqueue(new[] { "1", "2" });
 			queue.Enqueue(new[] { "3", "4" });
 			queue.Enqueue(null);
 
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.HasHeaderRecord = false;
 			csvReader.Configuration.RegisterClassMap<ConvertUsingBlockMap>();
 
 			var records = csvReader.GetRecords<TestClass>().ToList();
@@ -154,15 +141,18 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ConvertUsingConstantTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			var queue = new Queue<string[]>();
 			queue.Enqueue(new[] { "1", "2" });
 			queue.Enqueue(new[] { "3", "4" });
 			queue.Enqueue(null);
 
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.HasHeaderRecord = false;
 			csvReader.Configuration.RegisterClassMap<ConvertUsingConstantMap>();
 
 			var records = csvReader.GetRecords<TestClass>().ToList();
@@ -208,15 +198,6 @@ namespace CsvHelper.Tests
 		{
 			public int Id { get; set; }
 		}
-
-		// This isn't possible anymore.
-		//private sealed class ContravarianceClassMap : CsvClassMap<ContravarianceClass>
-		//{
-		//	public ContravarianceClassMap()
-		//	{
-		//		Map( m => m.Id ).ConvertUsing( row => row.GetField<int?>( 0 ) );
-		//	}
-		//}
 
 		private class TestClass
 		{

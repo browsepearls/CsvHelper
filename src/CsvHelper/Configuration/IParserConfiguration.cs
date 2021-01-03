@@ -13,115 +13,115 @@ namespace CsvHelper.Configuration
 	public interface IParserConfiguration
 	{
 		/// <summary>
-		/// Gets or sets the size of the buffer
+		/// Gets the size of the buffer
 		/// used for reading CSV files.
 		/// Default is 2048.
 		/// </summary>
-		int BufferSize { get; set; }
+		int BufferSize { get; }
 
 		/// <summary>
-		/// Gets or sets a value indicating whether the number of bytes should
+		/// Gets a value indicating whether the number of bytes should
 		/// be counted while parsing. Default is false. This will slow down parsing
 		/// because it needs to get the byte count of every char for the given encoding.
 		/// The <see cref="Encoding"/> needs to be set correctly for this to be accurate.
 		/// </summary>
-		bool CountBytes { get; set; }
+		bool CountBytes { get; }
 
 		/// <summary>
-		/// Gets or sets the encoding used when counting bytes.
+		/// Gets the encoding used when counting bytes.
 		/// </summary>
-		Encoding Encoding { get; set; }
+		Encoding Encoding { get; }
 
 		/// <summary>
-		/// Gets or sets the function that is called when bad field data is found. A field
+		/// Gets the function that is called when bad field data is found. A field
 		/// has bad data if it contains a quote and the field is not quoted (escaped).
 		/// You can supply your own function to do other things like logging the issue
 		/// instead of throwing an exception.
 		/// Arguments: context
 		/// </summary>
-		Action<ReadingContext> BadDataFound { get; set; }
+		Action<ReadingContext> BadDataFound { get; }
 
 		/// <summary>
-		/// Gets or sets a value indicating if a line break found in a quote field should
+		/// Gets a value indicating if a line break found in a quote field should
 		/// be considered bad data. True to consider a line break bad data, otherwise false.
 		/// Defaults to false.
 		/// </summary>
-		bool LineBreakInQuotedFieldIsBadData { get; set; }
+		bool LineBreakInQuotedFieldIsBadData { get; }
 
 		/// <summary>
-		/// Gets or sets the character used to denote
+		/// Gets the character used to denote
 		/// a line that is commented out. Default is '#'.
 		/// </summary>
-		char Comment { get; set; }
+		char Comment { get; }
 
 		/// <summary>
-		/// Gets or sets a value indicating if comments are allowed.
+		/// Gets a value indicating if comments are allowed.
 		/// True to allow commented out lines, otherwise false.
 		/// </summary>
-		bool AllowComments { get; set; }
+		bool AllowComments { get; }
 
 		/// <summary>
-		/// Gets or sets a value indicating if blank lines
+		/// Gets a value indicating if blank lines
 		/// should be ignored when reading.
 		/// True to ignore, otherwise false. Default is true.
 		/// </summary>
-		bool IgnoreBlankLines { get; set; }
+		bool IgnoreBlankLines { get; }
 
 		/// <summary>
-		/// Gets or sets a value indicating if quotes should be
+		/// Gets a value indicating if quotes should be
 		/// ignored when parsing and treated like any other character.
 		/// </summary>
-		bool IgnoreQuotes { get; set; }
+		bool IgnoreQuotes { get; }
 
 		/// <summary>
-		/// Gets or sets the character used to quote fields.
+		/// Gets the character used to quote fields.
 		/// Default is '"'.
 		/// </summary>
-		char Quote { get; set; }
+		char Quote { get; }
 
 		/// <summary>
-		/// Gets or sets the delimiter used to separate fields.
+		/// Gets the delimiter used to separate fields.
 		/// Default is CultureInfo.CurrentCulture.TextInfo.ListSeparator.
 		/// </summary>
-		string Delimiter { get; set; }
+		string Delimiter { get; }
 
 		/// <summary>
-		/// Gets or sets the escape character used to escape a quote inside a field.
+		/// Gets the escape character used to escape a quote inside a field.
 		/// Default is '"'.
 		/// </summary>
-		char Escape { get; set; }
+		char Escape { get; }
 
 		/// <summary>
-		/// Gets or sets the field trimming options.
+		/// Gets the field trimming options.
 		/// </summary>
-		TrimOptions TrimOptions { get; set; }
+		TrimOptions TrimOptions { get; }
 
 		/// <summary>
 		/// Processes a raw field.
 		/// This function calls the field parsing pipeline.
 		/// PreDequote -> Dequote -> PostDequote
 		/// </summary>
-		ProcessFieldFunc ProcessField { get; set; }
+		ProcessFieldFunc ProcessField { get; }
 
 		/// <summary>
 		/// Processing that happens to a field before dequoting.
 		/// </summary>
-		PreDequoteFieldFunc PreDequoteField { get; set; }
+		PreDequoteFieldFunc PreDequoteField { get; }
 
 		/// <summary>
 		/// Removes quoting from a field.
 		/// </summary>
-		DequoteFieldFunc DequoteField { get; set; }
+		DequoteFieldFunc DequoteField { get; }
 
 		/// <summary>
 		/// Processing that happens to a field after dequoting.
 		/// </summary>
-		PostDequoteFieldFunc PostDequoteField { get; set; }
+		PostDequoteFieldFunc PostDequoteField { get; }
 
 		/// <summary>
 		/// Characters considered whitespace.
 		/// Used when trimming fields.
 		/// </summary>
-		char[] WhiteSpaceChars { get; set; }
+		char[] WhiteSpaceChars { get; }
 	}
 }

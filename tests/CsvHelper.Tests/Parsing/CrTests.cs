@@ -131,7 +131,6 @@ namespace CsvHelper.Tests.Parsing
 			using (var reader = new StringReader(s.ToString()))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				parser.Read();
 				Assert.AreEqual("1", parser[0]);
 				Assert.AreEqual("2", parser[1]);
@@ -147,7 +146,6 @@ namespace CsvHelper.Tests.Parsing
 			using (var reader = new StringReader(s.ToString()))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				parser.Read();
 				Assert.AreEqual("1", parser[0]);
 				Assert.AreEqual("2", parser[1]);
@@ -167,7 +165,6 @@ namespace CsvHelper.Tests.Parsing
 			using (var reader = new StringReader(s.ToString()))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				parser.Read();
 				Assert.AreEqual("1", parser[0]);
 				Assert.AreEqual("2", parser[1]);
@@ -187,7 +184,6 @@ namespace CsvHelper.Tests.Parsing
 			using (var reader = new StringReader(s.ToString()))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				parser.Read();
 				Assert.AreEqual("1", parser[0]);
 				Assert.AreEqual("2", parser[1]);
@@ -207,7 +203,6 @@ namespace CsvHelper.Tests.Parsing
 			using (var reader = new StringReader(s.ToString()))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				parser.Read();
 				Assert.AreEqual("1", parser[0]);
 				Assert.AreEqual("2", parser[1]);
@@ -227,7 +222,6 @@ namespace CsvHelper.Tests.Parsing
 			using (var reader = new StringReader(s.ToString()))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				parser.Read();
 				Assert.AreEqual("1", parser[0]);
 				Assert.AreEqual("2", parser[1]);

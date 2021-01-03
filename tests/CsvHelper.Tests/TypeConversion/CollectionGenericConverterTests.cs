@@ -76,17 +76,19 @@ namespace CsvHelper.Tests.TypeConversion
 		[TestMethod]
 		public void FullWriteTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			using (var csv = new CsvWriter(writer, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				var list = new List<Test>
 				{
 					new Test { List = new List<int?> { 1, 2, 3 } }
 				};
-				csv.Configuration.HasHeaderRecord = false;
 				csv.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;

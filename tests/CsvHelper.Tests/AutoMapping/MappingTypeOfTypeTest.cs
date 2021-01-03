@@ -27,7 +27,6 @@ namespace CsvHelper.Tests.AutoMapping
 
 			using (var csv = new CsvReader(parser))
 			{
-				csv.Configuration.Delimiter = ",";
 				var records = csv.GetRecords<EquipmentDataPoint>().ToList();
 				Assert.AreEqual(1, records.Count);
 				Assert.AreEqual(1, records[0].Id);

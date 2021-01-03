@@ -78,15 +78,14 @@ namespace CsvHelper.Performance
 			var stopwatch = new Stopwatch();
 			stopwatch.Start();
 
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				ShouldQuote = quoteAllFields ? (field, context) => true : ConfigurationFunctions.ShouldQuote,
+			};
 			using (var stream = File.Create(GetFilePath()))
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				if (quoteAllFields)
-				{
-					csv.Configuration.ShouldQuote = (field, context) => true;
-				}
-
 				for (var column = 1; column <= columns; column++)
 				{
 					csv.WriteField($"Column{column}");
@@ -224,7 +223,6 @@ namespace CsvHelper.Performance
 			using (var reader = new StreamReader(stream))
 			using (var parser = new CsvStackParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.BufferSize = 1024 * 2;
 				while (parser.Read())
 				{
 				}

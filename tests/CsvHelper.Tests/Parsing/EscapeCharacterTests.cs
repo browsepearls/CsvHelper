@@ -15,10 +15,13 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void EscapeTest()
 		{
-			using (var reader = new StringReader("\"|\"a|\"\"\r\n"))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				parser.Configuration.Escape = '|';
+				Escape = '|',
+			};
+			using (var reader = new StringReader("\"|\"a|\"\"\r\n"))
+			using (var parser = new CsvParser(reader, config))
+			{
 				parser.Read();
 				Assert.AreEqual("\"a\"", parser[0]);
 			}
@@ -27,10 +30,13 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void EscapeNoNewlineTest()
 		{
-			using (var reader = new StringReader("\"|\"a|\"\""))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				parser.Configuration.Escape = '|';
+				Escape = '|',
+			};
+			using (var reader = new StringReader("\"|\"a|\"\""))
+			using (var parser = new CsvParser(reader, config))
+			{
 				parser.Read();
 				Assert.AreEqual("\"a\"", parser[0]);
 			}
@@ -39,11 +45,14 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void EscapeTrimOutsideTest()
 		{
-			using (var reader = new StringReader(" \"|\"a|\"\" \r\n"))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				parser.Configuration.Escape = '|';
-				parser.Configuration.TrimOptions = TrimOptions.Trim;
+				Escape = '|',
+				TrimOptions = TrimOptions.Trim,
+			};
+			using (var reader = new StringReader(" \"|\"a|\"\" \r\n"))
+			using (var parser = new CsvParser(reader, config))
+			{
 				parser.Read();
 				Assert.AreEqual("\"a\"", parser[0]);
 			}
@@ -52,11 +61,14 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void EscapeTrimInsideTest()
 		{
-			using (var reader = new StringReader("\" |\"a|\" \"\r\n"))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				parser.Configuration.Escape = '|';
-				parser.Configuration.TrimOptions = TrimOptions.InsideQuotes;
+				Escape = '|',
+				TrimOptions = TrimOptions.InsideQuotes,
+			};
+			using (var reader = new StringReader("\" |\"a|\" \"\r\n"))
+			using (var parser = new CsvParser(reader, config))
+			{
 				parser.Read();
 				Assert.AreEqual("\"a\"", parser[0]);
 			}
@@ -65,11 +77,14 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void EscapeTrimBothTest()
 		{
-			using (var reader = new StringReader(" \" |\"a|\" \" \r\n"))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				parser.Configuration.Escape = '|';
-				parser.Configuration.TrimOptions = TrimOptions.Trim | TrimOptions.InsideQuotes;
+				Escape = '|',
+				TrimOptions = TrimOptions.Trim | TrimOptions.InsideQuotes,
+			};
+			using (var reader = new StringReader(" \" |\"a|\" \" \r\n"))
+			using (var parser = new CsvParser(reader, config))
+			{
 				parser.Read();
 				Assert.AreEqual("\"a\"", parser[0]);
 			}
@@ -78,10 +93,13 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void EscapeWriteTest()
 		{
-			using (var writer = new StringWriter())
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				csv.Configuration.Escape = '|';
+				Escape = '|',
+			};
+			using (var writer = new StringWriter())
+			using (var csv = new CsvWriter(writer, config))
+			{
 				csv.WriteField("\"a\"");
 				csv.Flush();
 

@@ -10,49 +10,49 @@ namespace CsvHelper.Configuration
 	public interface ISerializerConfiguration
 	{
 		/// <summary>
-		/// Gets or sets the delimiter used to separate fields.
+		/// Gets the delimiter used to separate fields.
 		/// Default is ',';
 		/// </summary>
-		string Delimiter { get; set; }
+		string Delimiter { get; }
 
 		/// <summary>
-		/// Gets or sets the character used to quote fields.
+		/// Gets the character used to quote fields.
 		/// Default is '"'.
 		/// </summary>
-		char Quote { get; set; }
+		char Quote { get; }
 
 		/// <summary>
-		/// Gets or sets the escape character used to escape a quote inside a field.
+		/// Gets the escape character used to escape a quote inside a field.
 		/// Default is '"'.
 		/// </summary>
-		char Escape { get; set; }
+		char Escape { get; }
 
 		/// <summary>
-		/// Gets or sets the field trimming options.
+		/// Gets the field trimming options.
 		/// </summary>
-		TrimOptions TrimOptions { get; set; }
+		TrimOptions TrimOptions { get; }
 
 		/// <summary>
-		/// Gets or sets a value indicating if fields should be sanitized
+		/// Gets a value indicating if fields should be sanitized
 		/// to prevent malicious injection. This covers MS Excel, 
 		/// Google Sheets and Open Office Calc.
 		/// </summary>
-		bool SanitizeForInjection { get; set; }
+		bool SanitizeForInjection { get; }
 
 		/// <summary>
-		/// Gets or sets the characters that are used for injection attacks.
+		/// Gets the characters that are used for injection attacks.
 		/// </summary>
-		char[] InjectionCharacters { get; set; }
+		char[] InjectionCharacters { get; }
 
 		/// <summary>
-		/// Gets or sets the character used to escape a detected injection.
+		/// Gets the character used to escape a detected injection.
 		/// </summary>
-		char InjectionEscapeCharacter { get; set; }
+		char InjectionEscapeCharacter { get; }
 
 		/// <summary>
-		/// Gets or sets the newline to use when writing.
+		/// Gets the newline to use when writing.
 		/// </summary>
-		NewLine NewLine { get; set; }
+		NewLine NewLine { get; }
 
 		/// <summary>
 		/// Gets the newline string to use when writing. This string is determined

@@ -24,7 +24,6 @@ namespace CsvHelper.Tests.Writing
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, new CultureInfo("en-US")))
 			{
-				csv.Configuration.Delimiter = ",";
 				var records = new List<Test>
 				{
 					new Test { Dob = DateTime.Parse( "9/6/2017" ) }
@@ -50,7 +49,6 @@ namespace CsvHelper.Tests.Writing
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("A,B,C");
 				writer.WriteLine("9/6/2017 12:00:00 AM,9/7/2017 12:00:00 AM,9/8/2017 12:00:00 AM");
 				writer.Flush();

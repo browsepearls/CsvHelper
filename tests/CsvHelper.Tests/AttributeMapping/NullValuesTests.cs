@@ -19,7 +19,6 @@ namespace CsvHelper.Tests.AttributeMapping
 			using (var reader = new StringReader("Id,Name\r\nNULL,null\r\n"))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var records = csv.GetRecords<NullValuesTestClass>().ToList();
 				Assert.IsNull(records[0].Id);
 				Assert.IsNull(records[0].Name);

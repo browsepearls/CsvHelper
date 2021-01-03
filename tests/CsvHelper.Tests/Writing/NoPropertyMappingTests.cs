@@ -22,7 +22,6 @@ namespace CsvHelper.Tests.Writing
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var list = new List<Test>
 				{
 					new Test { Id = 1 },
@@ -54,7 +53,6 @@ namespace CsvHelper.Tests.Writing
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var list = new List<Test>
 				{
 					new Test { Id = 1 },
@@ -81,19 +79,21 @@ namespace CsvHelper.Tests.Writing
 		[TestMethod]
 		public void NoPropertyWithNoHeaderAndNameTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			using (var csv = new CsvWriter(writer, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				var list = new List<Test>
 				{
 					new Test { Id = 1 },
 					new Test { Id = 2 }
 				};
 
-				csv.Configuration.HasHeaderRecord = false;
 				csv.Configuration.RegisterClassMap<TestWithNameMap>();
 				csv.WriteRecords(list);
 
@@ -113,19 +113,21 @@ namespace CsvHelper.Tests.Writing
 		[TestMethod]
 		public void NoPropertyWithNoHeaderAndNoNameTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			using (var csv = new CsvWriter(writer, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				var list = new List<Test>
 				{
 					new Test { Id = 1 },
 					new Test { Id = 2 }
 				};
 
-				csv.Configuration.HasHeaderRecord = false;
 				csv.Configuration.RegisterClassMap<TestWithNoNameMap>();
 				csv.WriteRecords(list);
 
@@ -145,19 +147,21 @@ namespace CsvHelper.Tests.Writing
 		[TestMethod]
 		public void OutOfOrderTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			using (var csv = new CsvWriter(writer, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				var list = new List<Test>
 				{
 					new Test { Id = 1, Name = "one" },
 					new Test { Id = 2, Name = "two" }
 				};
 
-				csv.Configuration.HasHeaderRecord = false;
 				csv.Configuration.RegisterClassMap<TestMapOutOfOrderWithEmptyFieldsMap>();
 				csv.WriteRecords(list);
 

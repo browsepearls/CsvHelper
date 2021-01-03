@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CsvHelper.Configuration;
 using CsvHelper.Tests.Mocks;
 using CsvHelper.TypeConversion;
+using System.Globalization;
 
 namespace CsvHelper.Tests.TypeConversion
 {
@@ -17,12 +18,15 @@ namespace CsvHelper.Tests.TypeConversion
 		[TestMethod]
 		public void ReaderInheritedConverter()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			var queue = new Queue<string[]>();
-			queue.Enqueue( new[] { "1" } );
-			queue.Enqueue( null );
-			var parserMock = new ParserMock( queue );
-			var csv = new CsvReader( parserMock );
-			csv.Configuration.HasHeaderRecord = false;
+			queue.Enqueue(new[] { "1" });
+			queue.Enqueue(null);
+			var parserMock = new ParserMock(config, queue);
+			var csv = new CsvReader(parserMock);
 			csv.Configuration.RegisterClassMap<TestMap>();
 			var list = csv.GetRecords<Test>().ToList();
 		}
@@ -36,7 +40,7 @@ namespace CsvHelper.Tests.TypeConversion
 		{
 			public TestMap()
 			{
-				Map( m => m.IntColumn ).Index( 0 ).TypeConverter<Converter>();
+				Map(m => m.IntColumn).Index(0).TypeConverter<Converter>();
 			}
 		}
 

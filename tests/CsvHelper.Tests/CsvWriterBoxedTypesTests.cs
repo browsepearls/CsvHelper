@@ -17,10 +17,13 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void TypeMixedWithBoxedTypeTest()
 		{
-			using (var writer = new StringWriter())
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				csv.Configuration.Delimiter = ",";
+				HasHeaderRecord = false,
+			};
+			using (var writer = new StringWriter())
+			using (var csv = new CsvWriter(writer, config))
+			{
 				var recordsTyped = new List<A>
 				{
 					new A { Id = 1, Name = "one" },
@@ -30,7 +33,6 @@ namespace CsvHelper.Tests
 					new A { Id = 2, Name = "two" },
 				};
 
-				csv.Configuration.HasHeaderRecord = false;
 				csv.Configuration.RegisterClassMap<AMap>();
 				csv.WriteRecords(recordsTyped);
 				csv.WriteRecords(recordsBoxed);

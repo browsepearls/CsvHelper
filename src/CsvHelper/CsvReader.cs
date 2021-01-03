@@ -45,15 +45,8 @@ namespace CsvHelper
 		/// </summary>
 		/// <param name="reader">The reader.</param>
 		/// <param name="culture">The culture.</param>
-		public CsvReader(TextReader reader, CultureInfo culture) : this(new CsvParser(reader, new CsvConfiguration(culture), false)) { }
-
-		/// <summary>
-		/// Creates a new CSV reader using the given <see cref="TextReader" />.
-		/// </summary>
-		/// <param name="reader">The reader.</param>
-		/// <param name="culture">The culture.</param>
-		/// <param name="leaveOpen">true to leave the reader open after the CsvReader object is disposed, otherwise false.</param>
-		public CsvReader(TextReader reader, CultureInfo culture, bool leaveOpen) : this(new CsvParser(reader, new CsvConfiguration(culture), leaveOpen)) { }
+		/// <param name="leaveOpen"><c>true</c> to leave the <see cref="TextReader"/> open after the <see cref="CsvReader"/> object is disposed, otherwise <c>false</c>.</param>
+		public CsvReader(TextReader reader, CultureInfo culture, bool leaveOpen = false) : this(new CsvParser(reader, culture, leaveOpen)) { }
 
 		/// <summary>
 		/// Creates a new CSV reader using the given <see cref="TextReader" /> and
@@ -61,15 +54,7 @@ namespace CsvHelper
 		/// </summary>
 		/// <param name="reader">The reader.</param>
 		/// <param name="configuration">The configuration.</param>
-		public CsvReader(TextReader reader, Configuration.CsvConfiguration configuration) : this(new CsvParser(reader, configuration, false)) { }
-
-		/// <summary>
-		/// Creates a new CSV reader using the given <see cref="TextReader" />.
-		/// </summary>
-		/// <param name="reader">The reader.</param>
-		/// <param name="configuration">The configuration.</param>
-		/// <param name="leaveOpen">true to leave the reader open after the CsvReader object is disposed, otherwise false.</param>
-		public CsvReader(TextReader reader, Configuration.CsvConfiguration configuration, bool leaveOpen) : this(new CsvParser(reader, configuration, leaveOpen)) { }
+		public CsvReader(TextReader reader, CsvConfiguration configuration) : this(new CsvParser(reader, configuration)) { }
 
 		/// <summary>
 		/// Creates a new CSV reader using the given <see cref="IParser" />.

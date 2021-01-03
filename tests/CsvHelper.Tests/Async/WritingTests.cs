@@ -22,7 +22,6 @@ namespace CsvHelper.Tests.Async
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var records = new List<Simple>
 				{
 					new Simple { Id = 1, Name = "one" },
@@ -56,7 +55,6 @@ namespace CsvHelper.Tests.Async
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var records = new List<Simple>
 				{
 					new Simple { Id = 1, Name = "one" },

@@ -22,7 +22,6 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				csv.Configuration.RegisterClassMap<AMap>();
 
 				var list = new List<A>();
@@ -72,7 +71,6 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				csv.Configuration.RegisterClassMap<AMap>();
 
 				var list = new List<A>

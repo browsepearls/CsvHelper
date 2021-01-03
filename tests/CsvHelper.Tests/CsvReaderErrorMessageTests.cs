@@ -25,13 +25,16 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void FirstColumnEmptyFirstRowErrorWithNoHeaderTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+				AllowComments = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csvReader = new CsvReader(reader, config))
 			{
-				csvReader.Configuration.HasHeaderRecord = false;
-				csvReader.Configuration.AllowComments = true;
 				csvReader.Configuration.RegisterClassMap<Test1Map>();
 				writer.WriteLine(",one");
 				writer.WriteLine("2,two");
@@ -54,13 +57,15 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void FirstColumnEmptySecondRowErrorWithHeader()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				AllowComments = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csvReader = new CsvReader(reader, config))
 			{
-				csvReader.Configuration.Delimiter = ",";
-				csvReader.Configuration.AllowComments = true;
 				csvReader.Configuration.RegisterClassMap<Test1Map>();
 				writer.WriteLine("IntColumn,StringColumn");
 				writer.WriteLine("1,one");
@@ -84,12 +89,15 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void FirstColumnEmptyErrorWithHeaderAndCommentRowTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				AllowComments = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csvReader = new CsvReader(reader, config))
 			{
-				csvReader.Configuration.AllowComments = true;
 				csvReader.Configuration.RegisterClassMap<Test1Map>();
 				writer.WriteLine("IntColumn,StringColumn");
 				writer.WriteLine("# comment");
@@ -149,7 +157,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csvReader.Configuration.Delimiter = ",";
 				csvReader.Configuration.RegisterClassMap<Test2Map>();
 				writer.WriteLine("StringColumn,IntColumn");
 				writer.WriteLine("one,");
@@ -173,19 +180,21 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void Test()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csvReader = new CsvReader(reader, config))
 			{
-				csvReader.Configuration.Delimiter = ",";
 				writer.WriteLine("1,9/24/2012");
 				writer.Flush();
 				stream.Position = 0;
 
 				try
 				{
-					csvReader.Configuration.HasHeaderRecord = false;
 					csvReader.Configuration.RegisterClassMap<Test3Map>();
 					var records = csvReader.GetRecords<Test3>().ToList();
 				}

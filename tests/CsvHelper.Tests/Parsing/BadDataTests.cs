@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using System.Globalization;
 using System.IO;
+using CsvHelper.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CsvHelper.Tests.Parsing
@@ -14,20 +15,22 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void CallbackTest()
 		{
+			string field = null;
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				BadDataFound = f => field = f.Field,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
 				writer.WriteLine(" a\"bc\",d");
 				writer.WriteLine("\"a\"\"b\"c \" ,d");
 				writer.WriteLine("\"a\"\"b\",c");
 				writer.Flush();
 				stream.Position = 0;
 
-				string field = null;
-				parser.Configuration.BadDataFound = f => field = f.Field;
 				parser.Read();
 
 				Assert.IsNotNull(field);
@@ -70,17 +73,19 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void IgnoreQuotesTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				IgnoreQuotes = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
 				writer.WriteLine("one,2\"two,three");
 				writer.Flush();
 				stream.Position = 0;
 
-				parser.Configuration.IgnoreQuotes = true;
 				parser.Read();
 
 				Assert.AreEqual("2\"two", parser[1]);
@@ -90,10 +95,13 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void LineBreakInQuotedFieldIsBadDataCrTest()
 		{
-			using (var reader = new StringReader("\"a\rb\""))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				parser.Configuration.LineBreakInQuotedFieldIsBadData = true;
+				LineBreakInQuotedFieldIsBadData = true,
+			};
+			using (var reader = new StringReader("\"a\rb\""))
+			using (var parser = new CsvParser(reader, config))
+			{
 				Assert.ThrowsException<BadDataException>(() => parser.Read());
 			}
 		}
@@ -101,10 +109,13 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void LineBreakInQuotedFieldIsBadDataLfTest()
 		{
-			using (var reader = new StringReader("\"a\nb\""))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				parser.Configuration.LineBreakInQuotedFieldIsBadData = true;
+				LineBreakInQuotedFieldIsBadData = true,
+			};
+			using (var reader = new StringReader("\"a\nb\""))
+			using (var parser = new CsvParser(reader, config))
+			{
 				Assert.ThrowsException<BadDataException>(() => parser.Read());
 			}
 		}
@@ -112,10 +123,13 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void LineBreakInQuotedFieldIsBadDataCrLfTest()
 		{
-			using (var reader = new StringReader("\"a\r\nb\""))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				parser.Configuration.LineBreakInQuotedFieldIsBadData = true;
+				LineBreakInQuotedFieldIsBadData = true,
+			};
+			using (var reader = new StringReader("\"a\r\nb\""))
+			using (var parser = new CsvParser(reader, config))
+			{
 				Assert.ThrowsException<BadDataException>(() => parser.Read());
 			}
 		}

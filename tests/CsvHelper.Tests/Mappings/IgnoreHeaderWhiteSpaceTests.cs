@@ -21,7 +21,6 @@ namespace CsvHelper.Tests.Mappings
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("The Id,The Name");
 				writer.WriteLine("1,one");
 				writer.Flush();

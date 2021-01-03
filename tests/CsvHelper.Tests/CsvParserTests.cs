@@ -2,9 +2,11 @@
 // This file is a part of CsvHelper and is dual licensed under MS-PL and Apache 2.0.
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
+using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using CsvHelper.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CsvHelper.Tests
@@ -56,6 +58,10 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ParseEmptyRowsTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				IgnoreBlankLines = true,
+			};
 			var stream = new MemoryStream();
 			var writer = new StreamWriter(stream);
 			writer.WriteLine("one,two,three");
@@ -68,8 +74,7 @@ namespace CsvHelper.Tests
 			stream.Position = 0;
 			var reader = new StreamReader(stream);
 
-			var parser = new CsvParser(reader, CultureInfo.InvariantCulture);
-			parser.Configuration.IgnoreBlankLines = true;
+			var parser = new CsvParser(reader, config);
 
 			var count = 0;
 			while (parser.Read())
@@ -92,7 +97,6 @@ namespace CsvHelper.Tests
 			var reader = new StreamReader(stream);
 
 			var parser = new CsvParser(reader, CultureInfo.InvariantCulture);
-			parser.Configuration.Delimiter = ",";
 
 			Assert.IsTrue(parser.Read());
 			Assert.AreEqual("one", parser[0]);
@@ -118,7 +122,7 @@ namespace CsvHelper.Tests
 			stream.Position = 0;
 			var reader = new StreamReader(stream);
 
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture) { BufferSize = 2000 };
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture) { BufferSize = 2000 };
 			var parser = new CsvParser(reader, config);
 
 			Assert.IsTrue(parser.Read());
@@ -145,7 +149,7 @@ namespace CsvHelper.Tests
 			stream.Position = 0;
 			var reader = new StreamReader(stream);
 
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				BadDataFound = null,
 			};
@@ -195,13 +199,15 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ParseCrOnlyTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				IgnoreBlankLines = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.IgnoreBlankLines = true;
-
 				writer.Write("\r");
 				writer.Flush();
 				stream.Position = 0;
@@ -250,7 +256,6 @@ namespace CsvHelper.Tests
 			using (var streamWriter = new StreamWriter(memoryStream))
 			using (var parser = new CsvParser(streamReader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				streamWriter.Write("one,two,three");
 				streamWriter.Flush();
 				memoryStream.Position = 0;
@@ -273,7 +278,6 @@ namespace CsvHelper.Tests
 			using (var streamWriter = new StreamWriter(memoryStream))
 			using (var parser = new CsvParser(streamReader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				streamWriter.WriteLine("one,two,three");
 				streamWriter.Write("four,five,six");
 				streamWriter.Flush();
@@ -298,7 +302,6 @@ namespace CsvHelper.Tests
 			using (var streamWriter = new StreamWriter(memoryStream))
 			using (var parser = new CsvParser(streamReader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				streamWriter.WriteLine("\"\",\"two\",\"three\"");
 				streamWriter.Flush();
 				memoryStream.Position = 0;
@@ -319,7 +322,6 @@ namespace CsvHelper.Tests
 			using (var streamWriter = new StreamWriter(memoryStream))
 			using (var parser = new CsvParser(streamReader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				streamWriter.WriteLine("\"one\",\"two\",\"\"");
 				streamWriter.Flush();
 				memoryStream.Position = 0;
@@ -388,7 +390,6 @@ namespace CsvHelper.Tests
 			using (var streamWriter = new StreamWriter(memoryStream))
 			using (var parser = new CsvParser(streamReader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				streamWriter.Write("one,two\r");
 				streamWriter.Write("three,four\r");
 				streamWriter.Write("five,six\r");
@@ -420,7 +421,6 @@ namespace CsvHelper.Tests
 			using (var streamWriter = new StreamWriter(memoryStream))
 			using (var parser = new CsvParser(streamReader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				streamWriter.Write("one,two\n");
 				streamWriter.Write("three,four\n");
 				streamWriter.Write("five,six\n");
@@ -461,7 +461,6 @@ namespace CsvHelper.Tests
 				AllowComments = true,
 			};
 			var parser = new CsvParser(reader, config);
-			parser.Configuration.Delimiter = ",";
 
 			parser.Read();
 			parser.Read();
@@ -471,6 +470,10 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ParseCommentedOutLineWithCommentsOff()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				AllowComments = false,
+			};
 			var stream = new MemoryStream();
 			var writer = new StreamWriter(stream);
 			writer.WriteLine("one,two,three");
@@ -480,8 +483,7 @@ namespace CsvHelper.Tests
 			stream.Position = 0;
 			var reader = new StreamReader(stream);
 
-			var parser = new CsvParser(reader, CultureInfo.InvariantCulture) { Configuration = { AllowComments = false } };
-			parser.Configuration.Delimiter = ",";
+			var parser = new CsvParser(reader, config);
 
 			parser.Read();
 			parser.Read();
@@ -500,13 +502,12 @@ namespace CsvHelper.Tests
 			stream.Position = 0;
 			var reader = new StreamReader(stream);
 
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				AllowComments = true,
 				Comment = '*',
 			};
 			var parser = new CsvParser(reader, config);
-			parser.Configuration.Delimiter = ",";
 
 			parser.Read();
 			parser.Read();
@@ -523,7 +524,7 @@ namespace CsvHelper.Tests
 			stream.Position = 0;
 			var reader = new StreamReader(stream);
 
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				Delimiter = "\t",
 			};
@@ -545,12 +546,11 @@ namespace CsvHelper.Tests
 			stream.Position = 0;
 			var reader = new StreamReader(stream);
 
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				Quote = '\''
 			};
 			var parser = new CsvParser(reader, config);
-			parser.Configuration.Delimiter = ",";
 
 			Assert.IsTrue(parser.Read());
 			Assert.AreEqual("one", parser[0]);
@@ -570,7 +570,6 @@ namespace CsvHelper.Tests
 			var reader = new StreamReader(stream);
 
 			var parser = new CsvParser(reader, CultureInfo.InvariantCulture);
-			parser.Configuration.Delimiter = ",";
 
 			Assert.IsTrue(parser.Read());
 			Assert.AreEqual("", parser[2]);
@@ -874,7 +873,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				writer.WriteLine("1,\"2");
 				writer.WriteLine("2 continued");
 				writer.WriteLine("end of 2\",3");
@@ -951,8 +949,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
-				parser.Configuration.CountBytes = true;
 				writer.Write("1,\"2\"\r\n");
 				writer.Write("\"3\",4\r\n");
 				writer.Flush();
@@ -971,7 +967,7 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ByteCountTestWithQuotedFieldsExtraQuote()
 		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				BadDataFound = null,
 				CountBytes = true,
@@ -999,7 +995,7 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ByteCountTestWithQuotedFieldsEmptyQuotedField()
 		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				CountBytes = true,
 			};
@@ -1026,7 +1022,7 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ByteCountTestWithQuotedFieldsClosingQuoteAtStartOfBuffer()
 		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				CountBytes = true,
 				BufferSize = 4
@@ -1037,7 +1033,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
 				writer.Write("1,\"2\",3\r\n");
 				writer.Write("\"4\",5,\"6\"\r\n");
 				writer.Flush();
@@ -1056,7 +1051,7 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ByteCountTestWithQuotedFieldsEscapedQuoteAtStartOfBuffer()
 		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				CountBytes = true,
 				BufferSize = 4
@@ -1066,7 +1061,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
 				writer.Write("1,\"2a\",3\r\n");
 				writer.Write("\"\"\"4\"\"\",5,\"6\"\r\n");
 				writer.Flush();
@@ -1086,7 +1080,7 @@ namespace CsvHelper.Tests
 		public void ByteCountUsingCharWithMoreThanSingleByteTest()
 		{
 			var encoding = Encoding.Unicode;
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				CountBytes = true,
 				Encoding = encoding,
@@ -1120,7 +1114,7 @@ namespace CsvHelper.Tests
 		public void StreamSeekingUsingByteCountTest()
 		{
 			var encoding = Encoding.Unicode;
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				AllowComments = true,
 				CountBytes = true,
@@ -1216,7 +1210,7 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void EndBufferTest()
 		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				BufferSize = 12
 			};
@@ -1282,7 +1276,7 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ParseNoQuotesTest()
 		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				IgnoreQuotes = true,
 			};
@@ -1306,7 +1300,7 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void LastLineHasCommentTest()
 		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				AllowComments = true,
 			};
@@ -1326,7 +1320,7 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void LastLineHasCommentNoEolTest()
 		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				AllowComments = true,
 			};
@@ -1348,7 +1342,7 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void DoNotIgnoreBlankLinesTest()
 		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				IgnoreBlankLines = false,
 			};

@@ -116,13 +116,16 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void GetFieldByIndexTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			var data = new[] { "1", "2" };
 			var queue = new Queue<string[]>();
 			queue.Enqueue(data);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
 			var reader = new CsvReader(parserMock);
-			reader.Configuration.HasHeaderRecord = false;
 			reader.Read();
 
 			Assert.AreEqual(1, reader.GetField<int>(0));
@@ -170,15 +173,18 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void GetMissingFieldByNameTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null,
+			};
 			var data1 = new[] { "One", "Two" };
 			var data2 = new[] { "1", "2" };
 			var queue = new Queue<string[]>();
 			queue.Enqueue(data1);
 			queue.Enqueue(data2);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
 			var reader = new CsvReader(parserMock);
-			reader.Configuration.MissingFieldFound = null;
 			reader.Read();
 			reader.ReadHeader();
 
@@ -259,14 +265,17 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void GetMissingFieldByIndexStrictOffTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null,
+			};
 			var data = new Queue<string[]>();
 			data.Enqueue(new[] { "One", "Two" });
 			data.Enqueue(new[] { "1", "2" });
 			data.Enqueue(null);
-			var parserMock = new ParserMock(data);
+			var parserMock = new ParserMock(config, data);
 
 			var reader = new CsvReader(parserMock);
-			reader.Configuration.MissingFieldFound = null;
 			reader.Read();
 
 			Assert.IsNull(reader.GetField(2));
@@ -275,14 +284,17 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void GetMissingFieldGenericByIndexStrictOffTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null,
+			};
 			var data = new Queue<string[]>();
 			data.Enqueue(new[] { "One", "Two" });
 			data.Enqueue(new[] { "1", "2" });
 			data.Enqueue(null);
-			var parserMock = new ParserMock(data);
+			var parserMock = new ParserMock(config, data);
 
 			var reader = new CsvReader(parserMock);
-			reader.Configuration.MissingFieldFound = null;
 			reader.Read();
 
 			Assert.IsNull(reader.GetField<string>(2));
@@ -291,12 +303,16 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void GetFieldByNameNoHeaderExceptionTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			var data = new[] { "1", "2" };
 			var queue = new Queue<string[]>();
 			queue.Enqueue(data);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
-			var reader = new CsvReader(parserMock) { Configuration = { HasHeaderRecord = false } };
+			var reader = new CsvReader(parserMock);
 			reader.Read();
 
 			try
@@ -310,20 +326,28 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void GetRecordWithDuplicateHeaderFields()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null,
+			};
 			var data = new[] { "Field1", "Field1" };
 			var queue = new Queue<string[]>();
 			queue.Enqueue(data);
 			queue.Enqueue(data);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
 			var reader = new CsvReader(parserMock);
-			reader.Configuration.MissingFieldFound = null;
 			reader.Read();
 		}
 
 		[TestMethod]
 		public void GetRecordGenericTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null,
+				HeaderValidated = null,
+			};
 			var headerData = new[]
 			{
 				"IntColumn",
@@ -340,11 +364,9 @@ namespace CsvHelper.Tests
 			queue.Enqueue(headerData);
 			queue.Enqueue(recordData);
 			queue.Enqueue(null);
-			var csvParserMock = new ParserMock(queue);
+			var csvParserMock = new ParserMock(config, queue);
 
 			var csv = new CsvReader(csvParserMock);
-			csv.Configuration.HeaderValidated = null;
-			csv.Configuration.MissingFieldFound = null;
 			csv.Configuration.RegisterClassMap<TestRecordMap>();
 			csv.Read();
 			var record = csv.GetRecord<TestRecord>();
@@ -359,6 +381,11 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void GetRecordTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null,
+				HeaderValidated = null,
+			};
 			var headerData = new[]
 			{
 				"IntColumn",
@@ -375,11 +402,9 @@ namespace CsvHelper.Tests
 			queue.Enqueue(headerData);
 			queue.Enqueue(recordData);
 			queue.Enqueue(null);
-			var csvParserMock = new ParserMock(queue);
+			var csvParserMock = new ParserMock(config, queue);
 
 			var csv = new CsvReader(csvParserMock);
-			csv.Configuration.HeaderValidated = null;
-			csv.Configuration.MissingFieldFound = null;
 			csv.Configuration.RegisterClassMap<TestRecordMap>();
 			csv.Read();
 			var record = (TestRecord)csv.GetRecord(typeof(TestRecord));
@@ -394,6 +419,11 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void GetRecordsGenericTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null,
+				HeaderValidated = null,
+			};
 			var headerData = new[]
 			{
 				"IntColumn",
@@ -406,11 +436,9 @@ namespace CsvHelper.Tests
 			queue.Enqueue(new[] { "1", "string column 1", guid.ToString() });
 			queue.Enqueue(new[] { "2", "string column 2", guid.ToString() });
 			queue.Enqueue(null);
-			var csvParserMock = new ParserMock(queue);
+			var csvParserMock = new ParserMock(config, queue);
 
 			var csv = new CsvReader(csvParserMock);
-			csv.Configuration.HeaderValidated = null;
-			csv.Configuration.MissingFieldFound = null;
 			csv.Configuration.RegisterClassMap<TestRecordMap>();
 			var records = csv.GetRecords<TestRecord>().ToList();
 
@@ -430,6 +458,11 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void GetRecordsTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null,
+				HeaderValidated = null,
+			};
 			var headerData = new[]
 			{
 				"IntColumn",
@@ -442,11 +475,9 @@ namespace CsvHelper.Tests
 			queue.Enqueue(new[] { "1", "string column 1", guid.ToString() });
 			queue.Enqueue(new[] { "2", "string column 2", guid.ToString() });
 			queue.Enqueue(null);
-			var csvParserMock = new ParserMock(queue);
+			var csvParserMock = new ParserMock(config, queue);
 
 			var csv = new CsvReader(csvParserMock);
-			csv.Configuration.HeaderValidated = null;
-			csv.Configuration.MissingFieldFound = null;
 			csv.Configuration.RegisterClassMap<TestRecordMap>();
 			var records = csv.GetRecords(typeof(TestRecord)).ToList();
 
@@ -466,6 +497,10 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void GetRecordsWithDuplicateHeaderNames()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null,
+			};
 			var headerData = new[]
 			{
 				"Column",
@@ -478,10 +513,9 @@ namespace CsvHelper.Tests
 			queue.Enqueue(new[] { "one", "two", "three" });
 			queue.Enqueue(new[] { "one", "two", "three" });
 			queue.Enqueue(null);
-			var csvParserMock = new ParserMock(queue);
+			var csvParserMock = new ParserMock(config, queue);
 
 			var csv = new CsvReader(csvParserMock);
-			csv.Configuration.MissingFieldFound = null;
 			csv.Configuration.RegisterClassMap<TestRecordDuplicateHeaderNamesMap>();
 			var records = csv.GetRecords<TestRecordDuplicateHeaderNames>().ToList();
 
@@ -529,7 +563,6 @@ namespace CsvHelper.Tests
 
 			var reader = new StreamReader(stream);
 			var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture);
-			csvReader.Configuration.Delimiter = ",";
 
 			csvReader.Read();
 			var record = csvReader.GetRecord<TestNullable>();
@@ -556,6 +589,10 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void CaseInsensitiveHeaderMatchingTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				PrepareHeaderForMatch = (header, index) => header.ToLower(),
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
@@ -566,8 +603,6 @@ namespace CsvHelper.Tests
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.Delimiter = ",";
-				csv.Configuration.PrepareHeaderForMatch = (header, index) => header.ToLower();
 				csv.Read();
 				csv.ReadHeader();
 				csv.Read();
@@ -581,13 +616,16 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void SpacesInHeaderTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				PrepareHeaderForMatch = (header, index) => Regex.Replace(header, @"\s", string.Empty),
+			};
 			var queue = new Queue<string[]>();
 			queue.Enqueue(new[] { " Int Column ", " String Column " });
 			queue.Enqueue(new[] { "1", "one" });
 			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 			var reader = new CsvReader(parserMock);
-			reader.Configuration.PrepareHeaderForMatch = (header, index) => Regex.Replace(header, @"\s", string.Empty);
 			var data = reader.GetRecords<TestDefaultValues>().ToList();
 			Assert.IsNotNull(data);
 			Assert.AreEqual(1, data.Count);
@@ -614,7 +652,6 @@ namespace CsvHelper.Tests
 
 			var reader = new StreamReader(stream);
 			var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture);
-			csvReader.Configuration.Delimiter = ",";
 
 			var records = csvReader.GetRecords<TestBoolean>().ToList();
 
@@ -635,17 +672,20 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void SkipEmptyRecordsTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+				ShouldSkipRecord = record => record.All(string.IsNullOrWhiteSpace),
+			};
 			var queue = new Queue<string[]>();
 			queue.Enqueue(new[] { "1", "2", "3" });
 			queue.Enqueue(new[] { "", "", "" });
 			queue.Enqueue(new[] { "4", "5", "6" });
 			queue.Enqueue(null);
 
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
 			var reader = new CsvReader(parserMock);
-			reader.Configuration.HasHeaderRecord = false;
-			reader.Configuration.ShouldSkipRecord = record => record.All(string.IsNullOrWhiteSpace);
 
 			reader.Read();
 			Assert.AreEqual("1", reader.Context.Record[0]);
@@ -663,17 +703,20 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void SkipRecordCallbackTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+				ShouldSkipRecord = row => row[1] == "2",
+			};
 			var queue = new Queue<string[]>();
 			queue.Enqueue(new[] { "1", "2", "3" });
 			queue.Enqueue(new[] { " ", "", "" });
 			queue.Enqueue(new[] { "4", "5", "6" });
 			queue.Enqueue(null);
 
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
 			var reader = new CsvReader(parserMock);
-			reader.Configuration.HasHeaderRecord = false;
-			reader.Configuration.ShouldSkipRecord = row => row[1] == "2";
 
 			reader.Read();
 			Assert.AreEqual(" ", reader.Context.Record[0]);
@@ -691,20 +734,22 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void MultipleGetRecordsCalls()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HeaderValidated = null,
+				MissingFieldFound = null,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csvReader = new CsvReader(reader, config))
 			{
-				csvReader.Configuration.Delimiter = ",";
 				writer.WriteLine("IntColumn,String Column");
 				writer.WriteLine("1,one");
 				writer.WriteLine("2,two");
 				writer.Flush();
 				stream.Position = 0;
 
-				csvReader.Configuration.HeaderValidated = null;
-				csvReader.Configuration.MissingFieldFound = null;
 				csvReader.Configuration.RegisterClassMap<TestRecordMap>();
 				var records = csvReader.GetRecords<TestRecord>();
 				Assert.AreEqual(2, records.Count());
@@ -715,6 +760,15 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void IgnoreExceptionsTest()
 		{
+			var callbackCount = 0;
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				ReadingExceptionOccurred = (ex) =>
+				{
+					callbackCount++;
+					return false;
+				},
+			};
 			var queue = new Queue<string[]>();
 			queue.Enqueue(new[] { "BoolColumn", "BoolNullableColumn", "StringColumn" });
 			queue.Enqueue(new[] { "1", "1", "one" });
@@ -723,14 +777,8 @@ namespace CsvHelper.Tests
 			queue.Enqueue(new[] { "four", "1", "four" });
 			queue.Enqueue(new[] { "1", "1", "five" });
 			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 			var csv = new CsvReader(parserMock);
-			var callbackCount = 0;
-			csv.Configuration.ReadingExceptionOccurred = (ex) =>
-			{
-				callbackCount++;
-				return false;
-			};
 
 			var records = csv.GetRecords<TestBoolean>().ToList();
 
@@ -789,7 +837,6 @@ namespace CsvHelper.Tests
 			queue.Enqueue(null);
 			var parserMock = new ParserMock(queue);
 			var csv = new CsvReader(parserMock);
-			csv.Configuration.HasHeaderRecord = true;
 			var records = csv.GetRecords<int>().ToList();
 
 			Assert.IsNotNull(records);
@@ -801,13 +848,16 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ReadPrimitiveRecordsHasHeaderFalseTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			var queue = new Queue<string[]>();
 			queue.Enqueue(new[] { "1" });
 			queue.Enqueue(new[] { "2" });
 			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 			var csv = new CsvReader(parserMock);
-			csv.Configuration.HasHeaderRecord = false;
 			var records = csv.GetRecords<int>().ToList();
 
 			Assert.IsNotNull(records);
@@ -819,13 +869,16 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void TrimHeadersTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null,
+				PrepareHeaderForMatch = (header, index) => header.Trim(),
+			};
 			var queue = new Queue<string[]>();
 			queue.Enqueue(new[] { " one ", " two three " });
 			queue.Enqueue(new[] { "1", "2" });
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 			var reader = new CsvReader(parserMock);
-			reader.Configuration.MissingFieldFound = null;
-			reader.Configuration.PrepareHeaderForMatch = (header, index) => header.Trim();
 			reader.Read();
 			reader.ReadHeader();
 			reader.Read();
@@ -837,14 +890,17 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void RowTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			var queue = new Queue<string[]>();
 			queue.Enqueue(new[] { "1", "one" });
 			queue.Enqueue(new[] { "2", "two" });
 
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
 			var csv = new CsvReader(parserMock);
-			csv.Configuration.HasHeaderRecord = false;
 
 			csv.Read();
 			Assert.AreEqual(1, csv.Context.Row);
@@ -890,18 +946,20 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void WriteNestedHeadersTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				ReferenceHeaderPrefix = (type, name) => $"{name}.",
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Simple1.Id,Simple1.Name,Simple2.Id,Simple2.Name");
 				writer.WriteLine("1,one,2,two");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.ReferenceHeaderPrefix = (type, name) => $"{name}.";
 				var records = csv.GetRecords<Nested>().ToList();
 				Assert.IsNotNull(records);
 				Assert.AreEqual(1, records[0].Simple1.Id);
@@ -933,15 +991,18 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ReaderDynamicNoHeaderTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			var queue = new Queue<string[]>();
 			queue.Enqueue(new[] { "1", "one" });
 			queue.Enqueue(new[] { "2", "two" });
 			queue.Enqueue(null);
 
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
 			var csv = new CsvReader(parserMock);
-			csv.Configuration.HasHeaderRecord = false;
 			csv.Read();
 			var row = csv.GetRecord<dynamic>();
 

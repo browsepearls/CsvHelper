@@ -33,15 +33,19 @@ namespace CsvHelper.Tests.Mocks
 
 		public string this[int index] => throw new NotImplementedException();
 
-		public ParserMock()
+		public ParserMock() : this(new CsvConfiguration(CultureInfo.InvariantCulture)) { }
+
+		public ParserMock(CsvConfiguration configuration)
 		{
-			context = new ReadingContext(new StringReader(string.Empty), new CsvConfiguration(CultureInfo.InvariantCulture), false);
+			context = new ReadingContext(new StringReader(string.Empty), configuration, false);
 			rows = new Queue<string[]>();
 		}
 
-		public ParserMock(Queue<string[]> rows)
+		public ParserMock(Queue<string[]> rows) : this(new CsvConfiguration(CultureInfo.InvariantCulture), rows) { }
+
+		public ParserMock(CsvConfiguration configuration, Queue<string[]> rows)
 		{
-			context = new ReadingContext(new StringReader(string.Empty), new CsvConfiguration(CultureInfo.InvariantCulture), false);
+			context = new ReadingContext(new StringReader(string.Empty), configuration, false);
 			this.rows = rows;
 		}
 

@@ -22,7 +22,6 @@ namespace CsvHelper.Tests.AttributeMapping
 			using (var reader = new StringReader("Id,Name\r\n1,one\r\n"))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var records = csv.GetRecords<TypeConverterClass>().ToList();
 
 				Assert.AreEqual(1, records[0].Id);
@@ -40,7 +39,6 @@ namespace CsvHelper.Tests.AttributeMapping
 			using (var writer = new StringWriter())
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				csv.WriteRecords(records);
 
 				var expected = "Id,Name\r\n1,two\r\n";
@@ -59,7 +57,6 @@ namespace CsvHelper.Tests.AttributeMapping
 			using (var writer = new StringWriter())
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				csv.WriteRecords(records);
 
 				var expected = "Id,Name\r\n1,two\r\n";

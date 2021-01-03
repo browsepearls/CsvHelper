@@ -19,7 +19,6 @@ namespace CsvHelper.Tests.AttributeMapping
 			using (var reader = new StringReader("IsTrue,IsFalse\r\ntrue,false\r\n"))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var records = csv.GetRecords<BooleanValuesTestClass>().ToList();
 				Assert.AreEqual(true, records[0].IsTrue);
 				Assert.AreEqual(false, records[0].IsFalse);

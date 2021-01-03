@@ -5,6 +5,7 @@
 using System.Globalization;
 using System.IO;
 using System.Text;
+using CsvHelper.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CsvHelper.Tests.Parsing
@@ -15,16 +16,19 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void MultipleCharDelimiterWithPartOfDelimiterInFieldTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				Delimiter = "&|$",
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				writer.Write("1&|$2&3&|$4\r\n");
 				writer.Flush();
 				stream.Position = 0;
 
-				parser.Configuration.Delimiter = "&|$";
 				parser.Read();
 
 				Assert.AreEqual(3, parser.Count);
@@ -37,13 +41,15 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void NullDelimiterTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				Delimiter = "\0",
+			};
 			var s = new StringBuilder();
 			s.Append("1\02\03\r\n");
 			using (var reader = new StringReader(s.ToString()))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = "\0";
-
 				parser.Read();
 
 				Assert.AreEqual(3, parser.Count);
@@ -56,12 +62,15 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void FirstCharOfDelimiterNextToDelimiterTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				Delimiter = "!#",
+			};
 			var s = new StringBuilder();
 			s.AppendLine("1!#2!!#3");
 			using (var reader = new StringReader(s.ToString()))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = "!#";
 				parser.Read();
 
 				Assert.AreEqual("1", parser[0]);

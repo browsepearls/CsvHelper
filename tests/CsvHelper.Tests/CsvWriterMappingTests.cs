@@ -28,7 +28,6 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csvWriter.Configuration.Delimiter = ",";
 				csvWriter.Configuration.RegisterClassMap<MultipleNamesClassMap>();
 				csvWriter.WriteRecords(records);
 
@@ -55,7 +54,6 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var records = new List<SameNameMultipleTimesClass>
 				{
 					new SameNameMultipleTimesClass
@@ -79,18 +77,21 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ConvertUsingTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			string result;
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			using (var csv = new CsvWriter(writer, config))
 			{
 				var records = new List<TestClass>
 				{
 					new TestClass { IntColumn = 1 }
 				};
 
-				csv.Configuration.HasHeaderRecord = false;
 				csv.Configuration.RegisterClassMap<ConvertUsingMap>();
 				csv.WriteRecords(records);
 				writer.Flush();
@@ -105,18 +106,21 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ConvertUsingBlockTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			string result;
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			using (var csv = new CsvWriter(writer, config))
 			{
 				var records = new List<TestClass>
 				{
 					new TestClass { IntColumn = 1 }
 				};
 
-				csv.Configuration.HasHeaderRecord = false;
 				csv.Configuration.RegisterClassMap<ConvertUsingBlockMap>();
 				csv.WriteRecords(records);
 				writer.Flush();
@@ -131,18 +135,21 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ConvertUsingConstantTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			string result;
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			using (var csv = new CsvWriter(writer, config))
 			{
 				var records = new List<TestClass>
 				{
 					new TestClass { IntColumn = 1 }
 				};
 
-				csv.Configuration.HasHeaderRecord = false;
 				csv.Configuration.RegisterClassMap<ConvertUsingConstantMap>();
 				csv.WriteRecords(records);
 				writer.Flush();
@@ -158,19 +165,21 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ConvertUsingNullTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			string result;
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			using (var csv = new CsvWriter(writer, config))
 			{
 				var records = new List<MultipleNamesClass>
 				{
 					new MultipleNamesClass { IntColumn = 1, StringColumn = "test" }
 				};
 
-				csv.Configuration.HasHeaderRecord = false;
-				csv.Configuration.Delimiter = ";";
 				csv.Configuration.RegisterClassMap<ConvertUsingNullMap>();
 				csv.WriteRecords(records);
 				writer.Flush();

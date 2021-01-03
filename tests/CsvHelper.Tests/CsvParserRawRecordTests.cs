@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using System.Globalization;
 using System.IO;
+using CsvHelper.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CsvHelper.Tests
@@ -14,124 +15,128 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void RawRecordCrLfTest()
 		{
-			using( var stream = new MemoryStream() )
-			using( var writer = new StreamWriter( stream ) )
-			using( var reader = new StreamReader( stream ) )
-			using( var parser = new CsvParser(reader, CultureInfo.InvariantCulture) )
+			using (var stream = new MemoryStream())
+			using (var writer = new StreamWriter(stream))
+			using (var reader = new StreamReader(stream))
+			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				writer.Write( "1,2\r\n" );
-				writer.Write( "3,4\r\n" );
+				writer.Write("1,2\r\n");
+				writer.Write("3,4\r\n");
 				writer.Flush();
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual( "1,2\r\n", parser.Context.RawRecord );
+				Assert.AreEqual("1,2\r\n", parser.Context.RawRecord);
 
 				parser.Read();
-				Assert.AreEqual( "3,4\r\n", parser.Context.RawRecord );
+				Assert.AreEqual("3,4\r\n", parser.Context.RawRecord);
 
 				parser.Read();
-				Assert.AreEqual( string.Empty, parser.Context.RawRecord );
+				Assert.AreEqual(string.Empty, parser.Context.RawRecord);
 			}
 		}
 
 		[TestMethod]
 		public void RawRecordCrTest()
 		{
-			using( var stream = new MemoryStream() )
-			using( var writer = new StreamWriter( stream ) )
-			using( var reader = new StreamReader( stream ) )
-			using( var parser = new CsvParser(reader, CultureInfo.InvariantCulture) )
+			using (var stream = new MemoryStream())
+			using (var writer = new StreamWriter(stream))
+			using (var reader = new StreamReader(stream))
+			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				writer.Write( "1,2\r" );
-				writer.Write( "3,4\r" );
+				writer.Write("1,2\r");
+				writer.Write("3,4\r");
 				writer.Flush();
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual( "1,2\r", parser.Context.RawRecord );
+				Assert.AreEqual("1,2\r", parser.Context.RawRecord);
 
 				parser.Read();
-				Assert.AreEqual( "3,4\r", parser.Context.RawRecord );
+				Assert.AreEqual("3,4\r", parser.Context.RawRecord);
 
 				parser.Read();
-				Assert.AreEqual( string.Empty, parser.Context.RawRecord );
+				Assert.AreEqual(string.Empty, parser.Context.RawRecord);
 			}
 		}
 
 		[TestMethod]
 		public void RawRecordLfTest()
 		{
-			using( var stream = new MemoryStream() )
-			using( var writer = new StreamWriter( stream ) )
-			using( var reader = new StreamReader( stream ) )
-			using( var parser = new CsvParser(reader, CultureInfo.InvariantCulture) )
+			using (var stream = new MemoryStream())
+			using (var writer = new StreamWriter(stream))
+			using (var reader = new StreamReader(stream))
+			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				writer.Write( "1,2\n" );
-				writer.Write( "3,4\n" );
+				writer.Write("1,2\n");
+				writer.Write("3,4\n");
 				writer.Flush();
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual( "1,2\n", parser.Context.RawRecord );
+				Assert.AreEqual("1,2\n", parser.Context.RawRecord);
 
 				parser.Read();
-				Assert.AreEqual( "3,4\n", parser.Context.RawRecord );
+				Assert.AreEqual("3,4\n", parser.Context.RawRecord);
 
 				parser.Read();
-				Assert.AreEqual( string.Empty, parser.Context.RawRecord );
+				Assert.AreEqual(string.Empty, parser.Context.RawRecord);
 			}
 		}
 
 		[TestMethod]
 		public void RawRecordCr2DelimiterTest()
 		{
-			using( var stream = new MemoryStream() )
-			using( var writer = new StreamWriter( stream ) )
-			using( var reader = new StreamReader( stream ) )
-			using( var parser = new CsvParser(reader, CultureInfo.InvariantCulture) )
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				writer.Write( "1;;2\r" );
-				writer.Write( "3;;4\r" );
+				Delimiter = ";;",
+			};
+			using (var stream = new MemoryStream())
+			using (var writer = new StreamWriter(stream))
+			using (var reader = new StreamReader(stream))
+			using (var parser = new CsvParser(reader, config))
+			{
+				writer.Write("1;;2\r");
+				writer.Write("3;;4\r");
 				writer.Flush();
 				stream.Position = 0;
 
-				parser.Configuration.Delimiter = ";;";
+				parser.Read();
+				Assert.AreEqual("1;;2\r", parser.Context.RawRecord);
 
 				parser.Read();
-				Assert.AreEqual( "1;;2\r", parser.Context.RawRecord );
+				Assert.AreEqual("3;;4\r", parser.Context.RawRecord);
 
 				parser.Read();
-				Assert.AreEqual( "3;;4\r", parser.Context.RawRecord );
-
-				parser.Read();
-				Assert.AreEqual( string.Empty, parser.Context.RawRecord );
+				Assert.AreEqual(string.Empty, parser.Context.RawRecord);
 			}
 		}
 
 		[TestMethod]
 		public void TinyBufferTest()
 		{
-			using( var stream = new MemoryStream() )
-			using( var writer = new StreamWriter( stream ) )
-			using( var reader = new StreamReader( stream ) )
-			using( var parser = new CsvParser(reader, CultureInfo.InvariantCulture) )
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				writer.Write( "1,2\r\n" );
-				writer.Write( "3,4\r\n" );
+				BufferSize = 1,
+			};
+			using (var stream = new MemoryStream())
+			using (var writer = new StreamWriter(stream))
+			using (var reader = new StreamReader(stream))
+			using (var parser = new CsvParser(reader, config))
+			{
+				writer.Write("1,2\r\n");
+				writer.Write("3,4\r\n");
 				writer.Flush();
 				stream.Position = 0;
 
-				parser.Configuration.BufferSize = 1;
+				parser.Read();
+				Assert.AreEqual("1,2\r\n", parser.Context.RawRecord);
 
 				parser.Read();
-				Assert.AreEqual( "1,2\r\n", parser.Context.RawRecord );
+				Assert.AreEqual("3,4\r\n", parser.Context.RawRecord);
 
 				parser.Read();
-				Assert.AreEqual( "3,4\r\n", parser.Context.RawRecord );
-
-				parser.Read();
-				Assert.AreEqual( string.Empty, parser.Context.RawRecord );
+				Assert.AreEqual(string.Empty, parser.Context.RawRecord);
 			}
 		}
 	}

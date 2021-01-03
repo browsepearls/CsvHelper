@@ -20,7 +20,6 @@ namespace CsvHelper.Tests.Reading
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("A,B");
 				writer.WriteLine("1,one");
 				writer.WriteLine("Y,Z");
@@ -52,7 +51,6 @@ namespace CsvHelper.Tests.Reading
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("A,B");
 				writer.WriteLine("1,one");
 				writer.WriteLine("Y,Z");

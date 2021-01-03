@@ -17,18 +17,20 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void ValidateTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Id,Name");
 				writer.WriteLine(",one");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.MissingFieldFound = null;
 				csv.Configuration.RegisterClassMap<ValidateMap>();
 				Assert.ThrowsException<FieldValidationException>(() => csv.GetRecords<Test>().ToList());
 			}
@@ -37,19 +39,21 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void LogInsteadTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Id,Name");
 				writer.WriteLine("1,");
 				writer.Flush();
 				stream.Position = 0;
 
 				var logger = new StringBuilder();
-				csv.Configuration.MissingFieldFound = null;
 				csv.Configuration.RegisterClassMap(new LogInsteadMap(logger));
 				csv.GetRecords<Test>().ToList();
 
@@ -63,18 +67,20 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void CustomExceptionTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Id,Name");
 				writer.WriteLine(",one");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.MissingFieldFound = null;
 				csv.Configuration.RegisterClassMap<CustomExceptionMap>();
 				Assert.ThrowsException<CustomException>(() => csv.GetRecords<Test>().ToList());
 			}

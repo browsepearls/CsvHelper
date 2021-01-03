@@ -58,11 +58,13 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void IntConstantTest()
 		{
-			using (var reader = new StringReader("1,one\r\n"))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				csv.Configuration.Delimiter = ",";
-				csv.Configuration.HasHeaderRecord = false;
+				HasHeaderRecord = false,
+			};
+			using (var reader = new StringReader("1,one\r\n"))
+			using (var csv = new CsvReader(reader, config))
+			{
 				csv.Configuration.RegisterClassMap<TestIntMap>();
 				var records = csv.GetRecords<Test>().ToList();
 

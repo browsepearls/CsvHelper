@@ -23,7 +23,6 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var list = new List<Test>
 				{
 					new Test { Id = 1, Name = "one" }
@@ -55,7 +54,6 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Id1,Name1,Id2,Name2");
 				writer.WriteLine("1,one,2,two");
 				writer.Flush();

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ namespace CsvHelper
 		private readonly bool countBytes;
 		private readonly Encoding encoding;
 		private readonly bool ignoreQuotes;
+		private readonly bool leaveOpen;
 
 		private long charCount;
 		private long byteCount;
@@ -143,51 +145,38 @@ namespace CsvHelper
 		/// </summary>
 		/// <param name="reader">The <see cref="TextReader" /> with the CSV file data.</param>
 		/// <param name="culture">The culture.</param>
-		public CsvParser(TextReader reader, CultureInfo culture) : this(reader, new CsvConfiguration(culture), false) { }
-
-		/// <summary>
-		/// Creates a new parser using the given <see cref="TextReader" />.
-		/// </summary>
-		/// <param name="reader">The <see cref="TextReader" /> with the CSV file data.</param>
-		/// <param name="culture">The culture.</param>
-		/// <param name="leaveOpen">true to leave the reader open after the CsvReader object is disposed, otherwise false.</param>
-		public CsvParser(TextReader reader, CultureInfo culture, bool leaveOpen) : this(reader, new CsvConfiguration(culture), leaveOpen) { }
+		/// <param name="leaveOpen"><c>true</c> to leave the <see cref="TextReader"/> open after the <see cref="CsvReader"/> object is disposed, otherwise <c>false</c>.</param>
+		public CsvParser(TextReader reader, CultureInfo culture, bool leaveOpen = false) : this(reader, new CsvConfiguration(culture) { LeaveOpen = leaveOpen }) { }
 
 		/// <summary>
 		/// Creates a new parser using the given <see cref="TextReader"/> and <see cref="Configuration"/>.
 		/// </summary>
 		/// <param name="reader">The <see cref="TextReader"/> with the CSV file data.</param>
 		/// <param name="configuration">The configuration.</param>
-		public CsvParser(TextReader reader, CsvConfiguration configuration) : this(reader, configuration, false) { }
-
-		/// <summary>
-		/// Creates a new parser using the given <see cref="TextReader"/> and <see cref="Configuration"/>.
-		/// </summary>
-		/// <param name="reader">The <see cref="TextReader"/> with the CSV file data.</param>
-		/// <param name="configuration">The configuration.</param>
-		/// <param name="leaveOpen">true to leave the reader open after the CsvReader object is disposed, otherwise false.</param>
-		public CsvParser(TextReader reader, CsvConfiguration configuration, bool leaveOpen)
+		public CsvParser(TextReader reader, CsvConfiguration configuration)
 		{
 			this.reader = reader;
+
+			allowComments = configuration.AllowComments;
+			badDataFound = configuration.BadDataFound;
 			bufferSize = configuration.BufferSize;
+			comment = configuration.Comment;
+			context = new ReadingContext(reader, configuration, leaveOpen);
+			countBytes = configuration.CountBytes;
 			delimiter = configuration.Delimiter;
 			delimiterFirstChar = delimiter[0];
-			ignoreBlankLines = configuration.IgnoreBlankLines;
-			comment = configuration.Comment;
-			allowComments = configuration.AllowComments;
-			quote = configuration.Quote;
+			dequoteField = configuration.DequoteField;
+			encoding = configuration.Encoding;
 			escape = configuration.Escape;
+			ignoreBlankLines = configuration.IgnoreBlankLines;
+			ignoreQuotes = configuration.IgnoreQuotes;
+			leaveOpen = configuration.LeaveOpen;
+			postDequoteField = configuration.PostDequoteField;
+			preDequoteField = configuration.PreDequoteField;
+			processField = configuration.ProcessField;
+			quote = configuration.Quote;
 			trimOptions = configuration.TrimOptions;
 			whiteSpaceChars = configuration.WhiteSpaceChars;
-			badDataFound = configuration.BadDataFound;
-			context = new ReadingContext(reader, configuration, leaveOpen);
-			processField = configuration.ProcessField;
-			preDequoteField = configuration.PreDequoteField;
-			dequoteField = configuration.DequoteField;
-			postDequoteField = configuration.PostDequoteField;
-			countBytes = configuration.CountBytes;
-			encoding = configuration.Encoding;
-			ignoreQuotes = configuration.IgnoreQuotes;
 
 			Configuration = configuration;
 		}
@@ -222,7 +211,7 @@ namespace CsvHelper
 			var delimiterPosition = 0;
 			var inComment = false;
 			var c = '\0';
-			var cPrev = '\0';
+			char cPrev;
 
 			while (true)
 			{
@@ -535,7 +524,7 @@ namespace CsvHelper
 
 		public void Dispose()
 		{
-			Dispose(!Context?.LeaveOpen ?? true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
@@ -549,7 +538,11 @@ namespace CsvHelper
 			if (disposing)
 			{
 				// Dispose managed state (managed objects)
-				reader.Dispose();
+				if (!leaveOpen)
+				{
+					reader.Dispose();
+				}
+
 				memoryOwner.Dispose();
 				context.Dispose();
 			}

@@ -105,17 +105,19 @@ namespace CsvHelper.Tests.TypeConversion
 		[TestMethod]
 		public void FullReadNoHeaderTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("1,2,3,4,5");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.HasHeaderRecord = false;
 				csv.Configuration.RegisterClassMap<TestIndexMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
@@ -136,13 +138,11 @@ namespace CsvHelper.Tests.TypeConversion
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Before,List,List,List,After");
 				writer.WriteLine("1,2,3,4,5");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.HasHeaderRecord = true;
 				csv.Configuration.RegisterClassMap<TestIndexMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
@@ -163,13 +163,11 @@ namespace CsvHelper.Tests.TypeConversion
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Before,List,List,List,After");
 				writer.WriteLine("1,2,3,4,5");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.HasHeaderRecord = true;
 				csv.Configuration.RegisterClassMap<TestDefaultMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
@@ -190,13 +188,11 @@ namespace CsvHelper.Tests.TypeConversion
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Before,List,List,List,After");
 				writer.WriteLine("1,2,3,4,5");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.HasHeaderRecord = true;
 				csv.Configuration.RegisterClassMap<TestNamedMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
@@ -217,13 +213,11 @@ namespace CsvHelper.Tests.TypeConversion
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Before,List,A,List,B,List,After");
 				writer.WriteLine("1,2,3,4,5,6,7");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.HasHeaderRecord = true;
 				csv.Configuration.RegisterClassMap<TestNamedMap>();
 				var records = csv.GetRecords<Test>().ToList();
 

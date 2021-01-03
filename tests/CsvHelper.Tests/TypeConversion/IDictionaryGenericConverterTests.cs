@@ -82,16 +82,19 @@ namespace CsvHelper.Tests.TypeConversion
 		[TestMethod]
 		public void FullReadNoHeaderTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
 				writer.WriteLine("1,2,3,4,5");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.HasHeaderRecord = false;
 				csv.Configuration.RegisterClassMap<TestIndexMap>();
 
 				try
@@ -110,19 +113,20 @@ namespace CsvHelper.Tests.TypeConversion
 		[TestMethod]
 		public void FullReadWithHeaderTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HeaderValidated = null,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Before,Dictionary1,Dictionary2,Dictionary3,After");
 				writer.WriteLine("1,2,3,4,5");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.HeaderValidated = null;
-				csv.Configuration.HasHeaderRecord = true;
 				csv.Configuration.RegisterClassMap<TestIndexMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
@@ -143,13 +147,11 @@ namespace CsvHelper.Tests.TypeConversion
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Before,Dictionary,Dictionary,Dictionary,After");
 				writer.WriteLine("1,2,3,4,5");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.HasHeaderRecord = true;
 				csv.Configuration.RegisterClassMap<TestDefaultMap>();
 
 				try
@@ -172,13 +174,11 @@ namespace CsvHelper.Tests.TypeConversion
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Before,Dictionary,Dictionary,Dictionary,After");
 				writer.WriteLine("1,2,3,4,5");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.HasHeaderRecord = true;
 				csv.Configuration.RegisterClassMap<TestNamedMap>();
 				try
 				{
@@ -200,13 +200,11 @@ namespace CsvHelper.Tests.TypeConversion
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Before,Dictionary,A,Dictionary,B,Dictionary,After");
 				writer.WriteLine("1,2,3,4,5,6,7");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.HasHeaderRecord = true;
 				csv.Configuration.RegisterClassMap<TestNamedMap>();
 				try
 				{

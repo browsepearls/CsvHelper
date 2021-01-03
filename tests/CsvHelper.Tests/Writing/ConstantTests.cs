@@ -22,7 +22,6 @@ namespace CsvHelper.Tests.Writing
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var records = new List<Test>
 				{
 					new Test { Id = 1, Name = "one" },
@@ -48,17 +47,19 @@ namespace CsvHelper.Tests.Writing
 		[TestMethod]
 		public void NullConstantTest()
 		{
-			using (var writer = new StringWriter())
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				csv.Configuration.Delimiter = ",";
+				HasHeaderRecord = false,
+			};
+			using (var writer = new StringWriter())
+			using (var csv = new CsvWriter(writer, config))
+			{
 				var records = new List<Test>
 				{
 					new Test { Id = 1, Name = "one" },
 				};
 
 				csv.Configuration.RegisterClassMap<TestNullMap>();
-				csv.Configuration.HasHeaderRecord = false;
 				csv.WriteRecords(records);
 				writer.Flush();
 
@@ -69,18 +70,20 @@ namespace CsvHelper.Tests.Writing
 		[TestMethod]
 		public void IntConstantTest()
 		{
-			using (var writer = new StringWriter())
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				csv.Configuration.Delimiter = ",";
+				HasHeaderRecord = false,
+				SanitizeForInjection = false,
+			};
+			using (var writer = new StringWriter())
+			using (var csv = new CsvWriter(writer, config))
+			{
 				var records = new List<Test>
 				{
 					new Test { Id = 1, Name = "one" },
 				};
 
 				csv.Configuration.RegisterClassMap<TestIntMap>();
-				csv.Configuration.HasHeaderRecord = false;
-				csv.Configuration.SanitizeForInjection = false;
 				csv.WriteRecords(records);
 				writer.Flush();
 

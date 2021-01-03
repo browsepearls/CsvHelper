@@ -16,18 +16,19 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void AutoMappingTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				IncludePrivateMembers = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Id,Name");
 				writer.WriteLine("1,one");
 				writer.Flush();
 				stream.Position = 0;
-
-				csv.Configuration.IncludePrivateMembers = true;
 
 				var records = csv.GetRecords<Child>().ToList();
 				Assert.AreEqual(1, records[0].Id);
@@ -38,18 +39,20 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void ClassMappingTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				IncludePrivateMembers = true,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				writer.WriteLine("Id,Name");
 				writer.WriteLine("1,one");
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.IncludePrivateMembers = true;
 				csv.Configuration.RegisterClassMap<ChildMap>();
 
 				var records = csv.GetRecords<Child>().ToList();

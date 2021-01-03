@@ -16,12 +16,15 @@ namespace CsvHelper.Tests.Defaults
 		[TestMethod]
 		public void EmptyFieldsOnNullReferencePropertyTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				UseNewObjectForNullReferenceMembers = false,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			using (var csv = new CsvWriter(writer, config))
 			{
-				csv.Configuration.Delimiter = ",";
 				var records = new List<A>
 				{
 					new A
@@ -38,7 +41,6 @@ namespace CsvHelper.Tests.Defaults
 					},
 				};
 
-				csv.Configuration.UseNewObjectForNullReferenceMembers = false;
 				csv.Configuration.RegisterClassMap<AMap>();
 				csv.WriteRecords(records);
 
@@ -61,7 +63,6 @@ namespace CsvHelper.Tests.Defaults
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var records = new List<A>
 				{
 					new A

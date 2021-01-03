@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using System.Globalization;
 using System.IO;
+using CsvHelper.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CsvHelper.Tests
@@ -14,17 +15,19 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void DifferentDelimiterTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				Delimiter = "\t",
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				writer.WriteLine("1\t2\t3");
 				writer.WriteLine("4\t5\t6");
 				writer.Flush();
 				stream.Position = 0;
-
-				parser.Configuration.Delimiter = "\t";
 
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
@@ -48,17 +51,19 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void MultipleCharDelimiter2Test()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				Delimiter = "``",
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				writer.WriteLine("1``2``3");
 				writer.WriteLine("4``5``6");
 				writer.Flush();
 				stream.Position = 0;
-
-				parser.Configuration.Delimiter = "``";
 
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
@@ -82,17 +87,19 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void MultipleCharDelimiter3Test()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				Delimiter = "\t",
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				writer.WriteLine("1`\t`2`\t`3");
 				writer.WriteLine("4`\t`5`\t`6");
 				writer.Flush();
 				stream.Position = 0;
-
-				parser.Configuration.Delimiter = "`\t`";
 
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
@@ -116,17 +123,19 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void AllFieldsEmptyTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				Delimiter = ";;",
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				writer.WriteLine(";;;;");
 				writer.WriteLine(";;;;");
 				writer.Flush();
 				stream.Position = 0;
-
-				parser.Configuration.Delimiter = ";;";
 
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
@@ -150,17 +159,19 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void AllFieldsEmptyNoEolOnLastLineTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				Delimiter = ";;",
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				writer.WriteLine(";;;;");
 				writer.Write(";;;;");
 				writer.Flush();
 				stream.Position = 0;
-
-				parser.Configuration.Delimiter = ";;";
 
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
@@ -184,17 +195,19 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void EmptyLastFieldTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				Delimiter = ";;",
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				writer.WriteLine("1;;2;;");
 				writer.WriteLine("4;;5;;");
 				writer.Flush();
 				stream.Position = 0;
-
-				parser.Configuration.Delimiter = ";;";
 
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
@@ -218,17 +231,19 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void EmptyLastFieldNoEolOnLastLineTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				Delimiter = ";;",
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				writer.WriteLine("1;;2;;");
 				writer.Write("4;;5;;");
 				writer.Flush();
 				stream.Position = 0;
-
-				parser.Configuration.Delimiter = ";;";
 
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
@@ -252,18 +267,20 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void DifferentDelimiter2ByteCountTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				CountBytes = true,
+				Delimiter = ";;",
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				writer.Write("1;;2\r\n");
 				writer.Write("4;;5\r\n");
 				writer.Flush();
 				stream.Position = 0;
-
-				parser.Configuration.Delimiter = ";;";
-				parser.Configuration.CountBytes = true;
 
 				parser.Read();
 				Assert.AreEqual(6, parser.Context.BytePosition);
@@ -278,18 +295,20 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void DifferentDelimiter3ByteCountTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				CountBytes = true,
+				Delimiter = ";;;",
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
 				writer.Write("1;;;2\r\n");
 				writer.Write("4;;;5\r\n");
 				writer.Flush();
 				stream.Position = 0;
-
-				parser.Configuration.Delimiter = ";;;";
-				parser.Configuration.CountBytes = true;
 
 				parser.Read();
 				Assert.AreEqual(7, parser.Context.BytePosition);

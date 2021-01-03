@@ -19,7 +19,6 @@ namespace CsvHelper.Tests.AttributeMapping
 			using (var reader = new StringReader("Id,Name\r\n1,\r\n"))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				var records = csv.GetRecords<DefaultTestClass>().ToList();
 
 				Assert.AreEqual(1, records[0].Id);

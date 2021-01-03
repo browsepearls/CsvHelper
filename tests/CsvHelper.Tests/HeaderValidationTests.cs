@@ -19,7 +19,6 @@ namespace CsvHelper.Tests
 		{
 			using (var csv = new CsvReader(new StringReader("Id,Name"), CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.Delimiter = ",";
 				csv.Read();
 				csv.ReadHeader();
 				csv.ValidateHeader<Test>();

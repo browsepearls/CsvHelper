@@ -51,16 +51,18 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 		[TestMethod]
 		public void GetRecords_WithBooleanTrueValuesAttribute_NoHeader_CreatesRecords()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
 			var rows = new Queue<string[]>(new List<string[]>
 			{
 				new [] { "1", "Bar" },
 				null
 			});
-			using (var parser = new ParserMock(rows))
+			using (var parser = new ParserMock(config, rows))
 			using (var csv = new CsvReader(parser))
 			{
-				csv.Configuration.HasHeaderRecord = false;
-
 				var records = csv.GetRecords<Foo>().ToList();
 
 				Assert.AreEqual(1, records.Count);

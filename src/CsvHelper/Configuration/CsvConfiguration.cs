@@ -16,33 +16,34 @@ namespace CsvHelper.Configuration
 	/// <summary>
 	/// Configuration used for reading and writing CSV data.
 	/// </summary>
-	public class CsvConfiguration : IReaderConfiguration, IWriterConfiguration
+	public record CsvConfiguration : IReaderConfiguration, IWriterConfiguration
 	{
 		private string delimiter = CultureInfo.CurrentCulture.TextInfo.ListSeparator;
 		private char escape = '"';
 		private char quote = '"';
 		private string quoteString = "\"";
 		private string doubleQuoteString = "\"\"";
-		private CultureInfo cultureInfo = CultureInfo.CurrentCulture;
 		private readonly ClassMapCollection maps;
 		private NewLine newLine;
 
 		/// <summary>
 		/// Gets or sets the <see cref="TypeConverterOptionsCache"/>.
 		/// </summary>
-		public virtual TypeConverterOptionsCache TypeConverterOptionsCache { get; set; } = new TypeConverterOptionsCache();
+		public virtual TypeConverterOptionsCache TypeConverterOptionsCache { get; init; } = new TypeConverterOptionsCache();
 
 		/// <summary>
 		/// Gets or sets the <see cref="TypeConverterOptionsCache"/>.
 		/// </summary>
-		public virtual TypeConverterCache TypeConverterCache { get; set; } = new TypeConverterCache();
+		public virtual TypeConverterCache TypeConverterCache { get; init; } = new TypeConverterCache();
+
+		public virtual bool LeaveOpen { get; init; }
 
 		/// <summary>
 		/// Gets or sets a value indicating if the
 		/// CSV file has a header record.
 		/// Default is true.
 		/// </summary>
-		public virtual bool HasHeaderRecord { get; set; } = true;
+		public virtual bool HasHeaderRecord { get; init; } = true;
 
 		/// <summary>
 		/// Gets or sets the function that is called when a header validation check is ran. The default function
@@ -50,7 +51,7 @@ namespace CsvHelper.Configuration
 		/// You can supply your own function to do other things like logging the issue instead of throwing an exception.
 		/// Arguments: (isValid, headerNames, headerNameIndex, context)
 		/// </summary>
-		public virtual Action<InvalidHeader[], ReadingContext> HeaderValidated { get; set; } = ConfigurationFunctions.HeaderValidated;
+		public virtual Action<InvalidHeader[], ReadingContext> HeaderValidated { get; init; } = ConfigurationFunctions.HeaderValidated;
 
 		/// <summary>
 		/// Gets or sets the function that is called when a missing field is found. The default function will
@@ -58,7 +59,7 @@ namespace CsvHelper.Configuration
 		/// like logging the issue instead of throwing an exception.
 		/// Arguments: (headerNames, index, context)
 		/// </summary>
-		public virtual Action<string[], int, ReadingContext> MissingFieldFound { get; set; } = ConfigurationFunctions.MissingFieldFound;
+		public virtual Action<string[], int, ReadingContext> MissingFieldFound { get; init; } = ConfigurationFunctions.MissingFieldFound;
 
 		/// <summary>
 		/// Gets or sets the function that is called when bad field data is found. A field
@@ -67,7 +68,7 @@ namespace CsvHelper.Configuration
 		/// instead of throwing an exception.
 		/// Arguments: context
 		/// </summary>
-		public virtual Action<ReadingContext> BadDataFound { get; set; } = ConfigurationFunctions.BadDataFound;
+		public virtual Action<ReadingContext> BadDataFound { get; init; } = ConfigurationFunctions.BadDataFound;
 
 		/// <summary>
 		/// Gets or sets the function that is called when a reading exception occurs.
@@ -76,38 +77,38 @@ namespace CsvHelper.Configuration
 		/// logging the issue.
 		/// Arguments: (exception)
 		/// </summary>
-		public virtual Func<CsvHelperException, bool> ReadingExceptionOccurred { get; set; } = ConfigurationFunctions.ReadingExceptionOccurred;
+		public virtual Func<CsvHelperException, bool> ReadingExceptionOccurred { get; init; } = ConfigurationFunctions.ReadingExceptionOccurred;
 
 		/// <summary>
 		/// Gets or sets the callback that will be called to
 		/// determine whether to skip the given record or not.
 		/// Arguments: (record)
 		/// </summary>
-		public virtual Func<string[], bool> ShouldSkipRecord { get; set; } = ConfigurationFunctions.ShouldSkipRecord;
+		public virtual Func<string[], bool> ShouldSkipRecord { get; init; } = ConfigurationFunctions.ShouldSkipRecord;
 
 		/// <summary>
 		/// Gets or sets a value indicating if a line break found in a quote field should
 		/// be considered bad data. True to consider a line break bad data, otherwise false.
 		/// Defaults to false.
 		/// </summary>
-		public virtual bool LineBreakInQuotedFieldIsBadData { get; set; }
+		public virtual bool LineBreakInQuotedFieldIsBadData { get; init; }
 
 		/// <summary>
 		/// Gets or sets a value indicating if fields should be sanitized
 		/// to prevent malicious injection. This covers MS Excel, 
 		/// Google Sheets and Open Office Calc.
 		/// </summary>
-		public virtual bool SanitizeForInjection { get; set; }
+		public virtual bool SanitizeForInjection { get; init; }
 
 		/// <summary>
 		/// Gets or sets the characters that are used for injection attacks.
 		/// </summary>
-		public virtual char[] InjectionCharacters { get; set; } = new[] { '=', '@', '+', '-' };
+		public virtual char[] InjectionCharacters { get; init; } = new[] { '=', '@', '+', '-' };
 
 		/// <summary>
 		/// Gets or sets the character used to escape a detected injection.
 		/// </summary>
-		public virtual char InjectionEscapeCharacter { get; set; } = '\t';
+		public virtual char InjectionEscapeCharacter { get; init; } = '\t';
 
 		/// <summary>
 		/// Gets or sets a value indicating whether changes in the column
@@ -117,7 +118,7 @@ namespace CsvHelper.Configuration
 		/// <value>
 		/// <c>true</c> if [detect column count changes]; otherwise, <c>false</c>.
 		/// </value>
-		public virtual bool DetectColumnCountChanges { get; set; }
+		public virtual bool DetectColumnCountChanges { get; init; }
 
 		/// <summary>
 		/// Prepares the header field for matching against a member name.
@@ -126,20 +127,20 @@ namespace CsvHelper.Configuration
 		/// and making casing changes to ignore case.
 		/// Arguments: (header, fieldIndex)
 		/// </summary>
-		public virtual Func<string, int, string> PrepareHeaderForMatch { get; set; } = ConfigurationFunctions.PrepareHeaderForMatch;
+		public virtual Func<string, int, string> PrepareHeaderForMatch { get; init; } = ConfigurationFunctions.PrepareHeaderForMatch;
 
 		/// <summary>
 		/// Determines if constructor parameters should be used to create
 		/// the class instead of the default constructor and members.
 		/// Arguments: (parameterType)
 		/// </summary>
-		public virtual Func<Type, bool> ShouldUseConstructorParameters { get; set; } = ConfigurationFunctions.ShouldUseConstructorParameters;
+		public virtual Func<Type, bool> ShouldUseConstructorParameters { get; init; } = ConfigurationFunctions.ShouldUseConstructorParameters;
 
 		/// <summary>
 		/// Chooses the constructor to use for constructor mapping.
 		/// Arguments: (classType)
 		/// </summary>
-		public virtual Func<Type, ConstructorInfo> GetConstructor { get; set; } = ConfigurationFunctions.GetConstructor;
+		public virtual Func<Type, ConstructorInfo> GetConstructor { get; init; } = ConfigurationFunctions.GetConstructor;
 
 		/// <summary>
 		/// Gets or sets the comparer used to order the properties
@@ -147,53 +148,53 @@ namespace CsvHelper.Configuration
 		/// which will preserve the order the object properties
 		/// were created with.
 		/// </summary>
-		public virtual IComparer<string> DynamicPropertySort { get; set; }
+		public virtual IComparer<string> DynamicPropertySort { get; init; }
 
 		/// <summary>
 		/// Gets the name to use for the property of the dynamic object.
 		/// Arguments: (readingContext, fieldIndex)
 		/// </summary>
-		public virtual Func<ReadingContext, int, string> GetDynamicPropertyName { get; set; } = ConfigurationFunctions.GetDynamicPropertyName;
+		public virtual Func<ReadingContext, int, string> GetDynamicPropertyName { get; init; } = ConfigurationFunctions.GetDynamicPropertyName;
 
 		/// <summary>
 		/// Processes a raw field.
 		/// This method calls the field parsing pipeline.
 		/// PreDequote -> Dequote -> PostDequote
 		/// </summary>
-		public virtual ProcessFieldFunc ProcessField { get; set; } = ConfigurationFunctions.ProcessField;
+		public virtual ProcessFieldFunc ProcessField { get; init; } = ConfigurationFunctions.ProcessField;
 
 		/// <summary>
 		/// Processing that happens to a field before dequoting.
 		/// </summary>
-		public virtual PreDequoteFieldFunc PreDequoteField { get; set; } = ConfigurationFunctions.PreDequoteField;
+		public virtual PreDequoteFieldFunc PreDequoteField { get; init; } = ConfigurationFunctions.PreDequoteField;
 
 		/// <summary>
 		/// Removes quoting from a field.
 		/// </summary>
-		public virtual DequoteFieldFunc DequoteField { get; set; } = ConfigurationFunctions.DequoteField;
+		public virtual DequoteFieldFunc DequoteField { get; init; } = ConfigurationFunctions.DequoteField;
 
 		/// <summary>
 		/// Processing that happens to a field after dequoting.
 		/// </summary>
-		public virtual PostDequoteFieldFunc PostDequoteField { get; set; } = ConfigurationFunctions.PostDequoteField;
+		public virtual PostDequoteFieldFunc PostDequoteField { get; init; } = ConfigurationFunctions.PostDequoteField;
 
 		/// <summary>
 		/// Gets or sets a value indicating whether references
 		/// should be ignored when auto mapping. True to ignore
 		/// references, otherwise false. Default is false.
 		/// </summary>
-		public virtual bool IgnoreReferences { get; set; }
+		public virtual bool IgnoreReferences { get; init; }
 
 		/// <summary>
 		/// Gets or sets the field trimming options.
 		/// </summary>
-		public virtual TrimOptions TrimOptions { get; set; }
+		public virtual TrimOptions TrimOptions { get; init; }
 
 		/// <summary>
 		/// Characters considered whitespace.
 		/// Used when trimming fields.
 		/// </summary>
-		public virtual char[] WhiteSpaceChars { get; set; } = new char[] { ' ', '\t' };
+		public virtual char[] WhiteSpaceChars { get; init; } = new char[] { ' ', '\t' };
 
 		/// <summary>
 		/// Gets or sets the delimiter used to separate fields.
@@ -202,7 +203,7 @@ namespace CsvHelper.Configuration
 		public virtual string Delimiter
 		{
 			get { return delimiter; }
-			set
+			init
 			{
 				if (value == "\n")
 				{
@@ -230,7 +231,7 @@ namespace CsvHelper.Configuration
 		public virtual char Escape
 		{
 			get { return escape; }
-			set
+			init
 			{
 				if (value == '\n')
 				{
@@ -260,7 +261,7 @@ namespace CsvHelper.Configuration
 		public virtual char Quote
 		{
 			get { return quote; }
-			set
+			init
 			{
 				if (value == '\n')
 				{
@@ -284,7 +285,7 @@ namespace CsvHelper.Configuration
 
 				quote = value;
 
-				quoteString = Convert.ToString(value, cultureInfo);
+				quoteString = Convert.ToString(value, CultureInfo);
 				doubleQuoteString = escape + quoteString;
 			}
 		}
@@ -310,26 +311,26 @@ namespace CsvHelper.Configuration
 		/// when writing.
 		/// Arguments: field, context
 		/// </summary>
-		public Func<string, WritingContext, bool> ShouldQuote { get; set; } = ConfigurationFunctions.ShouldQuote;
+		public Func<string, WritingContext, bool> ShouldQuote { get; init; } = ConfigurationFunctions.ShouldQuote;
 
 		/// <summary>
 		/// Gets or sets the character used to denote
 		/// a line that is commented out. Default is '#'.
 		/// </summary>
-		public virtual char Comment { get; set; } = '#';
+		public virtual char Comment { get; init; } = '#';
 
 		/// <summary>
 		/// Gets or sets a value indicating if comments are allowed.
 		/// True to allow commented out lines, otherwise false.
 		/// </summary>
-		public virtual bool AllowComments { get; set; }
+		public virtual bool AllowComments { get; init; }
 
 		/// <summary>
 		/// Gets or sets the size of the buffer
 		/// used for reading CSV files.
 		/// Default is 2048.
 		/// </summary>
-		public virtual int BufferSize { get; set; } = 2048;
+		public virtual int BufferSize { get; init; } = 2048;
 
 		/// <summary>
 		/// Gets or sets a value indicating whether the number of bytes should
@@ -337,55 +338,51 @@ namespace CsvHelper.Configuration
 		/// because it needs to get the byte count of every char for the given encoding.
 		/// The <see cref="Encoding"/> needs to be set correctly for this to be accurate.
 		/// </summary>
-		public virtual bool CountBytes { get; set; }
+		public virtual bool CountBytes { get; init; }
 
 		/// <summary>
 		/// Gets or sets the encoding used when counting bytes.
 		/// </summary>
-		public virtual Encoding Encoding { get; set; } = Encoding.UTF8;
+		public virtual Encoding Encoding { get; init; } = Encoding.UTF8;
 
 		/// <summary>
 		/// Gets or sets the culture info used to read an write CSV files.
 		/// Default is <see cref="System.Globalization.CultureInfo.CurrentCulture"/>.
 		/// </summary>
-		public virtual CultureInfo CultureInfo
-		{
-			get { return cultureInfo; }
-			set { cultureInfo = value; }
-		}
+		public virtual CultureInfo CultureInfo { get; protected set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating if quotes should be
 		/// ignored when parsing and treated like any other character.
 		/// </summary>
-		public virtual bool IgnoreQuotes { get; set; }
+		public virtual bool IgnoreQuotes { get; init; }
 
 		/// <summary>
 		/// Gets or sets a value indicating if private
 		/// member should be read from and written to.
 		/// True to include private member, otherwise false. Default is false.
 		/// </summary>
-		public virtual bool IncludePrivateMembers { get; set; }
+		public virtual bool IncludePrivateMembers { get; init; }
 
 		/// <summary>
 		/// Gets or sets the member types that are used when auto mapping.
 		/// MemberTypes are flags, so you can choose more than one.
 		/// Default is Properties.
 		/// </summary>
-		public virtual MemberTypes MemberTypes { get; set; } = MemberTypes.Properties;
+		public virtual MemberTypes MemberTypes { get; init; } = MemberTypes.Properties;
 
 		/// <summary>
 		/// Gets or sets a value indicating if blank lines
 		/// should be ignored when reading.
 		/// True to ignore, otherwise false. Default is true.
 		/// </summary>
-		public virtual bool IgnoreBlankLines { get; set; } = true;
+		public virtual bool IgnoreBlankLines { get; init; } = true;
 
 		/// <summary>
 		/// Gets or sets a callback that will return the prefix for a reference header.
 		/// Arguments: (memberType, memberName)
 		/// </summary>
-		public virtual Func<Type, string, string> ReferenceHeaderPrefix { get; set; }
+		public virtual Func<Type, string, string> ReferenceHeaderPrefix { get; init; }
 
 		/// <summary>
 		/// The configured <see cref="ClassMap"/>s.
@@ -398,7 +395,7 @@ namespace CsvHelper.Configuration
 		public virtual NewLine NewLine
 		{
 			get => newLine;
-			set
+			init
 			{
 				newLine = value;
 
@@ -433,7 +430,7 @@ namespace CsvHelper.Configuration
 		/// fields, or false to leave the fields empty for all the
 		/// reference member's member.
 		/// </summary>
-		public virtual bool UseNewObjectForNullReferenceMembers { get; set; } = true;
+		public virtual bool UseNewObjectForNullReferenceMembers { get; init; } = true;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="CsvConfiguration"/> class
@@ -445,7 +442,7 @@ namespace CsvHelper.Configuration
 		public CsvConfiguration(CultureInfo cultureInfo)
 		{
 			maps = new ClassMapCollection(this);
-			this.cultureInfo = cultureInfo;
+			CultureInfo = cultureInfo;
 			delimiter = cultureInfo.TextInfo.ListSeparator;
 			NewLine = cultureInfo == CultureInfo.InvariantCulture ? NewLine.CRLF : NewLine.Environment;
 		}

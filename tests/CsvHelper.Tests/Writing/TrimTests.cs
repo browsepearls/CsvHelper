@@ -16,13 +16,15 @@ namespace CsvHelper.Tests.Writing
 		[TestMethod]
 		public void Test()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				TrimOptions = TrimOptions.Trim,
+			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			using (var csv = new CsvWriter(writer, config))
 			{
-				csv.Configuration.Delimiter = ",";
-				csv.Configuration.TrimOptions = TrimOptions.Trim;
 				csv.WriteField("  a b c  ");
 				csv.WriteField("  d e f  ");
 				csv.NextRecord();

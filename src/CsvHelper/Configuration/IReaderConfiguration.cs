@@ -16,51 +16,51 @@ namespace CsvHelper.Configuration
 	public interface IReaderConfiguration : IParserConfiguration
 	{
 		/// <summary>
-		/// Gets or sets a value indicating if the
+		/// Gets a value indicating if the
 		/// CSV file has a header record.
 		/// Default is true.
 		/// </summary>
-		bool HasHeaderRecord { get; set; }
+		bool HasHeaderRecord { get; }
 
 		/// <summary>
-		/// Gets or sets the function that is called when a header validation check is ran. The default function
+		/// Gets the function that is called when a header validation check is ran. The default function
 		/// will throw a <see cref="ValidationException"/> if there is no header for a given member mapping.
 		/// You can supply your own function to do other things like logging the issue instead of throwing an exception.
 		/// Arguments: (isValid, headerNames, headerNameIndex, context)
 		/// </summary>
-		Action<InvalidHeader[], ReadingContext> HeaderValidated { get; set; }
+		Action<InvalidHeader[], ReadingContext> HeaderValidated { get; }
 
 		/// <summary>
-		/// Gets or sets the function that is called when a missing field is found. The default function will
+		/// Gets the function that is called when a missing field is found. The default function will
 		/// throw a <see cref="MissingFieldException"/>. You can supply your own function to do other things
 		/// like logging the issue instead of throwing an exception.
 		/// Arguments: (headerNames, index, context)
 		/// </summary>
-		Action<string[], int, ReadingContext> MissingFieldFound { get; set; }
+		Action<string[], int, ReadingContext> MissingFieldFound { get; }
 
 		/// <summary>
-		/// Gets or sets the function that is called when a reading exception occurs.
+		/// Gets the function that is called when a reading exception occurs.
 		/// The default function will re-throw the given exception. If you want to ignore
 		/// reading exceptions, you can supply your own function to do other things like
 		/// logging the issue.
 		/// Arguments: (exception)
 		/// </summary>
-		Func<CsvHelperException, bool> ReadingExceptionOccurred { get; set; }
+		Func<CsvHelperException, bool> ReadingExceptionOccurred { get; }
 
 		/// <summary>
-		/// Gets or sets the culture info used to read an write CSV files.
+		/// Gets the culture info used to read an write CSV files.
 		/// </summary>
-		CultureInfo CultureInfo { get; set; }
+		CultureInfo CultureInfo { get; }
 
 		/// <summary>
-		/// Gets or sets the <see cref="TypeConverterOptionsCache"/>.
+		/// Gets the <see cref="TypeConverterOptionsCache"/>.
 		/// </summary>
-		TypeConverterOptionsCache TypeConverterOptionsCache { get; set; }
+		TypeConverterOptionsCache TypeConverterOptionsCache { get; }
 
 		/// <summary>
-		/// Gets or sets the <see cref="TypeConverterCache"/>.
+		/// Gets the <see cref="TypeConverterCache"/>.
 		/// </summary>
-		TypeConverterCache TypeConverterCache { get; set; }
+		TypeConverterCache TypeConverterCache { get; }
 
 		/// <summary>
 		/// Prepares the header field for matching against a member name.
@@ -69,70 +69,70 @@ namespace CsvHelper.Configuration
 		/// and making casing changes to ignore case.
 		/// Arguments: (header, fieldIndex)
 		/// </summary>
-		Func<string, int, string> PrepareHeaderForMatch { get; set; }
+		Func<string, int, string> PrepareHeaderForMatch { get; }
 
 		/// <summary>
 		/// Determines if constructor parameters should be used to create
 		/// the class instead of the default constructor and members.
 		/// Arguments: (parameterType)
 		/// </summary>
-		Func<Type, bool> ShouldUseConstructorParameters { get; set; }
+		Func<Type, bool> ShouldUseConstructorParameters { get; }
 
 		/// <summary>
 		/// Chooses the constructor to use for constructor mapping.
 		/// Arguments: (classType)
 		/// </summary>
-		Func<Type, ConstructorInfo> GetConstructor { get; set; }
+		Func<Type, ConstructorInfo> GetConstructor { get; }
 
 		/// <summary>
 		/// Gets the name to use for the property of the dynamic object.
 		/// Arguments: (readingContext, fieldIndex)
 		/// </summary>
-		Func<ReadingContext, int, string> GetDynamicPropertyName { get; set; }
+		Func<ReadingContext, int, string> GetDynamicPropertyName { get; }
 
 		/// <summary>
-		/// Gets or sets a value indicating whether references
+		/// Gets a value indicating whether references
 		/// should be ignored when auto mapping. True to ignore
 		/// references, otherwise false. Default is false.
 		/// </summary>
-		bool IgnoreReferences { get; set; }
+		bool IgnoreReferences { get; }
 
 		/// <summary>
-		/// Gets or sets the callback that will be called to
+		/// Gets the callback that will be called to
 		/// determine whether to skip the given record or not.
 		/// Arguments: (record)
 		/// </summary>
-		Func<string[], bool> ShouldSkipRecord { get; set; }
+		Func<string[], bool> ShouldSkipRecord { get; }
 
 		/// <summary>
-		/// Gets or sets a value indicating if private
+		/// Gets a value indicating if private
 		/// member should be read from and written to.
 		/// True to include private member, otherwise false. Default is false.
 		/// </summary>
-		bool IncludePrivateMembers { get; set; }
+		bool IncludePrivateMembers { get; }
 
 		/// <summary>
-		/// Gets or sets a callback that will return the prefix for a reference header.
+		/// Gets a callback that will return the prefix for a reference header.
 		/// Arguments: (memberType, memberName)
 		/// </summary>
-		Func<Type, string, string> ReferenceHeaderPrefix { get; set; }
+		Func<Type, string, string> ReferenceHeaderPrefix { get; }
 
 		/// <summary>
-		/// Gets or sets a value indicating whether changes in the column
+		/// Gets a value indicating whether changes in the column
 		/// count should be detected. If true, a <see cref="BadDataException"/>
 		/// will be thrown if a different column count is detected.
 		/// </summary>
 		/// <value>
 		/// <c>true</c> if [detect column count changes]; otherwise, <c>false</c>.
 		/// </value>
-		bool DetectColumnCountChanges { get; set; }
+		bool DetectColumnCountChanges { get; }
 
 		/// <summary>
-		/// Gets or sets the member types that are used when auto mapping.
+		/// Gets the member types that are used when auto mapping.
 		/// MemberTypes are flags, so you can choose more than one.
 		/// Default is Properties.
 		/// </summary>
-		MemberTypes MemberTypes { get; set; }
+		MemberTypes MemberTypes { get; }
 
 		/// <summary>
 		/// The configured <see cref="ClassMap"/>s.
@@ -153,30 +153,30 @@ namespace CsvHelper.Configuration
 		/// Only member specified in the mapping are used.
 		/// </summary>
 		/// <param name="classMapType">The type of mapping class to use.</param>
-		ClassMap RegisterClassMap( Type classMapType );
+		ClassMap RegisterClassMap(Type classMapType);
 
-	    /// <summary>
-	    /// Registers the class map.
-	    /// </summary>
-	    /// <param name="map">The class map to register.</param>
-	    void RegisterClassMap( ClassMap map );
+		/// <summary>
+		/// Registers the class map.
+		/// </summary>
+		/// <param name="map">The class map to register.</param>
+		void RegisterClassMap(ClassMap map);
 
-	    /// <summary>
-	    /// Unregisters the class map.
-	    /// </summary>
-	    /// <typeparam name="TMap">The map type to unregister.</typeparam>
-	    void UnregisterClassMap<TMap>() where TMap : ClassMap;
+		/// <summary>
+		/// Unregisters the class map.
+		/// </summary>
+		/// <typeparam name="TMap">The map type to unregister.</typeparam>
+		void UnregisterClassMap<TMap>() where TMap : ClassMap;
 
-	    /// <summary>
-	    /// Unregisters the class map.
-	    /// </summary>
-	    /// <param name="classMapType">The map type to unregister.</param>
-	    void UnregisterClassMap( Type classMapType );
+		/// <summary>
+		/// Unregisters the class map.
+		/// </summary>
+		/// <param name="classMapType">The map type to unregister.</param>
+		void UnregisterClassMap(Type classMapType);
 
-	    /// <summary>
-	    /// Unregisters all class maps.
-	    /// </summary>
-	    void UnregisterClassMap();
+		/// <summary>
+		/// Unregisters all class maps.
+		/// </summary>
+		void UnregisterClassMap();
 
 		/// <summary>
 		/// Generates a <see cref="ClassMap"/> for the type.
@@ -185,11 +185,11 @@ namespace CsvHelper.Configuration
 		/// <returns>The generate map.</returns>
 		ClassMap<T> AutoMap<T>();
 
-	    /// <summary>
-	    /// Generates a <see cref="ClassMap"/> for the type.
-	    /// </summary>
-	    /// <param name="type">The type to generate for the map.</param>
-	    /// <returns>The generate map.</returns>
-	    ClassMap AutoMap( Type type );
+		/// <summary>
+		/// Generates a <see cref="ClassMap"/> for the type.
+		/// </summary>
+		/// <param name="type">The type to generate for the map.</param>
+		/// <returns>The generate map.</returns>
+		ClassMap AutoMap(Type type);
 	}
 }

@@ -4,6 +4,8 @@
 // https://github.com/JoshClose/CsvHelper
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using CsvHelper.Configuration;
 using CsvHelper.Tests.Mocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -96,6 +98,11 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void TryGetFieldEmptyDate()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
+
 			// DateTimeConverter.IsValid() doesn't work correctly
 			// so we need to test and make sure that the conversion
 			// fails for an empty string for a date.
@@ -103,10 +110,9 @@ namespace CsvHelper.Tests.Reading
 			var queue = new Queue<string[]>();
 			queue.Enqueue(data);
 			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
 			var reader = new CsvReader(parserMock);
-			reader.Configuration.HasHeaderRecord = false;
 			reader.Read();
 
 			var got = reader.TryGetField(0, out DateTime field);
@@ -118,6 +124,11 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void TryGetNullableFieldEmptyDate()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+			};
+
 			// DateTimeConverter.IsValid() doesn't work correctly
 			// so we need to test and make sure that the conversion
 			// fails for an empty string for a date.
@@ -125,10 +136,9 @@ namespace CsvHelper.Tests.Reading
 			var queue = new Queue<string[]>();
 			queue.Enqueue(data);
 			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
 			var reader = new CsvReader(parserMock);
-			reader.Configuration.HasHeaderRecord = false;
 			reader.Read();
 
 			var got = reader.TryGetField(0, out DateTime? field);
@@ -140,14 +150,18 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void TryGetDoesNotThrowWhenWillThrowOnMissingFieldIsEnabled()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				MissingFieldFound = null,
+			};
+
 			var data = new[] { "1" };
 			var queue = new Queue<string[]>();
 			queue.Enqueue(data);
 			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock(config, queue);
 
 			var reader = new CsvReader(parserMock);
-			reader.Configuration.MissingFieldFound = null;
 			reader.Read();
 			reader.ReadHeader();
 			Assert.IsFalse(reader.TryGetField("test", out string field));

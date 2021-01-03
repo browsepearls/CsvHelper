@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using System.Globalization;
 using System.IO;
+using CsvHelper.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CsvHelper.Tests
@@ -19,7 +20,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				writer.WriteLine("one,two,three");
 				writer.Flush();
 				stream.Position = 0;
@@ -40,7 +40,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				// "one","two","three"
 				writer.WriteLine("\"one\",\"two\",\"three\"");
 				writer.Flush();
@@ -62,7 +61,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				// one,"two",three
 				writer.WriteLine("one,\"two\",three");
 				writer.Flush();
@@ -84,7 +82,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				// one,"two" ,three
 				writer.WriteLine("one,\"two\" ,three");
 				writer.Flush();
@@ -101,18 +98,20 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ParseEscapedFieldWithSpaceBeforeTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				BadDataFound = null,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
 				// one, "two",three
 				writer.WriteLine("one, \"two\",three");
 				writer.Flush();
 				stream.Position = 0;
 
-				parser.Configuration.BadDataFound = null;
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(3, parser.Count);
 				Assert.AreEqual("one", parser[0]);
@@ -124,18 +123,20 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ParseEscapedFieldWithQuoteAfterTest()
 		{
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				BadDataFound = null,
+			};
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			using (var parser = new CsvParser(reader, config))
 			{
-				parser.Configuration.Delimiter = ",";
 				// 1,"two" "2,3
 				writer.WriteLine("1,\"two\" \"2,3");
 				writer.Flush();
 				stream.Position = 0;
 
-				parser.Configuration.BadDataFound = null;
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(3, parser.Count);
 				Assert.AreEqual("1", parser[0]);
@@ -154,7 +155,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				// 1,"two "" 2",3
 				writer.WriteLine("1,\"two \"\" 2\",3");
 				writer.Flush();
@@ -176,7 +176,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Configuration.Delimiter = ",";
 				writer.WriteLine("a,b,\"c");
 				writer.WriteLine("d,e,f");
 				writer.Flush();

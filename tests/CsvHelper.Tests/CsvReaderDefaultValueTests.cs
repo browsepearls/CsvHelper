@@ -21,7 +21,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csvReader.Configuration.Delimiter = ",";
 				writer.WriteLine("Id,Name,Order");
 				writer.WriteLine(",,");
 				writer.WriteLine("2,two,2");
@@ -52,7 +51,6 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csvReader.Configuration.Delimiter = ",";
 				writer.WriteLine("Id,Name,Order");
 				writer.WriteLine(",,");
 				writer.WriteLine("2,two,2");

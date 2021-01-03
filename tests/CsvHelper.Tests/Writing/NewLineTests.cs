@@ -26,12 +26,15 @@ namespace CsvHelper.Tests.Writing
 				new Foo { Id = 1, Name = "one" },
 			};
 
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+				NewLine = NewLine.CRLF,
+			};
 			using (var writer = new StringWriter())
-			using (var serializer = new CsvSerializer(writer, CultureInfo.InvariantCulture))
+			using (var serializer = new CsvSerializer(writer, config))
 			{
 				var csv = new CsvWriter(serializer);
-				csv.Configuration.HasHeaderRecord = false;
-				csv.Configuration.NewLine = NewLine.CRLF;
 				csv.WriteRecords(records);
 
 				Assert.AreEqual("1,one\r\n", writer.ToString());
@@ -46,12 +49,15 @@ namespace CsvHelper.Tests.Writing
 				new Foo { Id = 1, Name = "one" },
 			};
 
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+				NewLine = NewLine.CR,
+			};
 			using (var writer = new StringWriter())
-			using (var serializer = new CsvSerializer(writer, CultureInfo.InvariantCulture))
+			using (var serializer = new CsvSerializer(writer, config))
 			{
 				var csv = new CsvWriter(serializer);
-				csv.Configuration.HasHeaderRecord = false;
-				csv.Configuration.NewLine = NewLine.CR;
 				csv.WriteRecords(records);
 
 				Assert.AreEqual("1,one\r", writer.ToString());
@@ -66,12 +72,15 @@ namespace CsvHelper.Tests.Writing
 				new Foo { Id = 1, Name = "one" },
 			};
 
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+				NewLine = NewLine.LF,
+			};
 			using (var writer = new StringWriter())
-			using (var serializer = new CsvSerializer(writer, CultureInfo.InvariantCulture))
+			using (var serializer = new CsvSerializer(writer, config))
 			{
 				var csv = new CsvWriter(serializer);
-				csv.Configuration.HasHeaderRecord = false;
-				csv.Configuration.NewLine = NewLine.LF;
 				csv.WriteRecords(records);
 
 				Assert.AreEqual("1,one\n", writer.ToString());
@@ -86,12 +95,15 @@ namespace CsvHelper.Tests.Writing
 				new Foo { Id = 1, Name = "one" },
 			};
 
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				HasHeaderRecord = false,
+				NewLine = NewLine.Environment,
+			};
 			using (var writer = new StringWriter())
-			using (var serializer = new CsvSerializer(writer, CultureInfo.InvariantCulture))
+			using (var serializer = new CsvSerializer(writer, config))
 			{
 				var csv = new CsvWriter(serializer);
-				csv.Configuration.HasHeaderRecord = false;
-				csv.Configuration.NewLine = NewLine.Environment;
 				csv.WriteRecords(records);
 
 				Assert.AreEqual($"1,one{Environment.NewLine}", writer.ToString());
