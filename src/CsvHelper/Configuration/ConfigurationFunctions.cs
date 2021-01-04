@@ -159,13 +159,13 @@ namespace CsvHelper.Configuration
 		/// <param name="fieldIndex">The field index of the header to get the name for.</param>
 		public static string GetDynamicPropertyName(ReadingContext context, int fieldIndex)
 		{
-			if (context.HeaderRecord == null)
+			if (context.Reader.HeaderRecord == null)
 			{
 				return $"Field{fieldIndex + 1}";
 			}
 
-			var header = context.HeaderRecord[fieldIndex];
-			header = context.ReaderConfiguration.PrepareHeaderForMatch(header, fieldIndex);
+			var header = context.Reader.HeaderRecord[fieldIndex];
+			header = context.Reader.Configuration.PrepareHeaderForMatch(header, fieldIndex);
 
 			return header;
 		}

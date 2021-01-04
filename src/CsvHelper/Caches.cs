@@ -37,10 +37,5 @@ namespace CsvHelper
 		/// Type converter options.
 		/// </summary>
 		TypeConverterOptions = 8,
-
-		/// <summary>
-		/// Raw record.
-		/// </summary>
-		RawRecord = 16
 	}
 }

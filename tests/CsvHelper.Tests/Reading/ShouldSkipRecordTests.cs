@@ -21,11 +21,12 @@ namespace CsvHelper.Tests.Reading
 			{
 				ShouldSkipRecord = row => row.All(string.IsNullOrWhiteSpace),
 			};
-			var rows = new Queue<string[]>();
-			rows.Enqueue(new[] { " " });
-			rows.Enqueue(new[] { "First,Second" });
-			rows.Enqueue(new[] { "1", "2" });
-			var parser = new ParserMock(config, rows);
+			var parser = new ParserMock(config)
+			{
+				{ " " },
+				{ "First,Second" },
+				{ "1", "2" },
+			};
 
 			var csv = new CsvReader(parser);
 
@@ -43,11 +44,12 @@ namespace CsvHelper.Tests.Reading
 			{
 				ShouldSkipRecord = row => row.All(string.IsNullOrWhiteSpace),
 			};
-			var rows = new Queue<string[]>();
-			rows.Enqueue(new[] { "First,Second" });
-			rows.Enqueue(new[] { " " });
-			rows.Enqueue(new[] { "1", "2" });
-			var parser = new ParserMock(config, rows);
+			var parser = new ParserMock(config)
+			{
+				{ "First,Second" },
+				{ " " },
+				{ "1", "2" },
+			};
 
 			var csv = new CsvReader(parser);
 
@@ -65,13 +67,14 @@ namespace CsvHelper.Tests.Reading
 			{
 				ShouldSkipRecord = row => row[0].StartsWith("skipme") || row.All(string.IsNullOrWhiteSpace),
 			};
-			var rows = new Queue<string[]>();
-			rows.Enqueue(new[] { "First,Second" });
-			rows.Enqueue(new[] { "skipme," });
-			rows.Enqueue(new[] { "" });
-			rows.Enqueue(new[] { "1", "2" });
 
-			var parser = new ParserMock(config, rows);
+			var parser = new ParserMock(config)
+			{
+				{ "First,Second" },
+				{ "skipme," },
+				{ "" },
+				{ "1", "2" },
+			};
 
 			var csv = new CsvReader(parser);
 

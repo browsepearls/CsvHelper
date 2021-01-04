@@ -167,6 +167,7 @@ namespace CsvHelper.Tests
 		{
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
+				Delimiter = ";",
 				HasHeaderRecord = false,
 			};
 			string result;

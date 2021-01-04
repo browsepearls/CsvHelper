@@ -6,7 +6,7 @@ using System.Globalization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
-using Moq;
+using CsvHelper.Tests.Mocks;
 
 namespace CsvHelper.Tests.TypeConversion
 {
@@ -18,28 +18,14 @@ namespace CsvHelper.Tests.TypeConversion
 		{
 			var converter = new EnumerableConverter();
 
-			var propertyMapData = new MemberMapData( null );
+			var propertyMapData = new MemberMapData(null);
 			propertyMapData.TypeConverterOptions.CultureInfo = CultureInfo.CurrentCulture;
 
-			var mockReaderRow = new Mock<IReaderRow>();
-			var mockWriterRow = new Mock<IWriterRow>();
+			var readerRow = new CsvReader(new ParserMock());
+			var writerRow = new CsvWriter(new SerializerMock());
 
-			try
-			{
-				converter.ConvertFromString( "", mockReaderRow.Object, propertyMapData );
-				Assert.Fail();
-			}
-			catch( TypeConverterException )
-			{
-			}
-			try
-			{
-				converter.ConvertToString( 5, mockWriterRow.Object, propertyMapData );
-				Assert.Fail();
-			}
-			catch( TypeConverterException )
-			{
-			}
+			Assert.ThrowsException<TypeConverterException>(() => converter.ConvertFromString("", readerRow, propertyMapData));
+			Assert.ThrowsException<TypeConverterException>(() => converter.ConvertToString(5, writerRow, propertyMapData));
 		}
 	}
 }

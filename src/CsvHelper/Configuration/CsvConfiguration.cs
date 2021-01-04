@@ -6,6 +6,7 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
 using System.Text;
 
@@ -36,6 +37,12 @@ namespace CsvHelper.Configuration
 		/// </summary>
 		public virtual TypeConverterCache TypeConverterCache { get; init; } = new TypeConverterCache();
 
+		/// <summary>
+		/// Gets a value indicating whether to leave the <see cref="TextReader"/> open after the <see cref="CsvReader"/> object is disposed.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> to leave the <see cref="TextReader"/> open after the <see cref="CsvReader"/> object is disposed, otherwise <c>false</c>.
+		/// </value>
 		public virtual bool LeaveOpen { get; init; }
 
 		/// <summary>

@@ -4,9 +4,9 @@
 // https://github.com/JoshClose/CsvHelper
 using System.Globalization;
 using CsvHelper.Configuration;
+using CsvHelper.Tests.Mocks;
 using CsvHelper.TypeConversion;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 
 namespace CsvHelper.Tests.TypeConversion
 {
@@ -17,17 +17,17 @@ namespace CsvHelper.Tests.TypeConversion
 		public void ConvertToStringTest()
 		{
 			var converter = new CharConverter();
-			var propertyMapData = new MemberMapData( null )
+			var propertyMapData = new MemberMapData(null)
 			{
 				TypeConverter = converter,
 				TypeConverterOptions = { CultureInfo = CultureInfo.CurrentCulture }
 			};
 
-			Assert.AreEqual( "a", converter.ConvertToString( 'a', null, propertyMapData ) );
+			Assert.AreEqual("a", converter.ConvertToString('a', null, propertyMapData));
 
-			Assert.AreEqual( "True", converter.ConvertToString( true, null, propertyMapData ) );
+			Assert.AreEqual("True", converter.ConvertToString(true, null, propertyMapData));
 
-			Assert.AreEqual( "", converter.ConvertToString( null, null, propertyMapData ) );
+			Assert.AreEqual("", converter.ConvertToString(null, null, propertyMapData));
 		}
 
 		[TestMethod]
@@ -35,21 +35,21 @@ namespace CsvHelper.Tests.TypeConversion
 		{
 			var converter = new CharConverter();
 
-			var propertyMapData = new MemberMapData( null );
+			var propertyMapData = new MemberMapData(null);
 			propertyMapData.TypeConverterOptions.CultureInfo = CultureInfo.CurrentCulture;
 
-			var mockRow = new Mock<IReaderRow>();
+			var row = new CsvReader(new ParserMock());
 
-			Assert.AreEqual( 'a', converter.ConvertFromString( "a", null, propertyMapData ) );
-			Assert.AreEqual( 'a', converter.ConvertFromString( " a ", null, propertyMapData ) );
-			Assert.AreEqual( ' ', converter.ConvertFromString( " ", null, propertyMapData ) );
+			Assert.AreEqual('a', converter.ConvertFromString("a", null, propertyMapData));
+			Assert.AreEqual('a', converter.ConvertFromString(" a ", null, propertyMapData));
+			Assert.AreEqual(' ', converter.ConvertFromString(" ", null, propertyMapData));
 
 			try
 			{
-				converter.ConvertFromString( null, mockRow.Object, propertyMapData );
+				converter.ConvertFromString(null, row, propertyMapData);
 				Assert.Fail();
 			}
-			catch( TypeConverterException )
+			catch (TypeConverterException)
 			{
 			}
 		}

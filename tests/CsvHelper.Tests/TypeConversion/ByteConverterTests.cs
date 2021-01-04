@@ -4,9 +4,9 @@
 // https://github.com/JoshClose/CsvHelper
 using System.Globalization;
 using CsvHelper.Configuration;
+using CsvHelper.Tests.Mocks;
 using CsvHelper.TypeConversion;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 
 namespace CsvHelper.Tests.TypeConversion
 {
@@ -36,14 +36,14 @@ namespace CsvHelper.Tests.TypeConversion
 			var propertyMapData = new MemberMapData( null );
 			propertyMapData.TypeConverterOptions.CultureInfo = CultureInfo.CurrentCulture;
 
-			var mockRow = new Mock<IReaderRow>();
+			var row = new CsvReader(new ParserMock());
 
 			Assert.AreEqual( (byte)123, converter.ConvertFromString( "123", null, propertyMapData ) );
 			Assert.AreEqual( (byte)123, converter.ConvertFromString( " 123 ", null, propertyMapData ) );
 
 			try
 			{
-				converter.ConvertFromString( null, mockRow.Object, propertyMapData );
+				converter.ConvertFromString( null, row, propertyMapData );
 				Assert.Fail();
 			}
 			catch( TypeConverterException )

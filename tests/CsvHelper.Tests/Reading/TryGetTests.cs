@@ -17,13 +17,12 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void TryGetFieldInvalidIndexTest()
 		{
-			var data1 = new[] { "One", "Two" };
-			var data2 = new[] { "one", "two" };
-			var queue = new Queue<string[]>();
-			queue.Enqueue(data1);
-			queue.Enqueue(data2);
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock
+			{
+				new[] { "One", "Two" },
+				new[] { "one", "two" },
+				null
+			};
 
 			var reader = new CsvReader(parserMock);
 			reader.Read();
@@ -36,13 +35,12 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void TryGetFieldInvalidNameTest()
 		{
-			var data1 = new[] { "One", "Two" };
-			var data2 = new[] { "one", "two" };
-			var queue = new Queue<string[]>();
-			queue.Enqueue(data1);
-			queue.Enqueue(data2);
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock
+			{
+				new[] { "One", "Two" },
+				new[] { "one", "two" },
+				null
+			};
 
 			var reader = new CsvReader(parserMock);
 			reader.Read();
@@ -56,13 +54,12 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void TryGetFieldTest()
 		{
-			var data1 = new[] { "One", "Two" };
-			var data2 = new[] { "1", "2" };
-			var queue = new Queue<string[]>();
-			queue.Enqueue(data1);
-			queue.Enqueue(data2);
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock
+			{
+				new[] { "One", "Two" },
+				new[] { "1", "2" },
+				null
+			};
 
 			var reader = new CsvReader(parserMock);
 			reader.Read();
@@ -77,13 +74,12 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void TryGetFieldStrictTest()
 		{
-			var data1 = new[] { "One", "Two" };
-			var data2 = new[] { "1", "2" };
-			var queue = new Queue<string[]>();
-			queue.Enqueue(data1);
-			queue.Enqueue(data2);
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock
+			{
+				new[] { "One", "Two" },
+				new[] { "1", "2" },
+				null
+			};
 
 			var reader = new CsvReader(parserMock);
 			reader.Read();
@@ -106,11 +102,11 @@ namespace CsvHelper.Tests.Reading
 			// DateTimeConverter.IsValid() doesn't work correctly
 			// so we need to test and make sure that the conversion
 			// fails for an empty string for a date.
-			var data = new[] { " " };
-			var queue = new Queue<string[]>();
-			queue.Enqueue(data);
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(config, queue);
+			var parserMock = new ParserMock(config)
+			{
+				new[] { " " },
+				null
+			};
 
 			var reader = new CsvReader(parserMock);
 			reader.Read();
@@ -132,11 +128,11 @@ namespace CsvHelper.Tests.Reading
 			// DateTimeConverter.IsValid() doesn't work correctly
 			// so we need to test and make sure that the conversion
 			// fails for an empty string for a date.
-			var data = new[] { " " };
-			var queue = new Queue<string[]>();
-			queue.Enqueue(data);
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(config, queue);
+			var parserMock = new ParserMock(config)
+			{
+				new[] { " " },
+				null
+			};
 
 			var reader = new CsvReader(parserMock);
 			reader.Read();
@@ -155,11 +151,11 @@ namespace CsvHelper.Tests.Reading
 				MissingFieldFound = null,
 			};
 
-			var data = new[] { "1" };
-			var queue = new Queue<string[]>();
-			queue.Enqueue(data);
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(config, queue);
+			var parserMock = new ParserMock(config)
+			{
+				new[] { "1" },
+				null
+			};
 
 			var reader = new CsvReader(parserMock);
 			reader.Read();

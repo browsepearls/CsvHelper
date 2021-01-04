@@ -29,14 +29,14 @@ namespace CsvHelper.TypeConversion
 			var dictionary = (IDictionary)ObjectResolver.Current.Resolve(dictionaryType);
 
 			var indexEnd = memberMapData.IndexEnd < memberMapData.Index
-				? row.Context.Record.Length - 1
+				? row.Parser.Count - 1
 				: memberMapData.IndexEnd;
 
 			for (var i = memberMapData.Index; i <= indexEnd; i++)
 			{
 				var field = row.GetField(valueType, i);
 
-				dictionary.Add(row.Context.HeaderRecord[i], field);
+				dictionary.Add(row.HeaderRecord[i], field);
 			}
 
 			return dictionary;

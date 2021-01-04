@@ -114,28 +114,19 @@ namespace CsvHelper.Tests.Configuration
 			public string[] CurrentRecord { get; }
 			public int Row { get; }
 
-			public ReadingContext Context
-			{
-				get
-				{
-					throw new NotImplementedException();
-				}
-			}
+			public ReadingContext Context => throw new NotImplementedException();
 
-			string IReaderRow.this[int index]
-			{
-				get { throw new NotImplementedException(); }
-			}
+			public int CurrentIndex => throw new NotImplementedException();
 
-			string IReaderRow.this[string name]
-			{
-				get { throw new NotImplementedException(); }
-			}
+			public string[] HeaderRecord => throw new NotImplementedException();
 
-			string IReaderRow.this[string name, int index]
-			{
-				get { throw new NotImplementedException(); }
-			}
+			public IParser Parser => throw new NotImplementedException();
+
+			string IReaderRow.this[int index] => throw new NotImplementedException();
+
+			string IReaderRow.this[string name] => throw new NotImplementedException();
+
+			string IReaderRow.this[string name, int index] => throw new NotImplementedException();
 
 			public string GetField(int index)
 			{

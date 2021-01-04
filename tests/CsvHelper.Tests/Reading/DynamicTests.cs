@@ -84,24 +84,25 @@ namespace CsvHelper.Tests.Reading
 			{
 				GetDynamicPropertyName = (context, index) =>
 				{
-					var header = context.HeaderRecord[index];
-					header = context.ReaderConfiguration.PrepareHeaderForMatch(header, index);
+					var header = context.Reader.HeaderRecord[index];
+					header = context.Reader.Configuration.PrepareHeaderForMatch(header, index);
 					var name = headerNameCounts[header] > 1 ? $"{header}{index}" : header;
 
 					return name;
 				},
 			};
-			var queue = new Queue<string[]>();
-			queue.Enqueue(new[] { "Id", "Name", "Name" });
-			queue.Enqueue(new[] { "1", "foo", "bar" });
-			queue.Enqueue(null);
-			using (var parserMock = new ParserMock(config, queue))
-			using (var csv = new CsvReader(parserMock))
+			var parser = new ParserMock(config)
+			{
+				{ "Id", "Name", "Name" },
+				{ "1", "foo", "bar" },
+				null
+			};
+			using (var csv = new CsvReader(parser))
 			{
 				csv.Read();
 				csv.ReadHeader();
 				var counts =
-					(from header in csv.Context.HeaderRecord.Select((h, i) => csv.Configuration.PrepareHeaderForMatch(h, i))
+					(from header in csv.Context.Reader.HeaderRecord.Select((h, i) => csv.Configuration.PrepareHeaderForMatch(h, i))
 					 group header by header into g
 					 select new
 					 {

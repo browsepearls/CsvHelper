@@ -21,14 +21,12 @@ namespace CsvHelper.Tests
 			{
 				HasHeaderRecord = false,
 			};
-			var data = new List<string[]>
+			var parserMock = new ParserMock(config)
 			{
 				new[] { "0", "1" },
 				new[] { "2", "3" },
 				null,
 			};
-			var queue = new Queue<string[]>(data);
-			var parserMock = new ParserMock(config, queue);
 
 			var csv = new CsvReader(parserMock);
 			csv.Configuration.RegisterClassMap<AMap>();

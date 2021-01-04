@@ -36,7 +36,7 @@ namespace CsvHelper.Tests
 				Assert.AreEqual(null, record.Name);
 
 				stream.Position = 0;
-				csv.Context.ClearCache(Caches.ReadRecord);
+				//csv.Context.ClearCache(Caches.ReadRecord);
 
 				csv.Configuration.RegisterClassMap<TestMap2>();
 				csv.Read();

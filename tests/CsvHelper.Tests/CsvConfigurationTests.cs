@@ -16,18 +16,18 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void EnsureReaderAndParserConfigIsAreSameTest()
 		{
-			using( var stream = new MemoryStream() )
-			using( var reader = new StreamReader( stream ) )
+			using (var stream = new MemoryStream())
+			using (var reader = new StreamReader(stream))
 			{
 				var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture);
 
-				Assert.AreSame( csvReader.Configuration, csvReader.Parser.Configuration );
+				Assert.AreSame(csvReader.Configuration, csvReader.Parser.Configuration);
 
-				var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
-				var parser = new CsvParser( reader, config );
-				csvReader = new CsvReader( parser );
+				var config = new CsvConfiguration(CultureInfo.InvariantCulture);
+				var parser = new CsvParser(reader, config);
+				csvReader = new CsvReader(parser);
 
-				Assert.AreSame( csvReader.Configuration, csvReader.Parser.Configuration );
+				Assert.AreSame(csvReader.Configuration, csvReader.Parser.Configuration);
 			}
 		}
 
@@ -37,7 +37,7 @@ namespace CsvHelper.Tests
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
 			config.RegisterClassMap<TestClassMappings>();
 
-			Assert.AreEqual( 2, config.Maps[typeof( TestClass )].MemberMaps.Count );
+			Assert.AreEqual(2, config.Maps[typeof(TestClass)].MemberMaps.Count);
 		}
 
 		[TestMethod]
@@ -46,25 +46,25 @@ namespace CsvHelper.Tests
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
 			config.RegisterClassMap<TestClassMappings>();
 
-			Assert.AreEqual( 2, config.Maps[typeof( TestClass )].MemberMaps.Count );
+			Assert.AreEqual(2, config.Maps[typeof(TestClass)].MemberMaps.Count);
 		}
 
 		[TestMethod]
 		public void AddingMappingsWithNonGenericMethodTest()
 		{
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
-			config.RegisterClassMap( typeof( TestClassMappings ) );
+			config.RegisterClassMap(typeof(TestClassMappings));
 
-			Assert.AreEqual( 2, config.Maps[typeof( TestClass )].MemberMaps.Count );
+			Assert.AreEqual(2, config.Maps[typeof(TestClass)].MemberMaps.Count);
 		}
 
 		[TestMethod]
 		public void AddingMappingsWithInstanceMethodTest()
 		{
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
-			config.RegisterClassMap( new TestClassMappings() );
+			config.RegisterClassMap(new TestClassMappings());
 
-			Assert.AreEqual( 2, config.Maps[typeof( TestClass )].MemberMaps.Count );
+			Assert.AreEqual(2, config.Maps[typeof(TestClass)].MemberMaps.Count);
 		}
 
 		[TestMethod]
@@ -72,9 +72,9 @@ namespace CsvHelper.Tests
 		{
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
 
-			Assert.IsNull( config.Maps[typeof( TestClass )] );
+			Assert.IsNull(config.Maps[typeof(TestClass)]);
 			config.RegisterClassMap<TestClassMappings>();
-			Assert.IsNotNull( config.Maps[typeof( TestClass )] );
+			Assert.IsNotNull(config.Maps[typeof(TestClass)]);
 		}
 
 		[TestMethod]
@@ -82,9 +82,9 @@ namespace CsvHelper.Tests
 		{
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
 
-			Assert.IsNull( config.Maps[typeof( TestClass )] );
-			config.RegisterClassMap( typeof( TestClassMappings ) );
-			Assert.IsNotNull( config.Maps[typeof( TestClass )] );
+			Assert.IsNull(config.Maps[typeof(TestClass)]);
+			config.RegisterClassMap(typeof(TestClassMappings));
+			Assert.IsNotNull(config.Maps[typeof(TestClass)]);
 		}
 
 		[TestMethod]
@@ -92,9 +92,9 @@ namespace CsvHelper.Tests
 		{
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
 
-			Assert.IsNull( config.Maps[typeof( TestClass )] );
-			config.RegisterClassMap( new TestClassMappings() );
-			Assert.IsNotNull( config.Maps[typeof( TestClass )] );
+			Assert.IsNull(config.Maps[typeof(TestClass)]);
+			config.RegisterClassMap(new TestClassMappings());
+			Assert.IsNotNull(config.Maps[typeof(TestClass)]);
 		}
 
 		[TestMethod]
@@ -102,12 +102,12 @@ namespace CsvHelper.Tests
 		{
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
 
-			Assert.IsNull( config.Maps[typeof( TestClass )] );
+			Assert.IsNull(config.Maps[typeof(TestClass)]);
 			config.RegisterClassMap<TestClassMappings>();
-			Assert.IsNotNull( config.Maps[typeof( TestClass )] );
+			Assert.IsNotNull(config.Maps[typeof(TestClass)]);
 
 			config.UnregisterClassMap<TestClassMappings>();
-			Assert.IsNull( config.Maps[typeof( TestClass )] );
+			Assert.IsNull(config.Maps[typeof(TestClass)]);
 		}
 
 		[TestMethod]
@@ -115,12 +115,12 @@ namespace CsvHelper.Tests
 		{
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
 
-			Assert.IsNull( config.Maps[typeof( TestClass )] );
-			config.RegisterClassMap( typeof( TestClassMappings ) );
-			Assert.IsNotNull( config.Maps[typeof( TestClass )] );
+			Assert.IsNull(config.Maps[typeof(TestClass)]);
+			config.RegisterClassMap(typeof(TestClassMappings));
+			Assert.IsNotNull(config.Maps[typeof(TestClass)]);
 
-			config.UnregisterClassMap( typeof( TestClassMappings ) );
-			Assert.IsNull( config.Maps[typeof( TestClass )] );
+			config.UnregisterClassMap(typeof(TestClassMappings));
+			Assert.IsNull(config.Maps[typeof(TestClass)]);
 		}
 
 		[TestMethod]
@@ -128,10 +128,10 @@ namespace CsvHelper.Tests
 		{
 			try
 			{
-				new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture).RegisterClassMap( typeof( TestClass ) );
+				new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture).RegisterClassMap(typeof(TestClass));
 				Assert.Fail();
 			}
-			catch( ArgumentException ) {}
+			catch (ArgumentException) { }
 		}
 
 		private class TestClass
@@ -144,8 +144,8 @@ namespace CsvHelper.Tests
 		{
 			public TestClassMappings()
 			{
-				Map( c => c.StringColumn );
-				Map( c => c.IntColumn );
+				Map(c => c.StringColumn);
+				Map(c => c.IntColumn);
 			}
 		}
 	}

@@ -27,7 +27,7 @@ namespace CsvHelper.TypeConversion
 			var message = "Converting IEnumerable types is not supported for a single field. " +
 						  "If you want to do this, create your own ITypeConverter and register " +
 						  "it in the TypeConverterFactory by calling AddConverter.";
-			throw new TypeConverterException(this, memberMapData, text, (ReadingContext)row.Context, message);
+			throw new TypeConverterException(this, memberMapData, text, row.Context, message);
 		}
 
 		/// <summary>
@@ -42,7 +42,7 @@ namespace CsvHelper.TypeConversion
 			var message = "Converting IEnumerable types is not supported for a single field. " +
 						  "If you want to do this, create your own ITypeConverter and register " +
 						  "it in the TypeConverterFactory by calling AddConverter.";
-			throw new TypeConverterException(this, memberMapData, value, (WritingContext)row.Context, message);
+			throw new TypeConverterException(this, memberMapData, value, row.Context, message);
 		}
 	}
 }

@@ -33,8 +33,8 @@ namespace CsvHelper.Tests.Reading
 				// Read header row, assert header row columns:
 				Assert.IsTrue(csv.Read());
 				Assert.IsTrue(csv.ReadHeader());
-				Assert.AreEqual(1, csv.Context.HeaderRecord.Length);
-				Assert.AreEqual("NullableInt32Field", csv.Context.HeaderRecord[0]);
+				Assert.AreEqual(1, csv.HeaderRecord.Length);
+				Assert.AreEqual("NullableInt32Field", csv.HeaderRecord[0]);
 
 				// Read single data row, assert single null value:
 				Assert.IsTrue(csv.Read());
@@ -73,8 +73,8 @@ namespace CsvHelper.Tests.Reading
 				// Read header row, assert header row columns:
 				Assert.IsTrue(csv.Read());
 				Assert.IsTrue(csv.ReadHeader());
-				Assert.AreEqual(1, csv.Context.HeaderRecord.Length);
-				Assert.AreEqual("NullableInt32Field", csv.Context.HeaderRecord[0]);
+				Assert.AreEqual(1, csv.HeaderRecord.Length);
+				Assert.AreEqual("NullableInt32Field", csv.HeaderRecord[0]);
 
 				// Read first data row, assert "1" value:
 				Assert.IsTrue(csv.Read());
@@ -138,9 +138,9 @@ namespace CsvHelper.Tests.Reading
 				// Read header row, assert header row columns:
 				Assert.IsTrue(csv.Read());
 				Assert.IsTrue(csv.ReadHeader());
-				Assert.AreEqual(2, csv.Context.HeaderRecord.Length);
-				Assert.AreEqual("NullableInt32Field", csv.Context.HeaderRecord[0]);
-				Assert.AreEqual("NullableStringField", csv.Context.HeaderRecord[1]);
+				Assert.AreEqual(2, csv.HeaderRecord.Length);
+				Assert.AreEqual("NullableInt32Field", csv.HeaderRecord[0]);
+				Assert.AreEqual("NullableStringField", csv.HeaderRecord[1]);
 
 				// Read first data row:
 				Assert.IsTrue(csv.Read());

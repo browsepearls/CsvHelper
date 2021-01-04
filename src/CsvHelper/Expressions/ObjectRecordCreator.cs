@@ -27,12 +27,12 @@ namespace CsvHelper.Expressions
 		/// <param name="recordType">The record type.</param>
 		protected override Delegate CreateCreateRecordDelegate(Type recordType)
 		{
-			if (Reader.Context.ReaderConfiguration.Maps[recordType] == null)
+			if (Reader.Configuration.Maps[recordType] == null)
 			{
-				Reader.Context.ReaderConfiguration.Maps.Add(Reader.Context.ReaderConfiguration.AutoMap(recordType));
+				Reader.Configuration.Maps.Add(Reader.Configuration.AutoMap(recordType));
 			}
 
-			var map = Reader.Context.ReaderConfiguration.Maps[recordType];
+			var map = Reader.Configuration.Maps[recordType];
 
 			Expression body;
 

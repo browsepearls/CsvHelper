@@ -17,16 +17,13 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ReadWithConvertUsingTest()
 		{
-			var data = new List<string[]>
+			var parserMock = new ParserMock
 			{
-				new[] { "int2", "string.3" },
-				new[] { "1", "one" },
-				new[] { "2", "two" },
+				{ "int2", "string.3" },
+				{ "1", "one" },
+				{ "2", "two" },
 				null
 			};
-
-			var queue = new Queue<string[]>(data);
-			var parserMock = new ParserMock(queue);
 
 			var csvReader = new CsvReader(parserMock);
 			// csvReader.Configuration.HeaderValidated = (isValid, headerNames, headerNameIndex, context) => {};
@@ -45,16 +42,13 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ReadMultipleNamesTest()
 		{
-			var data = new List<string[]>
+			var parserMock = new ParserMock
 			{
-				new[] { "int2", "string3" },
-				new[] { "1", "one" },
-				new[] { "2", "two" },
+				{ "int2", "string3" },
+				{ "1", "one" },
+				{ "2", "two" },
 				null
 			};
-
-			var queue = new Queue<string[]>(data);
-			var parserMock = new ParserMock(queue);
 
 			var csvReader = new CsvReader(parserMock);
 			csvReader.Configuration.RegisterClassMap<MultipleNamesClassMap>();
@@ -76,12 +70,12 @@ namespace CsvHelper.Tests
 			{
 				HasHeaderRecord = false,
 			};
-			var queue = new Queue<string[]>();
-			queue.Enqueue(new[] { "1", "2" });
-			queue.Enqueue(new[] { "3", "4" });
-			queue.Enqueue(null);
-
-			var parserMock = new ParserMock(config, queue);
+			var parserMock = new ParserMock(config)
+			{
+				{ "1", "2" },
+				{ "3", "4" },
+				null,
+			};
 
 			var csvReader = new CsvReader(parserMock);
 			csvReader.Configuration.RegisterClassMap<ConvertUsingMap>();
@@ -101,11 +95,11 @@ namespace CsvHelper.Tests
 			{
 				HasHeaderRecord = false,
 			};
-			var queue = new Queue<string[]>();
-			queue.Enqueue(new string[] { "1", "2" });
-			queue.Enqueue(null);
-
-			var parserMock = new ParserMock(config, queue);
+			var parserMock = new ParserMock(config)
+			{
+				{ "1", "2" },
+				null,
+			};
 
 			var csvReader = new CsvReader(parserMock);
 			csvReader.Configuration.RegisterClassMap<CovarianceClassMap>();
@@ -120,12 +114,12 @@ namespace CsvHelper.Tests
 			{
 				HasHeaderRecord = false,
 			};
-			var queue = new Queue<string[]>();
-			queue.Enqueue(new[] { "1", "2" });
-			queue.Enqueue(new[] { "3", "4" });
-			queue.Enqueue(null);
-
-			var parserMock = new ParserMock(config, queue);
+			var parserMock = new ParserMock(config)
+			{
+				{ "1", "2" },
+				{ "3", "4" },
+				null,
+			};
 
 			var csvReader = new CsvReader(parserMock);
 			csvReader.Configuration.RegisterClassMap<ConvertUsingBlockMap>();
@@ -145,12 +139,12 @@ namespace CsvHelper.Tests
 			{
 				HasHeaderRecord = false,
 			};
-			var queue = new Queue<string[]>();
-			queue.Enqueue(new[] { "1", "2" });
-			queue.Enqueue(new[] { "3", "4" });
-			queue.Enqueue(null);
-
-			var parserMock = new ParserMock(config, queue);
+			var parserMock = new ParserMock(config)
+			{
+				{ "1", "2" },
+				{ "3", "4" },
+				null,
+			};
 
 			var csvReader = new CsvReader(parserMock);
 			csvReader.Configuration.RegisterClassMap<ConvertUsingConstantMap>();
@@ -166,11 +160,12 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void ReadSameNameMultipleTimesTest()
 		{
-			var queue = new Queue<string[]>();
-			queue.Enqueue(new[] { "ColumnName", "ColumnName", "ColumnName" });
-			queue.Enqueue(new[] { "2", "3", "1" });
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock
+			{
+				{ "ColumnName", "ColumnName", "ColumnName" },
+				{ "2", "3", "1" },
+				null,
+			};
 
 			var csv = new CsvReader(parserMock);
 			csv.Configuration.RegisterClassMap<SameNameMultipleTimesClassMap>();

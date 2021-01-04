@@ -15,11 +15,6 @@ namespace CsvHelper
 	public interface IReader : IReaderRow, IDisposable
 	{
 		/// <summary>
-		/// Gets the parser.
-		/// </summary>
-		IParser Parser { get; }
-
-		/// <summary>
 		/// Reads the header record without reading the first row.
 		/// </summary>
 		/// <returns>True if there are more records, otherwise false.</returns>
@@ -81,7 +76,7 @@ namespace CsvHelper
 		/// <returns>An <see cref="IEnumerable{T}"/> of records.</returns>
 		IEnumerable<T> EnumerateRecords<T>(T record);
 
-#if NET47 || NETSTANDARD
+#if !NET45
 		/// <summary>
 		/// Gets all the records in the CSV file and
 		/// converts each to <see cref="Type"/> T. The Read method
@@ -121,6 +116,6 @@ namespace CsvHelper
 		/// <param name="record">The record to fill each enumeration.</param>
 		/// <returns>An <see cref="IAsyncEnumerable{T}"/> of records.</returns>
 		IAsyncEnumerable<T> EnumerateRecordsAsync<T>(T record);
-#endif // NET47 || NETSTANDARD
+#endif
 	}
 }

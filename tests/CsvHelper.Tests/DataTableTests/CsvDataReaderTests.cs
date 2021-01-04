@@ -236,14 +236,12 @@ namespace CsvHelper.Tests.DataTableTests
 		[TestMethod]
 		public void GetOrdinalCaseInsensitiveTest()
 		{
-			var data = new List<string[]>
+			var parser = new ParserMock
 			{
-				new[] { "Id", "Name" },
-				new[] { "1", "one" },
+				{ "Id", "Name" },
+				{ "1", "one" },
 				null,
 			};
-			var queue = new Queue<string[]>(data);
-			var parser = new ParserMock(queue);
 
 			using (var csv = new CsvReader(parser))
 			{
@@ -259,14 +257,12 @@ namespace CsvHelper.Tests.DataTableTests
 		[TestMethod]
 		public void GetOrdinalMissingTest()
 		{
-			var data = new List<string[]>
+			var parser = new ParserMock
 			{
-				new[] { "Id", "Name" },
-				new[] { "1", "one" },
+				{ "Id", "Name" },
+				{ "1", "one" },
 				null,
 			};
-			var queue = new Queue<string[]>(data);
-			var parser = new ParserMock(queue);
 
 			using (var csv = new CsvReader(parser))
 			{

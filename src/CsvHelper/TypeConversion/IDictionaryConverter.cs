@@ -48,14 +48,14 @@ namespace CsvHelper.TypeConversion
 			var dictionary = new Dictionary<string, string>();
 
 			var indexEnd = memberMapData.IndexEnd < memberMapData.Index
-				? row.Context.Record.Length - 1
+				? row.Parser.Count - 1
 				: memberMapData.IndexEnd;
 
 			for (var i = memberMapData.Index; i <= indexEnd; i++)
 			{
 				if (row.TryGetField(i, out string field))
 				{
-					dictionary.Add(row.Context.HeaderRecord[i], field);
+					dictionary.Add(row.HeaderRecord[i], field);
 				}
 			}
 

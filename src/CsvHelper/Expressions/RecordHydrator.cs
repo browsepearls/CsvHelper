@@ -16,6 +16,7 @@ namespace CsvHelper.Expressions
 	{
 		private readonly CsvReader reader;
 		private readonly ExpressionManager expressionManager;
+		private readonly Dictionary<Type, Delegate> hydrateRecordActions = new Dictionary<Type, Delegate>();
 
 		/// <summary>
 		/// Creates a new instance using the given reader.
@@ -52,9 +53,9 @@ namespace CsvHelper.Expressions
 		{
 			var recordType = typeof(T);
 
-			if (!reader.Context.HydrateRecordActions.TryGetValue(recordType, out Delegate action))
+			if (!hydrateRecordActions.TryGetValue(recordType, out Delegate action))
 			{
-				reader.Context.HydrateRecordActions[recordType] = action = CreateHydrateRecordAction<T>();
+				hydrateRecordActions[recordType] = action = CreateHydrateRecordAction<T>();
 			}
 
 			return (Action<T>)action;
@@ -68,12 +69,12 @@ namespace CsvHelper.Expressions
 		{
 			var recordType = typeof(T);
 
-			if (reader.Context.ReaderConfiguration.Maps[recordType] == null)
+			if (reader.Context.Reader.Configuration.Maps[recordType] == null)
 			{
-				reader.Context.ReaderConfiguration.Maps.Add(reader.Context.ReaderConfiguration.AutoMap(recordType));
+				reader.Context.Reader.Configuration.Maps.Add(reader.Context.Reader.Configuration.AutoMap(recordType));
 			}
 
-			var mapping = reader.Context.ReaderConfiguration.Maps[recordType];
+			var mapping = reader.Context.Reader.Configuration.Maps[recordType];
 
 			var recordTypeParameter = Expression.Parameter(recordType, "record");
 			var memberAssignments = new List<Expression>();

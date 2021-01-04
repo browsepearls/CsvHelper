@@ -7,101 +7,17 @@ using System.Globalization;
 using System.Linq;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
-using Moq;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Reflection;
+using CsvHelper.Tests.Mocks;
 
 namespace CsvHelper.Tests.TypeConversion
 {
 	[TestClass]
 	public class ArrayConverterTests
 	{
-		[TestMethod]
-		public void ReadConvertNoIndexEndTest()
-		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = false };
-			var rowMock = new Mock<IReaderRow>();
-			var currentRecord = new[] { "1", "one", "1", "2", "3" };
-			var context = new ReadingContext(new StringReader(string.Empty), config, false)
-			{
-				Record = currentRecord
-			};
-			rowMock.Setup(m => m.Configuration).Returns(config);
-			rowMock.Setup(m => m.Context).Returns(context);
-			rowMock.Setup(m => m.GetField(It.IsAny<Type>(), It.IsAny<int>())).Returns<Type, int>((type, index) => Convert.ToInt32(currentRecord[index]));
-			var data = new MemberMapData(typeof(Test).GetTypeInfo().GetProperty("List"))
-			{
-				Index = 2,
-				TypeConverterOptions = { CultureInfo = CultureInfo.CurrentCulture }
-			};
-
-			var converter = new ArrayConverter();
-			var enumerable = (int?[])converter.ConvertFromString("1", rowMock.Object, data);
-			var list = enumerable.ToList();
-
-			Assert.AreEqual(3, list.Count);
-			Assert.AreEqual(1, list[0]);
-			Assert.AreEqual(2, list[1]);
-			Assert.AreEqual(3, list[2]);
-		}
-
-		[TestMethod]
-		public void ReadConvertWithIndexEndTest()
-		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = false };
-			var rowMock = new Mock<IReaderRow>();
-			var currentRecord = new[] { "1", "one", "1", "2", "3" };
-			var context = new ReadingContext(new StringReader(string.Empty), config, false)
-			{
-				Record = currentRecord
-			};
-			rowMock.Setup(m => m.Configuration).Returns(config);
-			rowMock.Setup(m => m.Context).Returns(context);
-			rowMock.Setup(m => m.GetField(It.IsAny<Type>(), It.IsAny<int>())).Returns<Type, int>((type, index) => Convert.ToInt32(currentRecord[index]));
-			var data = new MemberMapData(typeof(Test).GetProperty("List"))
-			{
-				Index = 2,
-				IndexEnd = 3,
-				TypeConverterOptions = { CultureInfo = CultureInfo.CurrentCulture }
-			};
-
-			var converter = new ArrayConverter();
-			var enumerable = (int?[])converter.ConvertFromString("1", rowMock.Object, data);
-			var list = enumerable.ToList();
-
-			Assert.AreEqual(2, list.Count);
-			Assert.AreEqual(1, list[0]);
-			Assert.AreEqual(2, list[1]);
-		}
-
-		[TestMethod]
-		public void WriteConvertTest()
-		{
-			var rowMock = new Mock<IWriterRow>();
-			var list = new List<string>();
-			rowMock.Setup(m => m.WriteField(It.IsAny<string>())).Callback<string>(s => list.Add(s));
-
-			var array = new[] { 1, 2, 3 };
-
-			var data = new MemberMapData(typeof(Test).GetProperty("List"))
-			{
-				Index = 2,
-				IndexEnd = 3,
-				TypeConverterOptions = { CultureInfo = CultureInfo.CurrentCulture }
-			};
-
-			var converter = new ArrayConverter();
-			var converted = converter.ConvertToString(array, rowMock.Object, data);
-
-			Assert.IsNull(converted);
-			Assert.AreEqual(3, list.Count);
-			Assert.AreEqual("1", list[0]);
-			Assert.AreEqual("2", list[1]);
-			Assert.AreEqual("3", list[2]);
-		}
-
 		[TestMethod]
 		public void FullReadNoHeaderTest()
 		{

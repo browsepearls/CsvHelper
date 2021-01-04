@@ -28,7 +28,7 @@ namespace CsvHelper.Tests.Issues
 			using (var stream = new MemoryStream())
 			using (var writer = new StreamWriter(stream))
 			using (var reader = new StreamReader(stream))
-			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+			using (var csv = new CsvReader(reader, config))
 			{
 				writer.WriteLine("A,B");
 				writer.WriteLine("1,one");

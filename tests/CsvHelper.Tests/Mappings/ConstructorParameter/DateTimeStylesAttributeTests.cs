@@ -31,13 +31,12 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 		[TestMethod]
 		public void GetRecords_WithCultureInfoAttributes_HasHeader_CreatesRecords()
 		{
-			var rows = new Queue<string[]>(new List<string[]>
+			var parser = new ParserMock
 			{
-				new [] { "id", "date" },
-				new [] { "1", $" {DATE}" },
+				{ "id", "date" },
+				{ "1", $" {DATE}" },
 				null
-			});
-			using (var parser = new ParserMock(rows))
+			};
 			using (var csv = new CsvReader(parser))
 			{
 				var records = csv.GetRecords<Foo>().ToList();
@@ -55,12 +54,11 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 			{
 				HasHeaderRecord = false,
 			};
-			var rows = new Queue<string[]>(new List<string[]>
+			var parser = new ParserMock(config)
 			{
-				new [] { "1", $" {DATE}" },
+				{ "1", $" {DATE}" },
 				null
-			});
-			using (var parser = new ParserMock(config, rows))
+			};
 			using (var csv = new CsvReader(parser))
 			{
 				var records = csv.GetRecords<Foo>().ToList();

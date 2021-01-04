@@ -72,6 +72,7 @@ namespace CsvHelper.Tests.Culture
 			var config = new CsvConfiguration(new CultureInfo(culture))
 			{
 				HasHeaderRecord = false,
+				Delimiter = ",",
 			};
 			using (var reader = new StringReader(csvText))
 			using (var csvReader = new CsvReader(reader, config))

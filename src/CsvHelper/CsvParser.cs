@@ -37,6 +37,7 @@ namespace CsvHelper
 		private readonly Encoding encoding;
 		private readonly bool ignoreQuotes;
 		private readonly bool leaveOpen;
+		private readonly bool lineBreakInQuotedFieldIsBadData;
 
 		private long charCount;
 		private long byteCount;
@@ -79,6 +80,8 @@ namespace CsvHelper
 		{
 			get
 			{
+				// TODO: Cache the current record
+
 				if (fields.Count == 0)
 				{
 					return null;
@@ -98,7 +101,18 @@ namespace CsvHelper
 		/// <summary>
 		/// Gets the raw record for the current row.
 		/// </summary>
-		public Span<char> RawRecord => memoryOwner.Memory.Slice(rowStartPosition, memoryPosition + 1 - rowStartPosition).Span;
+		public Span<char> RawRecord
+		{
+			get
+			{
+				if (fields.Count == 0)
+				{
+					return null;
+				}
+
+				return memoryOwner.Memory.Slice(rowStartPosition, memoryPosition + 1 - rowStartPosition).Span;
+			}
+		}
 
 		/// <summary>
 		/// Gets the reading context.
@@ -161,7 +175,7 @@ namespace CsvHelper
 			badDataFound = configuration.BadDataFound;
 			bufferSize = configuration.BufferSize;
 			comment = configuration.Comment;
-			context = new ReadingContext(reader, configuration, leaveOpen);
+			context = new ReadingContext(this);
 			countBytes = configuration.CountBytes;
 			delimiter = configuration.Delimiter;
 			delimiterFirstChar = delimiter[0];
@@ -171,6 +185,7 @@ namespace CsvHelper
 			ignoreBlankLines = configuration.IgnoreBlankLines;
 			ignoreQuotes = configuration.IgnoreQuotes;
 			leaveOpen = configuration.LeaveOpen;
+			lineBreakInQuotedFieldIsBadData = configuration.LineBreakInQuotedFieldIsBadData;
 			postDequoteField = configuration.PostDequoteField;
 			preDequoteField = configuration.PreDequoteField;
 			processField = configuration.ProcessField;
@@ -191,10 +206,10 @@ namespace CsvHelper
 		{
 			fields.Clear();
 
-			if (charsRead == 0)
-			{
-				return false;
-			}
+			//if (charsRead == 0)
+			//{
+			//	return false;
+			//}
 
 			Span<char> span = Span<char>.Empty;
 			if (memoryPosition > -1)
@@ -248,7 +263,12 @@ namespace CsvHelper
 							return false;
 						}
 
-						//if (fields.Count > 0)
+						if (inComment && allowComments)
+						{
+							// Ignore line.
+							return false;
+						}
+
 						if (rowStartPosition < memoryPosition)
 						{
 							// Add the last field.
@@ -263,6 +283,7 @@ namespace CsvHelper
 							});
 
 							fieldStartPosition = memoryPosition;
+							memoryPosition--;
 
 							return true;
 						}
@@ -352,7 +373,7 @@ namespace CsvHelper
 							{
 								IsQuoted = isQuoted,
 								Start = fieldStartPosition - rowStartPosition,
-								Length = memoryPosition - delimiter.Length - fieldStartPosition,
+								Length = memoryPosition - fieldStartPosition - delimiterPosition,
 							});
 
 							inDelimiter = false;
@@ -384,6 +405,11 @@ namespace CsvHelper
 
 				if (inQuotes)
 				{
+					if (lineBreakInQuotedFieldIsBadData && (c == '\r' || c == '\n'))
+					{
+						badDataFound?.Invoke(context);
+					}
+
 					// If we're in quotes, nothing else is parsed.
 					continue;
 				}
@@ -522,12 +548,20 @@ namespace CsvHelper
 			return true;
 		}
 
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
+		/// <filterpriority>2</filterpriority>
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
+		/// <param name="disposing">True if the instance needs to be disposed of.</param>
 		protected virtual void Dispose(bool disposing)
 		{
 			if (disposed)
@@ -540,11 +574,10 @@ namespace CsvHelper
 				// Dispose managed state (managed objects)
 				if (!leaveOpen)
 				{
-					reader.Dispose();
+					reader?.Dispose();
 				}
 
-				memoryOwner.Dispose();
-				context.Dispose();
+				memoryOwner?.Dispose();
 			}
 
 			// Free unmanaged resources (unmanaged objects) and override finalizer

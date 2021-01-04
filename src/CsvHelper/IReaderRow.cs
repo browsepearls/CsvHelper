@@ -14,6 +14,15 @@ namespace CsvHelper
 	/// </summary>
 	public interface IReaderRow
 	{
+		int CurrentIndex { get; }
+
+		string[] HeaderRecord { get; }
+
+		/// <summary>
+		/// Gets the parser.
+		/// </summary>
+		IParser Parser { get; }
+
 		/// <summary>
 		/// Gets the reading context.
 		/// </summary>

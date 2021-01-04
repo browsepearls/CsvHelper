@@ -218,7 +218,7 @@ namespace CsvHelper.Expressions
 			}
 
 			int index;
-			if (memberMap.Data.IsNameSet || reader.Context.ReaderConfiguration.HasHeaderRecord && !memberMap.Data.IsIndexSet)
+			if (memberMap.Data.IsNameSet || reader.Configuration.HasHeaderRecord && !memberMap.Data.IsIndexSet)
 			{
 				// Use the name.
 				index = reader.GetFieldIndex(memberMap.Data.Names.ToArray(), memberMap.Data.NameIndex, memberMap.Data.IsOptional);
@@ -368,7 +368,7 @@ namespace CsvHelper.Expressions
 		/// <param name="fieldExpression">The field expression.</param>
 		public virtual Expression CreateTypeConverterExpression(MemberMap memberMap, Expression fieldExpression)
 		{
-			memberMap.Data.TypeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = reader.Context.ReaderConfiguration.CultureInfo }, reader.Context.ReaderConfiguration.TypeConverterOptionsCache.GetOptions(memberMap.Data.Member.MemberType()), memberMap.Data.TypeConverterOptions);
+			memberMap.Data.TypeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = reader.Configuration.CultureInfo }, reader.Configuration.TypeConverterOptionsCache.GetOptions(memberMap.Data.Member.MemberType()), memberMap.Data.TypeConverterOptions);
 
 			Expression typeConverterFieldExpression = Expression.Call(Expression.Constant(memberMap.Data.TypeConverter), nameof(ITypeConverter.ConvertFromString), null, fieldExpression, Expression.Constant(reader), Expression.Constant(memberMap.Data));
 			typeConverterFieldExpression = Expression.Convert(typeConverterFieldExpression, memberMap.Data.Member.MemberType());
@@ -385,8 +385,8 @@ namespace CsvHelper.Expressions
 		{
 			parameterMap.Data.TypeConverterOptions = TypeConverterOptions.Merge
 			(
-				new TypeConverterOptions { CultureInfo = reader.Context.ReaderConfiguration.CultureInfo },
-				reader.Context.ReaderConfiguration.TypeConverterOptionsCache.GetOptions(parameterMap.Data.Parameter.ParameterType),
+				new TypeConverterOptions { CultureInfo = reader.Configuration.CultureInfo },
+				reader.Configuration.TypeConverterOptionsCache.GetOptions(parameterMap.Data.Parameter.ParameterType),
 				parameterMap.Data.TypeConverterOptions
 			);
 

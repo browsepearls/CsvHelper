@@ -13,7 +13,7 @@ namespace CsvHelper.Tests.Reading
 	public class MultipleGetRecordsTests
 	{
 		[TestMethod]
-		public void Blah()
+		public void GetRecordsAfterRefillingReaderTest()
 		{
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))

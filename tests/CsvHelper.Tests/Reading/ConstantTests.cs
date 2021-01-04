@@ -18,12 +18,13 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void ConstantAlwaysReturnsSameValueTest()
 		{
-			var rows = new Queue<string[]>();
-			rows.Enqueue(new[] { "Id", "Name" });
-			rows.Enqueue(new[] { "1", "one" });
-			rows.Enqueue(new[] { "2", "two" });
-			rows.Enqueue(null);
-			var parser = new ParserMock(rows);
+			var parser = new ParserMock
+			{
+				{ "Id", "Name" },
+				{ "1", "one" },
+				{ "2", "two" },
+				null,
+			};
 
 			var csv = new CsvReader(parser);
 			csv.Configuration.RegisterClassMap<TestStringMap>();
@@ -43,7 +44,13 @@ namespace CsvHelper.Tests.Reading
 			rows.Enqueue(new[] { "1", "one" });
 			rows.Enqueue(new[] { "2", "two" });
 			rows.Enqueue(null);
-			var parser = new ParserMock(rows);
+			var parser = new ParserMock
+			{
+				{ "Id", "Name" },
+				{ "1", "one" },
+				{ "2", "two" },
+				null,
+			};
 
 			var csv = new CsvReader(parser);
 			csv.Configuration.RegisterClassMap<TestNullMap>();

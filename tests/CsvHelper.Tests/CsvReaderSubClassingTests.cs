@@ -15,23 +15,21 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void GetRecordTest()
 		{
-			var data = new List<string[]>
+			var parserMock = new ParserMock
 			{
-				new[] { "Id", "Name" },
-				new[] { "1", "one" },
-				new[] { "2", "two" },
+				{ "Id", "Name" },
+				{ "1", "one" },
+				{ "2", "two" },
 				null
 			};
 
-			var parserMock = new ParserMock( new Queue<string[]>( data ) );
-
-			var csvReader = new MyCsvReader( parserMock );
+			var csvReader = new MyCsvReader(parserMock);
 			csvReader.GetRecords<Test>().ToList();
 		}
 
 		private class MyCsvReader : CsvReader
 		{
-			public MyCsvReader( IParser parser ) : base( parser ){}
+			public MyCsvReader(IParser parser) : base(parser) { }
 		}
 
 		private class Test

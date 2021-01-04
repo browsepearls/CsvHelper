@@ -9,69 +9,70 @@ using System.IO;
 using CsvHelper.Configuration;
 using System.Threading.Tasks;
 using System.Globalization;
+using System.Linq;
 
 namespace CsvHelper.Tests.Mocks
 {
 	public class ParserMock : IParser, IEnumerable<string[]>
 	{
-		private readonly Queue<string[]> rows;
-		private ReadingContext context;
+		private readonly Queue<string[]> records = new Queue<string[]>();
+		private string[] record;
+		private int row;
 
-		public ReadingContext Context => context;
+		public ReadingContext Context { get; private set; }
 
-		public IParserConfiguration Configuration { get; }
+		public IParserConfiguration Configuration { get; private set; }
 
-		public int Count => context.Record.Length;
+		public int Count => record?.Length ?? 0;
 
-		public string[] Record => context.Record;
+		public string[] Record => record;
 
 		public Span<char> RawRecord => Span<char>.Empty;
 
-		public int Row => context.Row;
+		public int Row => row;
 
-		public int RawRow => context.RawRow;
+		public int RawRow => row;
 
-		public string this[int index] => throw new NotImplementedException();
+		public string this[int index] => record[index];
 
 		public ParserMock() : this(new CsvConfiguration(CultureInfo.InvariantCulture)) { }
 
 		public ParserMock(CsvConfiguration configuration)
 		{
-			context = new ReadingContext(new StringReader(string.Empty), configuration, false);
-			rows = new Queue<string[]>();
-		}
-
-		public ParserMock(Queue<string[]> rows) : this(new CsvConfiguration(CultureInfo.InvariantCulture), rows) { }
-
-		public ParserMock(CsvConfiguration configuration, Queue<string[]> rows)
-		{
-			context = new ReadingContext(new StringReader(string.Empty), configuration, false);
-			this.rows = rows;
+			Configuration = configuration;
+			Context = new ReadingContext(this);
 		}
 
 		public bool Read()
 		{
-			context.Row++;
-			context.Record = rows.Dequeue();
+			row++;
+			record = records.Dequeue();
 
-			return rows.Count > 0;
+			return records.Count > 0;
 		}
 
 		public Task<bool> ReadAsync()
 		{
-			context.Row++;
+			row++;
+			record = records.Dequeue();
 
-			return Task.FromResult(rows.Count > 0);
+			return Task.FromResult(records.Count > 0);
 		}
 
-		public void Add(params string[] row)
+		public void Dispose()
 		{
-			rows.Enqueue(row);
+		}
+
+		#region Mock Methods
+
+		public void Add(params string[] record)
+		{
+			records.Enqueue(record);
 		}
 
 		public IEnumerator<string[]> GetEnumerator()
 		{
-			return rows.GetEnumerator();
+			return records.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -79,8 +80,6 @@ namespace CsvHelper.Tests.Mocks
 			return GetEnumerator();
 		}
 
-		public void Dispose()
-		{
-		}
+		#endregion Mock Methods
 	}
 }

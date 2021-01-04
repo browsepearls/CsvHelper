@@ -48,8 +48,8 @@ namespace CsvHelper.Tests
 				}
 				catch (TypeConverterException ex)
 				{
-					Assert.AreEqual(1, ex.ReadingContext.Row);
-					Assert.AreEqual(0, ex.ReadingContext.CurrentIndex);
+					Assert.AreEqual(1, ex.ReadingContext.Parser.Row);
+					Assert.AreEqual(0, ex.ReadingContext.Reader.CurrentIndex);
 				}
 			}
 		}
@@ -80,8 +80,8 @@ namespace CsvHelper.Tests
 				}
 				catch (TypeConverterException ex)
 				{
-					Assert.AreEqual(3, ex.ReadingContext.Row);
-					Assert.AreEqual(0, ex.ReadingContext.CurrentIndex);
+					Assert.AreEqual(3, ex.ReadingContext.Parser.Row);
+					Assert.AreEqual(0, ex.ReadingContext.Reader.CurrentIndex);
 				}
 			}
 		}
@@ -114,8 +114,8 @@ namespace CsvHelper.Tests
 				}
 				catch (TypeConverterException ex)
 				{
-					Assert.AreEqual(4, ex.ReadingContext.Row);
-					Assert.AreEqual(0, ex.ReadingContext.CurrentIndex);
+					Assert.AreEqual(4, ex.ReadingContext.Parser.Row);
+					Assert.AreEqual(0, ex.ReadingContext.Reader.CurrentIndex);
 				}
 			}
 		}
@@ -143,8 +143,8 @@ namespace CsvHelper.Tests
 				}
 				catch (TypeConverterException ex)
 				{
-					Assert.AreEqual(3, ex.ReadingContext.Row);
-					Assert.AreEqual(0, ex.ReadingContext.CurrentIndex);
+					Assert.AreEqual(3, ex.ReadingContext.Parser.Row);
+					Assert.AreEqual(0, ex.ReadingContext.Reader.CurrentIndex);
 				}
 			}
 		}
@@ -171,8 +171,8 @@ namespace CsvHelper.Tests
 				}
 				catch (TypeConverterException ex)
 				{
-					Assert.AreEqual(2, ex.ReadingContext.Row);
-					Assert.AreEqual(1, ex.ReadingContext.CurrentIndex);
+					Assert.AreEqual(2, ex.ReadingContext.Parser.Row);
+					Assert.AreEqual(1, ex.ReadingContext.Reader.CurrentIndex);
 				}
 			}
 		}

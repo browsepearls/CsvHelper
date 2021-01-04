@@ -22,10 +22,11 @@ namespace CsvHelper.Tests.TypeConversion
 			{
 				HasHeaderRecord = false,
 			};
-			var queue = new Queue<string[]>();
-			queue.Enqueue(new[] { "1" });
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(config, queue);
+			var parserMock = new ParserMock(config)
+			{
+				{ "1" },
+				null
+			};
 			var csv = new CsvReader(parserMock);
 			csv.Configuration.RegisterClassMap<TestMap>();
 			var list = csv.GetRecords<Test>().ToList();

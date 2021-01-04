@@ -84,7 +84,7 @@ namespace CsvHelper
 		{
 			get
 			{
-				return csv.Context.Record?.Length ?? 0;
+				return csv?.Parser.Count ?? 0;
 			}
 		}
 
@@ -343,7 +343,7 @@ namespace CsvHelper
 		public string GetName(int i)
 		{
 			return csv.Configuration.HasHeaderRecord
-				? csv.Context.HeaderRecord[i]
+				? csv.HeaderRecord[i]
 				: string.Empty;
 		}
 
@@ -364,7 +364,7 @@ namespace CsvHelper
 
 			var namePrepared = csv.Configuration.PrepareHeaderForMatch(name, 0);
 
-			var headerRecord = csv.Context.HeaderRecord;
+			var headerRecord = csv.HeaderRecord;
 			for (var i = 0; i < headerRecord.Length; i++)
 			{
 				var headerPrepared = csv.Configuration.PrepareHeaderForMatch(headerRecord[i], i);
@@ -416,20 +416,20 @@ namespace CsvHelper
 
 			if (csv.Configuration.HasHeaderRecord)
 			{
-				for (var i = 0; i < csv.Context.HeaderRecord.Length; i++)
+				for (var i = 0; i < csv.HeaderRecord.Length; i++)
 				{
-					var header = csv.Context.HeaderRecord[i];
+					var header = csv.HeaderRecord[i];
 					var row = dt.NewRow();
 					row["AllowDBNull"] = true;
 					row["AutoIncrementSeed"] = DBNull.Value;
 					row["AutoIncrementStep"] = DBNull.Value;
 					row["BaseCatalogName"] = null;
-					row["BaseColumnName"] = csv.Context.HeaderRecord[i];
+					row["BaseColumnName"] = csv.HeaderRecord[i];
 					row["BaseColumnNamespace"] = null;
 					row["BaseSchemaName"] = null;
 					row["BaseTableName"] = null;
 					row["BaseTableNamespace"] = null;
-					row["ColumnName"] = csv.Context.HeaderRecord[i];
+					row["ColumnName"] = csv.HeaderRecord[i];
 					row["ColumnMapping"] = MappingType.Element;
 					row["ColumnOrdinal"] = i;
 					row["ColumnSize"] = int.MaxValue;
@@ -491,7 +491,7 @@ namespace CsvHelper
 				values[i] = IsDBNull(i) ? DBNull.Value : (object)csv.GetField(i);
 			}
 
-			return csv.Context.Record.Length;
+			return csv.Parser.Count;
 		}
 
 		/// <summary>

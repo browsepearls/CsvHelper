@@ -704,25 +704,25 @@ namespace CsvHelper.Tests
 				Assert.AreEqual("Name", parser[1]);
 
 				stream.Position = 0;
-				stream.Seek(parser.Context.CharPosition, SeekOrigin.Begin);
+				stream.Seek(parser.CharPosition, SeekOrigin.Begin);
 				parser.Read();
 				Assert.AreEqual("1", parser[0]);
 				Assert.AreEqual("one", parser[1]);
 
 				stream.Position = 0;
-				stream.Seek(parser.Context.CharPosition, SeekOrigin.Begin);
+				stream.Seek(parser.CharPosition, SeekOrigin.Begin);
 				parser.Read();
 				Assert.AreEqual("", parser[0]);
 				Assert.AreEqual("", parser[1]);
 
 				stream.Position = 0;
-				stream.Seek(parser.Context.CharPosition, SeekOrigin.Begin);
+				stream.Seek(parser.CharPosition, SeekOrigin.Begin);
 				parser.Read();
 				Assert.AreEqual("2", parser[0]);
 				Assert.AreEqual("two", parser[1]);
 
 				stream.Position = 0;
-				stream.Seek(parser.Context.CharPosition, SeekOrigin.Begin);
+				stream.Seek(parser.CharPosition, SeekOrigin.Begin);
 				parser.Read();
 				Assert.AreEqual("3", parser[0]);
 				Assert.AreEqual("three, four", parser[1]);
@@ -828,7 +828,7 @@ namespace CsvHelper.Tests
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(2, parser.Row);
-				Assert.AreEqual(0, parser.Count);
+				Assert.AreEqual(1, parser.Count);
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(3, parser.Row);
@@ -918,8 +918,8 @@ namespace CsvHelper.Tests
 				CountBytes = true
 			};
 			using (var stream = new MemoryStream())
-			using (var writer = new StreamWriter(stream))
-			using (var reader = new StreamReader(stream))
+			using (var writer = new StreamWriter(stream, config.Encoding))
+			using (var reader = new StreamReader(stream, config.Encoding))
 			using (var parser = new CsvParser(reader, config))
 			{
 				writer.Write("1,2\r\n");
@@ -945,8 +945,8 @@ namespace CsvHelper.Tests
 				CountBytes = true
 			};
 			using (var stream = new MemoryStream())
-			using (var writer = new StreamWriter(stream))
-			using (var reader = new StreamReader(stream))
+			using (var writer = new StreamWriter(stream, config.Encoding))
+			using (var reader = new StreamReader(stream, config.Encoding))
 			using (var parser = new CsvParser(reader, config))
 			{
 				writer.Write("1,\"2\"\r\n");
@@ -973,11 +973,11 @@ namespace CsvHelper.Tests
 				CountBytes = true,
 			};
 			using (var stream = new MemoryStream())
-			using (var writer = new StreamWriter(stream))
-			using (var reader = new StreamReader(stream))
+			using (var writer = new StreamWriter(stream, config.Encoding))
+			using (var reader = new StreamReader(stream, config.Encoding))
 			using (var parser = new CsvParser(reader, config))
 			{
-				writer.Write("1,\"2\" \" a\r\n");
+				writer.Write("1,\"2\" \" a\r\n"); // 1,"2" " a\r\n
 				writer.Write("\"3\",4\r\n");
 				writer.Flush();
 				stream.Position = 0;
@@ -1000,8 +1000,8 @@ namespace CsvHelper.Tests
 				CountBytes = true,
 			};
 			using (var stream = new MemoryStream())
-			using (var writer = new StreamWriter(stream))
-			using (var reader = new StreamReader(stream))
+			using (var writer = new StreamWriter(stream, config.Encoding))
+			using (var reader = new StreamReader(stream, config.Encoding))
 			using (var parser = new CsvParser(reader, config))
 			{
 				writer.Write("1,\"\",2\r\n");
@@ -1029,8 +1029,8 @@ namespace CsvHelper.Tests
 			};
 
 			using (var stream = new MemoryStream())
-			using (var writer = new StreamWriter(stream))
-			using (var reader = new StreamReader(stream))
+			using (var writer = new StreamWriter(stream, config.Encoding))
+			using (var reader = new StreamReader(stream, config.Encoding))
 			using (var parser = new CsvParser(reader, config))
 			{
 				writer.Write("1,\"2\",3\r\n");
@@ -1057,8 +1057,8 @@ namespace CsvHelper.Tests
 				BufferSize = 4
 			};
 			using (var stream = new MemoryStream())
-			using (var writer = new StreamWriter(stream))
-			using (var reader = new StreamReader(stream))
+			using (var writer = new StreamWriter(stream, config.Encoding))
+			using (var reader = new StreamReader(stream, config.Encoding))
 			using (var parser = new CsvParser(reader, config))
 			{
 				writer.Write("1,\"2a\",3\r\n");
@@ -1266,10 +1266,10 @@ namespace CsvHelper.Tests
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Read();
-				Assert.AreEqual(row1, parser.Context.RawRecord);
+				Assert.AreEqual(row1, parser.RawRecord.ToString());
 
 				parser.Read();
-				Assert.AreEqual(row2, parser.Context.RawRecord);
+				Assert.AreEqual(row2, parser.RawRecord.ToString());
 			}
 		}
 
@@ -1333,9 +1333,7 @@ namespace CsvHelper.Tests
 				writer.Flush();
 				stream.Position = 0;
 
-				var record = parser.Read();
-
-				Assert.IsNull(record);
+				Assert.IsFalse(parser.Read());
 			}
 		}
 
@@ -1369,7 +1367,7 @@ namespace CsvHelper.Tests
 				Assert.AreEqual("", parser[2]);
 
 				parser.Read();
-				Assert.AreEqual(0, parser.Count);
+				Assert.AreEqual(1, parser.Count);
 
 				parser.Read();
 				Assert.AreEqual("4", parser[0]);

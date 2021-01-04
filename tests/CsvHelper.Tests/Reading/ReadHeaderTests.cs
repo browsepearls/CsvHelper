@@ -16,38 +16,40 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void ReadHeaderReadsHeaderTest()
 		{
-			var rows = new Queue<string[]>();
-			rows.Enqueue(new[] { "Id", "Name" });
-			rows.Enqueue(new[] { "1", "One" });
-			rows.Enqueue(new[] { "2", "two" });
-			rows.Enqueue(null);
-			var parser = new ParserMock(rows);
+			var parser = new ParserMock
+			{
+				{ "Id", "Name" },
+				{ "1", "One" },
+				{ "2", "two" },
+				null
+			};
 
 			var csv = new CsvReader(parser);
 			csv.Read();
 			csv.ReadHeader();
 
-			Assert.IsNotNull(csv.Context.HeaderRecord);
-			Assert.AreEqual("Id", csv.Context.HeaderRecord[0]);
-			Assert.AreEqual("Name", csv.Context.HeaderRecord[1]);
+			Assert.IsNotNull(csv.HeaderRecord);
+			Assert.AreEqual("Id", csv.HeaderRecord[0]);
+			Assert.AreEqual("Name", csv.HeaderRecord[1]);
 		}
 
 		[TestMethod]
 		public void ReadHeaderDoesNotAffectCurrentRecordTest()
 		{
-			var rows = new Queue<string[]>();
-			rows.Enqueue(new[] { "Id", "Name" });
-			rows.Enqueue(new[] { "1", "One" });
-			rows.Enqueue(new[] { "2", "two" });
-			rows.Enqueue(null);
-			var parser = new ParserMock(rows);
+			var parser = new ParserMock
+			{
+				{ "Id", "Name" },
+				{ "1", "One" },
+				{ "2", "two" },
+				null,
+			};
 
 			var csv = new CsvReader(parser);
 			csv.Read();
 			csv.ReadHeader();
 
-			Assert.AreEqual("Id", csv.Context.Record[0]);
-			Assert.AreEqual("Name", csv.Context.Record[1]);
+			Assert.AreEqual("Id", csv.Parser[0]);
+			Assert.AreEqual("Name", csv.Parser[1]);
 		}
 
 		[TestMethod]
@@ -57,12 +59,13 @@ namespace CsvHelper.Tests.Reading
 			{
 				HasHeaderRecord = false,
 			};
-			var rows = new Queue<string[]>();
-			rows.Enqueue(new[] { "Id", "Name" });
-			rows.Enqueue(new[] { "1", "One" });
-			rows.Enqueue(new[] { "2", "two" });
-			rows.Enqueue(null);
-			var parser = new ParserMock(config, rows);
+			var parser = new ParserMock(config)
+			{
+				{ "Id", "Name" },
+				{ "1", "One" },
+				{ "2", "two" },
+				null,
+			};
 
 			var csv = new CsvReader(parser);
 			while (csv.Read()) { }
@@ -84,12 +87,13 @@ namespace CsvHelper.Tests.Reading
 			{
 				HasHeaderRecord = false,
 			};
-			var rows = new Queue<string[]>();
-			rows.Enqueue(new[] { "Id", "Name" });
-			rows.Enqueue(new[] { "1", "One" });
-			rows.Enqueue(new[] { "2", "two" });
-			rows.Enqueue(null);
-			var parser = new ParserMock(config, rows);
+			var parser = new ParserMock(config)
+			{
+				{ "Id", "Name" },
+				{ "1", "One" },
+				{ "2", "two" },
+				null
+			};
 
 			var csv = new CsvReader(parser);
 
@@ -106,12 +110,13 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void ReadingHeaderDoesNotFailWhenHeaderAlreadyReadTest()
 		{
-			var rows = new Queue<string[]>();
-			rows.Enqueue(new[] { "Id", "Name" });
-			rows.Enqueue(new[] { "1", "One" });
-			rows.Enqueue(new[] { "2", "two" });
-			rows.Enqueue(null);
-			var parser = new ParserMock(rows);
+			var parser = new ParserMock
+			{
+				{ "Id", "Name" },
+				{ "1", "One" },
+				{ "2", "two" },
+				null
+			};
 
 			var csv = new CsvReader(parser);
 			csv.Read();
@@ -124,24 +129,21 @@ namespace CsvHelper.Tests.Reading
 		{
 			var parser = new ParserMock
 			{
-				new [] { "Id", "Name" },
-				new [] { "Name", "Id" },
+				{ "Id", "Name" },
+				{ "Name", "Id" },
 			};
 			var csv = new CsvReader(parser);
 			csv.Read();
 			csv.ReadHeader();
 
-			Assert.AreEqual(0, csv.Context.NamedIndexes["Id"][0]);
-			Assert.AreEqual(1, csv.Context.NamedIndexes["Name"][0]);
-
-			csv.GetField("Id");
-			csv.GetField("Name");
+			Assert.AreEqual(0, csv.GetFieldIndex("Id"));
+			Assert.AreEqual(1, csv.GetFieldIndex("Name"));
 
 			csv.Read();
 			csv.ReadHeader();
 
-			Assert.AreEqual(1, csv.Context.NamedIndexes["Id"][0]);
-			Assert.AreEqual(0, csv.Context.NamedIndexes["Name"][0]);
+			Assert.AreEqual(1, csv.GetFieldIndex("Id"));
+			Assert.AreEqual(0, csv.GetFieldIndex("Name"));
 		}
 
 		[TestMethod]
@@ -149,10 +151,10 @@ namespace CsvHelper.Tests.Reading
 		{
 			var parser = new ParserMock
 			{
-				new [] { "Id", "Name", "Id", "Name" },
-				new [] { "1", "one", "2", "two" },
-				new [] { "Name", "Id", "Name", "Id" },
-				new [] { "three", "3", "four", "4" },
+				{ "Id", "Name", "Id", "Name" },
+				{ "1", "one", "2", "two" },
+				{ "Name", "Id", "Name", "Id" },
+				{ "three", "3", "four", "4" },
 			};
 			var csv = new CsvReader(parser);
 

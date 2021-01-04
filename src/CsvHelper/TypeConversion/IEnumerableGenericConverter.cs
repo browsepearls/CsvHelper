@@ -47,7 +47,7 @@ namespace CsvHelper.TypeConversion
 			{
 				// Use the index.
 				var indexEnd = memberMapData.IndexEnd < memberMapData.Index
-					? row.Context.Record.Length - 1
+					? row.Parser.Count - 1
 					: memberMapData.IndexEnd;
 
 				for (var i = memberMapData.Index; i <= indexEnd; i++)

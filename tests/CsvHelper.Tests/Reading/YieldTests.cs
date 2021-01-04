@@ -9,16 +9,17 @@ using System.Threading.Tasks;
 namespace CsvHelper.Tests.Reading
 {
 	[TestClass]
-    public class YieldTests
-    {
+	public class YieldTests
+	{
 		[TestMethod]
-        public void GetRecordsGeneric_Disposed_ThrowsObjectDisposedExceptionTest()
+		public void GetRecordsGeneric_Disposed_ThrowsObjectDisposedExceptionTest()
 		{
-			var queue = new Queue<string[]>();
-			queue.Enqueue(new[] { "Id", "Name" });
-			queue.Enqueue(new[] { "1", "one" });
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock
+			{
+				new[] { "Id", "Name" },
+				new[] { "1", "one" },
+				null
+			};
 
 			IEnumerable<Foo> records;
 			using (var csv = new CsvReader(parserMock))
@@ -31,11 +32,12 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void GetRecords_Disposed_ThrowsObjectDisposedExceptionTest()
 		{
-			var queue = new Queue<string[]>();
-			queue.Enqueue(new[] { "Id", "Name" });
-			queue.Enqueue(new[] { "1", "one" });
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock
+			{
+				new[] { "Id", "Name" },
+				new[] { "1", "one" },
+				null
+			};
 
 			IEnumerable<object> records;
 			using (var csv = new CsvReader(parserMock))
@@ -49,11 +51,12 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public void EnumerateRecords_Disposed_ThrowsObjectDisposedExceptionTest()
 		{
-			var queue = new Queue<string[]>();
-			queue.Enqueue(new[] { "Id", "Name" });
-			queue.Enqueue(new[] { "1", "one" });
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock
+			{
+				new[] { "Id", "Name" },
+				new[] { "1", "one" },
+				null
+			};
 
 			Foo record = null;
 			IEnumerable<Foo> records;
@@ -69,11 +72,12 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public async Task GetRecordsAsyncGeneric_Disposed_ThrowsObjectDisposedExceptionTest()
 		{
-			var queue = new Queue<string[]>();
-			queue.Enqueue(new[] { "Id", "Name" });
-			queue.Enqueue(new[] { "1", "one" });
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock
+			{
+				new[] { "Id", "Name" },
+				new[] { "1", "one" },
+				null
+			};
 
 			IAsyncEnumerable<Foo> records;
 			using (var csv = new CsvReader(parserMock))
@@ -87,11 +91,12 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public async Task GetRecordsAsync_Disposed_ThrowsObjectDisposedExceptionTest()
 		{
-			var queue = new Queue<string[]>();
-			queue.Enqueue(new[] { "Id", "Name" });
-			queue.Enqueue(new[] { "1", "one" });
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock
+			{
+				new[] { "Id", "Name" },
+				new[] { "1", "one" },
+				null
+			};
 
 			IAsyncEnumerable<object> records;
 			using (var csv = new CsvReader(parserMock))
@@ -105,11 +110,12 @@ namespace CsvHelper.Tests.Reading
 		[TestMethod]
 		public async Task EnumerateRecordsAsync_Disposed_ThrowsObjectDisposedExceptionTest()
 		{
-			var queue = new Queue<string[]>();
-			queue.Enqueue(new[] { "Id", "Name" });
-			queue.Enqueue(new[] { "1", "one" });
-			queue.Enqueue(null);
-			var parserMock = new ParserMock(queue);
+			var parserMock = new ParserMock
+			{
+				new[] { "Id", "Name" },
+				new[] { "1", "one" },
+				null
+			};
 
 			Foo record = null;
 			IAsyncEnumerable<Foo> records;

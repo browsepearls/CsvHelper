@@ -18,31 +18,34 @@ namespace CsvHelper.Tests.Parsing
 			string field = null;
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				BadDataFound = f => field = f.Field,
+				BadDataFound = context => field = context.Parser.RawRecord.ToString(),
 			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
 			using (var parser = new CsvParser(reader, config))
 			{
-				writer.WriteLine(" a\"bc\",d");
-				writer.WriteLine("\"a\"\"b\"c \" ,d");
-				writer.WriteLine("\"a\"\"b\",c");
+				writer.Write(" a\"bc\",d\r\n");        //  a\"bc\",d\r\n
+				writer.Write("\"a\"\"b\"c \" ,d\r\n"); // "a""b"c " ,d\r\n
+				writer.Write("\"a\"\"b\",c\r\n");      // "a""b",c\r\n
 				writer.Flush();
 				stream.Position = 0;
 
 				parser.Read();
+				var record = parser.Record;
 
 				Assert.IsNotNull(field);
-				Assert.AreEqual(" a\"bc\"", field);
+				Assert.AreEqual(" a\"bc\",d\r\n", field);
 
 				field = null;
 				parser.Read();
+				record = parser.Record;
 				Assert.IsNotNull(field);
-				Assert.AreEqual("a\"bc \" ", field);
+				Assert.AreEqual("\"a\"\"b\"c \" ,d\r\n\"a\"\"b\",c\r\n", field);
 
 				field = null;
 				parser.Read();
+				record = parser.Record;
 				Assert.IsNull(field);
 			}
 		}
@@ -64,6 +67,7 @@ namespace CsvHelper.Tests.Parsing
 				try
 				{
 					parser.Read();
+					var record = parser.Record;
 					Assert.Fail("Failed to throw exception on bad data.");
 				}
 				catch (BadDataException) { }

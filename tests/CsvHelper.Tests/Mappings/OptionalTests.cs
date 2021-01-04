@@ -20,16 +20,13 @@ namespace CsvHelper.Tests.Mappings
 		[TestMethod]
 		public void OptionalWithExistingColumnTest()
 		{
-			var data = new List<string[]>
+			var parserMock = new ParserMock
 			{
-				new[] { "Id", "Name" },
-				new[] { "1", "one" },
-				new[] { "2", "two" },
+				{ "Id", "Name" },
+				{ "1", "one" },
+				{ "2", "two" },
 				null
 			};
-
-			var queue = new Queue<string[]>(data);
-			var parserMock = new ParserMock(queue);
 
 			var csvReader = new CsvReader(parserMock);
 			csvReader.Configuration.RegisterClassMap<FooOptionalIntMap>();
@@ -47,16 +44,13 @@ namespace CsvHelper.Tests.Mappings
 		[TestMethod]
 		public void OptionalIntTest()
 		{
-			var data = new List<string[]>
+			var parserMock = new ParserMock
 			{
-				new[] { "Name" },
-				new[] { "one" },
-				new[] { "two" },
+				{ "Name" },
+				{ "one" },
+				{ "two" },
 				null
 			};
-
-			var queue = new Queue<string[]>(data);
-			var parserMock = new ParserMock(queue);
 
 			var csvReader = new CsvReader(parserMock);
 			csvReader.Configuration.RegisterClassMap<FooOptionalIntMap>();
@@ -76,16 +70,13 @@ namespace CsvHelper.Tests.Mappings
 		[TestMethod]
 		public void OptionalIntDefaultTest()
 		{
-			var data = new List<string[]>
+			var parserMock = new ParserMock
 			{
-				new[] { "Name" },
-				new[] { "one" },
-				new[] { "two" },
+				{ "Name" },
+				{ "one" },
+				{ "two" },
 				null
 			};
-
-			var queue = new Queue<string[]>(data);
-			var parserMock = new ParserMock(queue);
 
 			var csvReader = new CsvReader(parserMock);
 			csvReader.Configuration.RegisterClassMap<FooOptionalIntDefaultMap>();
@@ -105,16 +96,13 @@ namespace CsvHelper.Tests.Mappings
 		[TestMethod]
 		public void OptionalStringIntDefaultTest()
 		{
-			var data = new List<string[]>
+			var parserMock = new ParserMock
 			{
-				new[] { "Name" },
-				new[] { "one" },
-				new[] { "two" },
+				{ "Name" },
+				{ "one" },
+				{ "two" },
 				null
 			};
-
-			var queue = new Queue<string[]>(data);
-			var parserMock = new ParserMock(queue);
 
 			var csvReader = new CsvReader(parserMock);
 			csvReader.Configuration.RegisterClassMap<FooOptionalStringIntDefaultMap>();
@@ -134,16 +122,13 @@ namespace CsvHelper.Tests.Mappings
 		[TestMethod]
 		public void OptionalStringTest()
 		{
-			var data = new List<string[]>
+			var parserMock = new ParserMock
 			{
-				new[] { "Id" },
-				new[] { "1" },
-				new[] { "2" },
+				{ "Id" },
+				{ "1" },
+				{ "2" },
 				null
 			};
-
-			var queue = new Queue<string[]>(data);
-			var parserMock = new ParserMock(queue);
 
 			var csvReader = new CsvReader(parserMock);
 			csvReader.Configuration.RegisterClassMap<FooOptionalStringMap>();
@@ -163,16 +148,13 @@ namespace CsvHelper.Tests.Mappings
 		[TestMethod]
 		public void OptionalStringDefaultTest()
 		{
-			var data = new List<string[]>
+			var parserMock = new ParserMock
 			{
-				new[] { "Id" },
-				new[] { "1" },
-				new[] { "2" },
+				{ "Id" },
+				{ "1" },
+				{ "2" },
 				null
 			};
-
-			var queue = new Queue<string[]>(data);
-			var parserMock = new ParserMock(queue);
 
 			var csvReader = new CsvReader(parserMock);
 			csvReader.Configuration.RegisterClassMap<FooOptionalStringDefaultMap>();

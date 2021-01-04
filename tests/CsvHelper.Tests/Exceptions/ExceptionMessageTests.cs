@@ -32,8 +32,8 @@ namespace CsvHelper.Tests.Exceptions
 			}
 			catch( MissingFieldException ex )
 			{
-				Assert.AreEqual( 2, ex.ReadingContext.Row );
-				Assert.AreEqual( 2, ex.ReadingContext.CurrentIndex );
+				Assert.AreEqual( 2, ex.ReadingContext.Parser.Row );
+				Assert.AreEqual( 2, ex.ReadingContext.Reader.CurrentIndex );
 			}
 		}
 
@@ -57,9 +57,9 @@ namespace CsvHelper.Tests.Exceptions
 			}
 			catch( MissingFieldException ex )
 			{
-				Assert.AreEqual( 2, ex.ReadingContext.Row );
+				Assert.AreEqual( 2, ex.ReadingContext.Parser.Row );
 				//Assert.AreEqual( ex.Type, typeof( int ) );
-				Assert.AreEqual( 2, ex.ReadingContext.CurrentIndex );
+				Assert.AreEqual( 2, ex.ReadingContext.Reader.CurrentIndex );
 			}
 		}
 
@@ -89,9 +89,9 @@ namespace CsvHelper.Tests.Exceptions
 				//        "Field Value: 'a'\r\n";
 				//Assert.AreEqual( expected, ex.Data["CsvHelper"] );
 
-				Assert.AreEqual( 2, ex.ReadingContext.Row );
+				Assert.AreEqual( 2, ex.ReadingContext.Parser.Row );
 				//Assert.AreEqual( typeof( Simple ), ex.Type );
-				Assert.AreEqual( 0, ex.ReadingContext.CurrentIndex );
+				Assert.AreEqual( 0, ex.ReadingContext.Reader.CurrentIndex );
 			}
 		}
 
@@ -114,9 +114,9 @@ namespace CsvHelper.Tests.Exceptions
 			}
 			catch( TypeConverterException ex )
 			{
-				Assert.AreEqual( 2, ex.ReadingContext.Row );
+				Assert.AreEqual( 2, ex.ReadingContext.Parser.Row );
 				//Assert.AreEqual( typeof( Simple ), ex.Type );
-				Assert.AreEqual( 0, ex.ReadingContext.CurrentIndex );
+				Assert.AreEqual( 0, ex.ReadingContext.Reader.CurrentIndex );
 			}
 		}
 
@@ -138,9 +138,9 @@ namespace CsvHelper.Tests.Exceptions
 			}
 			catch( TypeConverterException ex )
 			{
-				Assert.AreEqual( 2, ex.ReadingContext.Row );
+				Assert.AreEqual( 2, ex.ReadingContext.Parser.Row );
 				//Assert.AreEqual( typeof( Simple ), ex.Type );
-				Assert.AreEqual( 0, ex.ReadingContext.CurrentIndex );
+				Assert.AreEqual( 0, ex.ReadingContext.Reader.CurrentIndex );
 			}
 		}
 
@@ -162,9 +162,9 @@ namespace CsvHelper.Tests.Exceptions
 			}
 			catch( TypeConverterException ex )
 			{
-				Assert.AreEqual( 2, ex.ReadingContext.Row );
+				Assert.AreEqual( 2, ex.ReadingContext.Parser.Row );
 				//Assert.AreEqual( typeof( Simple ), ex.Type );
-				Assert.AreEqual( 0, ex.ReadingContext.CurrentIndex );
+				Assert.AreEqual( 0, ex.ReadingContext.Reader.CurrentIndex );
 			}
 		}
 
@@ -189,8 +189,8 @@ namespace CsvHelper.Tests.Exceptions
 			}
 			catch( MissingFieldException ex )
 			{
-				Assert.AreEqual( 2, ex.ReadingContext.Row );
-				Assert.AreEqual( -1, ex.ReadingContext.CurrentIndex );
+				Assert.AreEqual( 2, ex.ReadingContext.Parser.Row );
+				Assert.AreEqual( -1, ex.ReadingContext.Reader.CurrentIndex );
 			}
 		}
 

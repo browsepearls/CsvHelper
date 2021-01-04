@@ -45,19 +45,20 @@ namespace CsvHelper.Tests
 				new TestRecordWithDecimal
 				{
 					DecimalColumn = 12.0m,
-					DateTimeColumn = new DateTime( 2010, 11, 11 )
+					DateTimeColumn = new DateTime(2010, 11, 11)
 				}
 			};
 
 			var writer = new StringWriter();
-			var csv = new CsvWriter(writer, new CsvHelper.Configuration.CsvConfiguration(new CultureInfo("uk-UA")) { Delimiter = ";" });
+			var culture = new CultureInfo("uk-UA");
+			var csv = new CsvWriter(writer, new CsvHelper.Configuration.CsvConfiguration(culture) { Delimiter = ";" });
 
 			csv.WriteRecords(records);
 
 			var csvFile = writer.ToString();
 
-			const string expected = "DecimalColumn;DateTimeColumn\r\n" +
-									"12,0;11.11.2010 0:00:00\r\n";
+			var expected = "DecimalColumn;DateTimeColumn\r\n" +
+							$"{records[0].DecimalColumn.ToString(culture)};{records[0].DateTimeColumn.ToString(culture)}\r\n";
 
 			Assert.AreEqual(expected, csvFile);
 		}

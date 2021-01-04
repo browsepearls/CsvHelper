@@ -16,14 +16,12 @@ namespace CsvHelper.Tests.AutoMapping
 		[TestMethod]
 		public void ClassWithPropertyOfTypeTypeShouldNotCauseStackOverflowExceptionTest()
 		{
-			var data = new List<string[]>
+			var parser = new ParserMock
 			{
-				new[] { "Id" },
-				new[] { "1" },
+				{ "Id" },
+				{ "1" },
 				null
 			};
-			var queue = new Queue<string[]>(data);
-			var parser = new ParserMock(queue);
 
 			using (var csv = new CsvReader(parser))
 			{

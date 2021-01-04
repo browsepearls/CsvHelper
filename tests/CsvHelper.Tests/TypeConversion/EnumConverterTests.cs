@@ -7,8 +7,8 @@ using System.Globalization;
 using CsvHelper.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CsvHelper.TypeConversion;
-using Moq;
 using CsvHelper.Configuration.Attributes;
+using CsvHelper.Tests.Mocks;
 
 namespace CsvHelper.Tests.TypeConversion
 {
@@ -54,14 +54,14 @@ namespace CsvHelper.Tests.TypeConversion
 			var propertyMapData = new MemberMapData(null);
 			propertyMapData.TypeConverterOptions.CultureInfo = CultureInfo.CurrentCulture;
 
-			var mockRow = new Mock<IReaderRow>();
+			var row = new CsvReader(new ParserMock());
 
 			Assert.AreEqual(TestEnum.One, converter.ConvertFromString("One", null, propertyMapData));
 			Assert.AreEqual(TestEnum.One, converter.ConvertFromString("one", null, propertyMapData));
 			Assert.AreEqual(TestEnum.One, converter.ConvertFromString("1", null, propertyMapData));
 			try
 			{
-				Assert.AreEqual(TestEnum.One, converter.ConvertFromString("", mockRow.Object, propertyMapData));
+				Assert.AreEqual(TestEnum.One, converter.ConvertFromString("", row, propertyMapData));
 				Assert.Fail();
 			}
 			catch (TypeConverterException)
@@ -70,7 +70,7 @@ namespace CsvHelper.Tests.TypeConversion
 
 			try
 			{
-				Assert.AreEqual(TestEnum.One, converter.ConvertFromString(null, mockRow.Object, propertyMapData));
+				Assert.AreEqual(TestEnum.One, converter.ConvertFromString(null, row, propertyMapData));
 				Assert.Fail();
 			}
 			catch (TypeConverterException)

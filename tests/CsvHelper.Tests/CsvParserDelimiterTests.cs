@@ -89,7 +89,7 @@ namespace CsvHelper.Tests
 		{
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				Delimiter = "\t",
+				Delimiter = "`\t`",
 			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
@@ -283,12 +283,12 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual(6, parser.Context.BytePosition);
+				Assert.AreEqual(6, parser.BytePosition);
 
 				parser.Read();
-				Assert.AreEqual(12, parser.Context.BytePosition);
+				Assert.AreEqual(12, parser.BytePosition);
 
-				Assert.IsNull(parser.Read());
+				Assert.IsFalse(parser.Read());
 			}
 		}
 
@@ -311,12 +311,12 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual(7, parser.Context.BytePosition);
+				Assert.AreEqual(7, parser.BytePosition);
 
 				parser.Read();
-				Assert.AreEqual(14, parser.Context.BytePosition);
+				Assert.AreEqual(14, parser.BytePosition);
 
-				Assert.IsNull(parser.Read());
+				Assert.IsFalse(parser.Read());
 			}
 		}
 

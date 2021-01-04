@@ -22,7 +22,7 @@ namespace CsvHelper.Performance
 		{
 			//BenchmarkRunner.Run<Benchmarks>(); return;
 
-			Test(); return;
+			//Test(); return;
 
 			//WriteField(50, 1_000_000, false);
 			//WriteRecords(1_000_000);
@@ -30,11 +30,11 @@ namespace CsvHelper.Performance
 			for (var i = 0; i < 10; i++)
 			{
 				//LumenworksParse();
-				//SoftCircuitsParse();
+				SoftCircuitsParse();
 				//StefanBertelsParse();
 				//StackParse();
 				//StackParse2();
-				//CsvHelperParse(false);
+				CsvHelperParse();
 
 				//ReadGetField();
 				//ReadGetRecords();
@@ -184,7 +184,7 @@ namespace CsvHelper.Performance
 			Console.WriteLine(stopwatch.Elapsed);
 		}
 
-		static void CsvHelperParse(bool writeToConsole = false)
+		static void CsvHelperParse()
 		{
 			Console.WriteLine("CsvHelper parsing");
 			var stopwatch = new Stopwatch();
