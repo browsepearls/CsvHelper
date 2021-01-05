@@ -597,28 +597,34 @@ namespace CsvHelper
 		{
 			public bool IsQuoted { get; init; }
 
+			/// <summary>
+			/// The start position of the field.
+			/// This position is an offset from the <see cref="rowStartPosition"/>.
+			/// </summary>
 			public int Start { get; init; }
 
 			public int Length { get; init; }
 		}
 
 
-		private int memoryPosition = -1;
+
+
+		private int memoryPosition = 0;
 
 		private char c;
 		private char cPrev;
 		private int spanPosition;
 		private int spanBufferSize = 1024;
-		private int spanLength = 0;
 		private bool inQuotes;
+		private bool isQuoted;
 
 		public bool Read2()
 		{
 			fields.Clear();
 			spanPosition = 0;
-			spanLength = 0;
 			inQuotes = false;
-			rowStartPosition = memoryPosition + 1;
+			isQuoted = false;
+			rowStartPosition = memoryPosition;
 			fieldStartPosition = rowStartPosition;
 
 			var span = Span<char>.Empty;
@@ -630,9 +636,17 @@ namespace CsvHelper
 					return false;
 				}
 
+				if (c == comment && allowComments || fieldStartPosition == memoryPosition - 1 && (c == '\r' || c == '\n') && ignoreBlankLines)
+				{
+					ReadBlankLine(ref span);
+
+					continue;
+				}
+
 				if (c == quote)
 				{
 					inQuotes = !inQuotes;
+					isQuoted = true;
 				}
 
 				if (inQuotes)
@@ -643,9 +657,9 @@ namespace CsvHelper
 
 				if (c == delimiterFirstChar)
 				{
-					if (!ReadDelimiter(ref span))
+					if (ReadDelimiter(ref span))
 					{
-						return true;
+						continue;
 					}
 				}
 
@@ -658,12 +672,37 @@ namespace CsvHelper
 			}
 		}
 
+		/// <summary>
+		/// Reads the blank line.
+		/// </summary>
+		/// <param name="span">The span.</param>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void ReadBlankLine(ref Span<char> span)
 		{
+			// Read until a line ending is found.
 			while (true)
 			{
-				c = span[spanPosition];
+				if (c == '\r' || c == '\n')
+				{
+					NextChar(ref span);
+
+					if (c != '\n')
+					{
+						memoryPosition--;
+						spanPosition = spanPosition == 0 ? 0 : spanPosition - 1;
+					}
+
+					break; ;
+				}
+
+				if (!NextChar(ref span))
+				{
+					break; ;
+				}
 			}
+
+			rowStartPosition = memoryPosition;
+			fieldStartPosition = rowStartPosition;
 		}
 
 		/// <summary>
@@ -684,9 +723,9 @@ namespace CsvHelper
 				}
 			}
 
-			AddField(fieldStartPosition, memoryPosition - fieldStartPosition - delimiter.Length + 1);
+			AddField(fieldStartPosition, memoryPosition - fieldStartPosition - delimiter.Length);
 
-			fieldStartPosition = memoryPosition + 1;
+			fieldStartPosition = memoryPosition;
 
 			return true;
 		}
@@ -695,19 +734,14 @@ namespace CsvHelper
 		/// Reads the line ending.
 		/// </summary>
 		/// <param name="span">The span.</param>
-		/// <returns><c>true</c> if there is more to read, otherwise false.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void ReadLineEnding(ref Span<char> span)
 		{
 			row++;
 
-			if (!NextChar(ref span))
-			{
-				// EOF
-				return;
-			}
+			var charsToRemove = NextChar(ref span) ? 2 : 1;
 
-			AddField(fieldStartPosition, memoryPosition - fieldStartPosition - 1);
+			AddField(fieldStartPosition, memoryPosition - fieldStartPosition - charsToRemove);
 
 			if (c != '\n')
 			{
@@ -718,10 +752,6 @@ namespace CsvHelper
 			}
 		}
 
-		private void ReadEof(ref Span<char> span)
-		{
-		}
-
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void AddField(int start, int length)
 		{
@@ -729,7 +759,7 @@ namespace CsvHelper
 			{
 				Start = start - rowStartPosition,
 				Length = length,
-				IsQuoted = inQuotes,
+				IsQuoted = isQuoted,
 			});
 		}
 
@@ -748,12 +778,11 @@ namespace CsvHelper
 				return false;
 			}
 
-			memoryPosition++;
-			spanPosition++;
-
 			cPrev = c;
 			c = span[spanPosition];
 
+			memoryPosition++;
+			spanPosition++;
 			charCount++;
 
 			return true;
@@ -767,7 +796,7 @@ namespace CsvHelper
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private bool FillBuffers(ref Span<char> span)
 		{
-			if (memoryPosition + 1 >= charsRead)
+			if (memoryPosition >= charsRead)
 			{
 				// Fill memory buffer.
 
@@ -778,9 +807,8 @@ namespace CsvHelper
 					span = memoryOwner.Memory.Slice(0, spanBufferSize).Span;
 					charsRead = reader.Read(span);
 
-					memoryPosition = -1;
-					spanPosition = -1;
-					spanLength = span.Length;
+					memoryPosition = 0;
+					spanPosition = 0;
 
 					return charsRead > 0;
 				}
@@ -788,7 +816,7 @@ namespace CsvHelper
 				// If the row is longer than the buffer, make the buffer larger.
 				if (rowStartPosition == 0 && charsRead > 0)
 				{
-					// maybe use charsread instead of memory.length
+					// TODO: maybe use charsread instead of memory.length
 					bufferSize = Math.Max(memoryOwner.Memory.Length, bufferSize) * 2;
 				}
 
@@ -803,7 +831,7 @@ namespace CsvHelper
 				}
 
 				charsRead += start;
-				memoryPosition = start - 1;
+				memoryPosition = start;
 				fieldStartPosition = fieldStartPosition - rowStartPosition;
 				rowStartPosition = 0;
 
@@ -811,17 +839,15 @@ namespace CsvHelper
 				memoryOwner = tempMemoryOwner;
 			}
 
-			if (spanPosition + 1 >= spanLength)
+			if (spanPosition >= span.Length)
 			{
 				// Fill span.
-				var start = memoryPosition + 1;
-				//spanBufferSize = 
+				var start = memoryPosition;
+				// TODO: Let spanBufferSize grow up to some value like 1024.
 				var length = Math.Min(spanBufferSize, charsRead - start);
 				span = memoryOwner.Memory.Slice(start, length).Span;
-				//Console.Write($"{length} ");
 
-				spanPosition = -1;
-				spanLength = span.Length;
+				spanPosition = 0;
 			}
 
 			return true;

@@ -33,7 +33,7 @@ namespace CsvHelper.Performance
 				//StefanBertelsParse();
 				//StackParse();
 				//StackParse2();
-				//SoftCircuitsParse();
+				SoftCircuitsParse();
 				//CsvHelperParse();
 				CsvHelperParse2();
 
@@ -49,6 +49,7 @@ namespace CsvHelper.Performance
 		{
 			var s = new StringBuilder();
 			s.Append("Id,Name\r\n");
+			s.Append("\r\n");
 			s.Append("1,one\r\n");
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
@@ -58,7 +59,7 @@ namespace CsvHelper.Performance
 			{
 				while (parser.Read2())
 				{
-					//var record = parser.Record;
+					var record = parser.Record;
 				}
 			}
 		}
