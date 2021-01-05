@@ -33,7 +33,7 @@ namespace CsvHelper.Performance
 				//StefanBertelsParse();
 				//StackParse();
 				//StackParse2();
-				SoftCircuitsParse();
+				//SoftCircuitsParse();
 				//CsvHelperParse();
 				CsvHelperParse2();
 
@@ -212,7 +212,7 @@ namespace CsvHelper.Performance
 
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				//BufferSize = 16,
+				BufferSize = 1024 * 4,
 			};
 			using (var stream = File.OpenRead(GetFilePath()))
 			using (var reader = new StreamReader(stream))
@@ -221,8 +221,10 @@ namespace CsvHelper.Performance
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
 
+				//string[] record;
 				while (parser.Read2())
 				{
+					//record = parser.Record;
 				}
 
 				stopwatch.Stop();

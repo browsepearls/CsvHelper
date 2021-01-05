@@ -194,13 +194,6 @@ namespace CsvHelper
 			whiteSpaceChars = configuration.WhiteSpaceChars;
 
 			Configuration = configuration;
-
-
-
-
-
-			// Make sure the span size isn't bigger than the buffer size.
-			spanBufferSize = Math.Min(1024, bufferSize);
 		}
 
 		/// <summary>
@@ -614,7 +607,6 @@ namespace CsvHelper
 		private char c;
 		private char cPrev;
 		private int spanPosition;
-		private int spanBufferSize = 1024;
 		private bool inQuotes;
 		private bool isQuoted;
 
@@ -804,7 +796,7 @@ namespace CsvHelper
 				{
 					// First read.
 					memoryOwner = MemoryPool<char>.Shared.Rent(bufferSize);
-					span = memoryOwner.Memory.Slice(0, spanBufferSize).Span;
+					span = memoryOwner.Memory.Slice(0, Math.Min(1024, bufferSize)).Span;
 					charsRead = reader.Read(span);
 
 					memoryPosition = 0;
@@ -843,8 +835,7 @@ namespace CsvHelper
 			{
 				// Fill span.
 				var start = memoryPosition;
-				// TODO: Let spanBufferSize grow up to some value like 1024.
-				var length = Math.Min(spanBufferSize, charsRead - start);
+				var length = Math.Min(1024, charsRead - start);
 				span = memoryOwner.Memory.Slice(start, length).Span;
 
 				spanPosition = 0;
