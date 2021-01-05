@@ -24,17 +24,18 @@ namespace CsvHelper.Performance
 
 			//Test(); return;
 
-			//WriteField(50, 1_000_000, false);
+			//WriteField(50, 1_000_000, true); return;
 			//WriteRecords(1_000_000);
 
 			for (var i = 0; i < 10; i++)
 			{
 				//LumenworksParse();
-				SoftCircuitsParse();
 				//StefanBertelsParse();
 				//StackParse();
 				//StackParse2();
-				CsvHelperParse();
+				//SoftCircuitsParse();
+				//CsvHelperParse();
+				CsvHelperParse2();
 
 				//ReadGetField();
 				//ReadGetRecords();
@@ -47,19 +48,17 @@ namespace CsvHelper.Performance
 		static void Test()
 		{
 			var s = new StringBuilder();
-			s.Append(" \" Id \" , \"  Name \"  \r\n");
-			s.Append("1,one");
+			s.Append("Id,Name\r\n");
+			s.Append("1,one\r\n");
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				BufferSize = 2048,
-				TrimOptions = TrimOptions.InsideQuotes,
 			};
 			using (var reader = new StringReader(s.ToString()))
 			using (var parser = new CsvParser(reader, config))
 			{
-				while (parser.Read())
+				while (parser.Read2())
 				{
-					var record = parser.Record;
+					//var record = parser.Record;
 				}
 			}
 		}
@@ -80,11 +79,12 @@ namespace CsvHelper.Performance
 
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				ShouldQuote = quoteAllFields ? (field, context) => true : ConfigurationFunctions.ShouldQuote,
+				//Delimiter = ";",
+				ShouldQuote = (field, context) => quoteAllFields,
 			};
 			using (var stream = File.Create(GetFilePath()))
 			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+			using (var csv = new CsvWriter(writer, config))
 			{
 				for (var column = 1; column <= columns; column++)
 				{
@@ -96,7 +96,8 @@ namespace CsvHelper.Performance
 				{
 					for (var column = 1; column <= columns; column++)
 					{
-						csv.WriteField($"{row:N0}_{column}");
+						//csv.WriteField($"{row:N0}_{column}");
+						csv.WriteField($"{row}_{column}");
 					}
 					csv.NextRecord();
 				}
@@ -187,30 +188,45 @@ namespace CsvHelper.Performance
 		static void CsvHelperParse()
 		{
 			Console.WriteLine("CsvHelper parsing");
-			var stopwatch = new Stopwatch();
-			stopwatch.Start();
 
 			using (var stream = File.OpenRead(GetFilePath()))
 			using (var reader = new StreamReader(stream))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
+				var stopwatch = new Stopwatch();
+				stopwatch.Start();
+
 				while (parser.Read())
 				{
-					//for (var i = 0; i < parser.Length; i++)
-					//{
-					//	Console.WriteLine(parser[i]);
-					//}
-					//Console.WriteLine();
-
-					//if (writeToConsole)
-					//{
-					//	Console.WriteLine($"{parser.Row.ToString("N0")}: {parser.RawRecord}");
-					//}
 				}
-			}
 
-			stopwatch.Stop();
-			Console.WriteLine(stopwatch.Elapsed);
+				stopwatch.Stop();
+				Console.WriteLine(stopwatch.Elapsed);
+			}
+		}
+
+		static void CsvHelperParse2()
+		{
+			Console.WriteLine("CsvHelper parsing 2");
+
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+			{
+				//BufferSize = 16,
+			};
+			using (var stream = File.OpenRead(GetFilePath()))
+			using (var reader = new StreamReader(stream))
+			using (var parser = new CsvParser(reader, config))
+			{
+				var stopwatch = new Stopwatch();
+				stopwatch.Start();
+
+				while (parser.Read2())
+				{
+				}
+
+				stopwatch.Stop();
+				Console.WriteLine(stopwatch.Elapsed);
+			}
 		}
 
 		static void StackParse()
@@ -356,20 +372,21 @@ namespace CsvHelper.Performance
 		static void SoftCircuitsParse()
 		{
 			Console.WriteLine("SoftCircuits parsing");
-			var stopwatch = new Stopwatch();
-			stopwatch.Start();
 
 			using (var stream = File.OpenRead(GetFilePath()))
 			using (var csv = new SoftCircuits.CsvParser.CsvReader(stream))
 			{
+				var stopwatch = new Stopwatch();
+				stopwatch.Start();
+
 				string[] row = null;
 				while (csv.ReadRow(ref row))
 				{
 				}
-			}
 
-			stopwatch.Stop();
-			Console.WriteLine(stopwatch.Elapsed);
+				stopwatch.Stop();
+				Console.WriteLine(stopwatch.Elapsed);
+			}
 		}
 
 		static void StefanBertelsParse()
