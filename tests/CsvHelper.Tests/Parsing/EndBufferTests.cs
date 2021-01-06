@@ -47,8 +47,8 @@ namespace CsvHelper.Tests.Parsing
 			{
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(2, parser.Count);
-				Assert.AreEqual("abcdefghijklmno", parser[0]);
-				Assert.AreEqual("pqrs", parser[1]);
+				Assert.AreEqual("abcdefghijklmnop", parser[0]);
+				Assert.AreEqual("qrs", parser[1]);
 			}
 		}
 
