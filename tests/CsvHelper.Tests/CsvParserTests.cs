@@ -965,34 +965,6 @@ namespace CsvHelper.Tests
 		}
 
 		[TestMethod]
-		public void ByteCountTestWithQuotedFieldsExtraQuote()
-		{
-			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-			{
-				BadDataFound = null,
-				CountBytes = true,
-			};
-			using (var stream = new MemoryStream())
-			using (var writer = new StreamWriter(stream, config.Encoding))
-			using (var reader = new StreamReader(stream, config.Encoding))
-			using (var parser = new CsvParser(reader, config))
-			{
-				writer.Write("1,\"2\" \" a\r\n"); // 1,"2" " a\r\n
-				writer.Write("\"3\",4\r\n");
-				writer.Flush();
-				stream.Position = 0;
-
-				parser.Read();
-				Assert.AreEqual(11, parser.ByteCount);
-
-				parser.Read();
-				Assert.AreEqual(18, parser.ByteCount);
-
-				Assert.IsFalse(parser.Read());
-			}
-		}
-
-		[TestMethod]
 		public void ByteCountTestWithQuotedFieldsEmptyQuotedField()
 		{
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
