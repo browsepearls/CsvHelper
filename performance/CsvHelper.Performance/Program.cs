@@ -22,7 +22,7 @@ namespace CsvHelper.Performance
 		{
 			//BenchmarkRunner.Run<Benchmarks>(); return;
 
-			//Test(); return;
+			Test(); return;
 
 			//WriteField(50, 1_000_000, true); return;
 			//WriteRecords(1_000_000);
@@ -35,7 +35,6 @@ namespace CsvHelper.Performance
 				//StackParse2();
 				//SoftCircuitsParse();
 				//CsvHelperParse();
-				CsvHelperParse2();
 
 				//ReadGetField();
 				//ReadGetRecords();
@@ -48,16 +47,15 @@ namespace CsvHelper.Performance
 		static void Test()
 		{
 			var s = new StringBuilder();
-			s.Append("Id,Name\r\n");
-			s.Append("\r\n");
-			s.Append("1,one\r\n");
+			s.Append("\r");
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
+				IgnoreBlankLines = false,
 			};
 			using (var reader = new StringReader(s.ToString()))
 			using (var parser = new CsvParser(reader, config))
 			{
-				while (parser.Read2())
+				while (parser.Read())
 				{
 					var record = parser.Record;
 				}
@@ -188,31 +186,12 @@ namespace CsvHelper.Performance
 
 		static void CsvHelperParse()
 		{
-			Console.WriteLine("CsvHelper parsing");
-
-			using (var stream = File.OpenRead(GetFilePath()))
-			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
-			{
-				var stopwatch = new Stopwatch();
-				stopwatch.Start();
-
-				while (parser.Read())
-				{
-				}
-
-				stopwatch.Stop();
-				Console.WriteLine(stopwatch.Elapsed);
-			}
-		}
-
-		static void CsvHelperParse2()
-		{
 			Console.WriteLine("CsvHelper parsing 2");
 
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				BufferSize = 1024 * 4,
+				//BufferSize = 1024 * 4,
+				BufferSize = 16
 			};
 			using (var stream = File.OpenRead(GetFilePath()))
 			using (var reader = new StreamReader(stream))
@@ -222,7 +201,7 @@ namespace CsvHelper.Performance
 				stopwatch.Start();
 
 				//string[] record;
-				while (parser.Read2())
+				while (parser.Read())
 				{
 					//record = parser.Record;
 				}

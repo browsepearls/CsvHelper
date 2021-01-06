@@ -283,10 +283,10 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual(6, parser.BytePosition);
+				Assert.AreEqual(6, parser.ByteCount);
 
 				parser.Read();
-				Assert.AreEqual(12, parser.BytePosition);
+				Assert.AreEqual(12, parser.ByteCount);
 
 				Assert.IsFalse(parser.Read());
 			}
@@ -311,10 +311,10 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual(7, parser.BytePosition);
+				Assert.AreEqual(7, parser.ByteCount);
 
 				parser.Read();
-				Assert.AreEqual(14, parser.BytePosition);
+				Assert.AreEqual(14, parser.ByteCount);
 
 				Assert.IsFalse(parser.Read());
 			}

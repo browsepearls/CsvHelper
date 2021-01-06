@@ -34,13 +34,20 @@ namespace CsvHelper.Tests.Reading
 
 				records = csv.GetRecords<Test>().ToList();
 
-				writer.WriteLine("2,two");
-				writer.Flush();
-				stream.Position = position;
-
 				Assert.AreEqual(1, records.Count);
 				Assert.AreEqual(2, records[0].Id);
 				Assert.AreEqual("two", records[0].Name);
+
+				position = stream.Position;
+				writer.WriteLine("3,three");
+				writer.Flush();
+				stream.Position = position;
+
+				records = csv.GetRecords<Test>().ToList();
+
+				Assert.AreEqual(1, records.Count);
+				Assert.AreEqual(3, records[0].Id);
+				Assert.AreEqual("three", records[0].Name);
 			}
 		}
 

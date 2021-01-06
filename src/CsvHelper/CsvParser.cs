@@ -46,15 +46,28 @@ namespace CsvHelper
 		private bool disposed;
 		private readonly List<Field> fields = new List<Field>(128);
 		private int charsRead = -1;
-		//private int memoryPosition = -1;
+		private int memoryPosition;
 		private int rowStartPosition; // Position in memory.
 		private int fieldStartPosition; // Position in memory.
 		private int row;
 		private int rawRow;
+		private char c;
+		private char cPrev;
+		private int spanPosition;
+		private bool inQuotes;
+		private bool isQuoted;
 
-		public long CharPosition => charCount;
+		/// <summary>
+		/// Gets the count of how many characters have been read.
+		/// </summary>
+		public long CharCount => charCount;
 
-		public long BytePosition => byteCount;
+		/// <summary>
+		/// Gets the count of how many bytes have been read.
+		/// <see cref="IParserConfiguration.CountBytes"/> needs
+		/// to be enabled for this value to be populated.
+		/// </summary>
+		public long ByteCount => byteCount;
 
 		/// <summary>
 		/// Gets the number of fields for the current row.
@@ -110,7 +123,7 @@ namespace CsvHelper
 					return null;
 				}
 
-				return memoryOwner.Memory.Slice(rowStartPosition, memoryPosition + 1 - rowStartPosition).Span;
+				return memoryOwner.Memory.Slice(rowStartPosition, memoryPosition - rowStartPosition).Span;
 			}
 		}
 
@@ -137,14 +150,16 @@ namespace CsvHelper
 				{
 					BadDataFound = badDataFound,
 					Context = context,
+					Dequote = dequoteField,
 					Escape = escape,
+					IgnoreQuotes = ignoreQuotes,
 					IsQuoted = fields[index].IsQuoted,
+					LineBreakInQuotedFieldIsBadData = lineBreakInQuotedFieldIsBadData,
+					PreDequote = preDequoteField,
+					PostDequote = postDequoteField,
 					Quote = quote,
 					TrimOptions = trimOptions,
 					WhiteSpaceChars = whiteSpaceChars,
-					PreDequote = preDequoteField,
-					Dequote = dequoteField,
-					PostDequote = postDequoteField,
 				};
 
 				var span = memoryOwner.Memory.Slice(fields[index].Start + rowStartPosition, fields[index].Length).Span;
@@ -205,288 +220,60 @@ namespace CsvHelper
 		public bool Read()
 		{
 			fields.Clear();
+			spanPosition = 0;
+			inQuotes = false;
+			isQuoted = false;
+			rowStartPosition = memoryPosition;
+			fieldStartPosition = rowStartPosition;
 
-			//if (charsRead == 0)
-			//{
-			//	return false;
-			//}
-
-			Span<char> span = Span<char>.Empty;
-			if (memoryPosition > -1)
-			{
-				span = memoryOwner.Memory.Slice(memoryPosition + 1).Span;
-				rowStartPosition = fieldStartPosition = memoryPosition + 1;
-			}
-
-			var spanPosition = -1;
-			var inQuotes = false;
-			var isQuoted = false;
-			var inLineEnding = false;
-			var inDelimiter = false;
-			var delimiterPosition = 0;
-			var inComment = false;
-			var c = '\0';
-			char cPrev;
+			var span = Span<char>.Empty;
 
 			while (true)
 			{
-				charCount++;
-				memoryPosition++;
-				spanPosition++;
-
-				if (memoryPosition >= charsRead)
+				if (!NextChar(ref span))
 				{
-					// Buffer ran out.
-
-					if (!FillBuffer())
-					{
-						// EOF
-
-						if (row == 0)
-						{
-							row++;
-						}
-
-						if (rawRow == 0)
-						{
-							rawRow++;
-						}
-
-						if (countBytes)
-						{
-							byteCount += encoding.GetByteCount(RawRecord);
-						}
-
-						if (inLineEnding && memoryPosition - 1 == rowStartPosition && ignoreBlankLines)
-						{
-							// Ignore line.
-							return false;
-						}
-
-						if (inComment && allowComments)
-						{
-							// Ignore line.
-							return false;
-						}
-
-						if (rowStartPosition < memoryPosition)
-						{
-							// Add the last field.
-
-							var lineEndingChars = inLineEnding ? 1 : 0;
-
-							fields.Add(new Field
-							{
-								IsQuoted = isQuoted,
-								Start = fieldStartPosition - rowStartPosition,
-								Length = memoryPosition - lineEndingChars - fieldStartPosition,
-							});
-
-							fieldStartPosition = memoryPosition;
-							memoryPosition--;
-
-							return true;
-						}
-
-						return false;
-					}
-
-					span = memoryOwner.Memory.Slice(memoryPosition).Span;
-					spanPosition = 0;
+					return ReadEndOfFile(ref span);
 				}
 
-				cPrev = c;
-				c = span[spanPosition];
-
-				if (c == '\r' || c == '\n' && cPrev != '\r')
+				if (c == comment && allowComments || rowStartPosition == memoryPosition - 1 && (c == '\r' || c == '\n') && ignoreBlankLines)
 				{
-					rawRow++;
-				}
+					ReadBlankLine(ref span);
 
-				if (inLineEnding)
-				{
-					inLineEnding = false;
-
-					var lineEndingChars = c == '\n' ? 1 : 0;
-
-					if (memoryPosition - 1 == rowStartPosition && ignoreBlankLines)
-					{
-						// Blank line.
-						// Skip the line and continue reading.
-						rowStartPosition = memoryPosition + lineEndingChars;
-						fieldStartPosition = rowStartPosition;
-
-						// If the line ending has a '\n' then start loop over.
-						// If not, this is a new field and the character needs
-						// to be processed.
-						if (c == '\n')
-						{
-							continue;
-						}
-					}
-					else if (inComment)
-					{
-						// End of commented line.
-						// Skip the line and continue reading.
-						inComment = false;
-						rowStartPosition = memoryPosition + lineEndingChars;
-						fieldStartPosition = rowStartPosition;
-
-						if (c == '\n')
-						{
-							continue;
-						}
-					}
-					else
-					{
-						fields.Add(new Field
-						{
-							IsQuoted = isQuoted,
-							Start = fieldStartPosition - rowStartPosition,
-							Length = memoryPosition - 1 - fieldStartPosition,
-						});
-
-						if (c != '\n')
-						{
-							memoryPosition--;
-						}
-
-						if (countBytes)
-						{
-							byteCount += encoding.GetByteCount(RawRecord);
-						}
-
-						return true;
-					}
-				}
-
-				if (inDelimiter)
-				{
-					delimiterPosition++;
-
-					if (c == delimiter[delimiterPosition])
-					{
-						if (delimiterPosition + 1 >= delimiter.Length)
-						{
-							// End of delimiter.
-							fields.Add(new Field
-							{
-								IsQuoted = isQuoted,
-								Start = fieldStartPosition - rowStartPosition,
-								Length = memoryPosition - fieldStartPosition - delimiterPosition,
-							});
-
-							inDelimiter = false;
-							delimiterPosition = 0;
-							fieldStartPosition = memoryPosition + 1;
-							isQuoted = false;
-						}
-
-						continue;
-					}
-
-					// This was not actually a delimiter.
-					// Keep parsing as normal.
-					inDelimiter = false;
-					delimiterPosition = 0;
-				}
-
-				if (inComment && c != '\r' && c != '\n')
-				{
-					// If we're on a commented line, nothing else is parsed.
 					continue;
 				}
 
-				if (c == quote && !ignoreQuotes)
+				if (c == quote)
 				{
-					inQuotes = !inQuotes;
 					isQuoted = true;
+
+					if (!ignoreQuotes)
+					{
+						inQuotes = !inQuotes;
+					}
 				}
 
 				if (inQuotes)
 				{
-					if (lineBreakInQuotedFieldIsBadData && (c == '\r' || c == '\n'))
+					if (c == '\r' || c == '\n' && cPrev != '\r')
 					{
-						badDataFound?.Invoke(context);
+						rawRow++;
 					}
 
-					// If we're in quotes, nothing else is parsed.
-					continue;
-				}
-
-				if (c == comment && allowComments && memoryPosition == rowStartPosition)
-				{
-					// Skip commented row.
-					inComment = true;
-
+					// White in quotes, we don't care about anything else.
 					continue;
 				}
 
 				if (c == delimiterFirstChar)
 				{
-					if (delimiter.Length > 1)
+					if (ReadDelimiter(ref span))
 					{
-						// There is more of the delimiter to read.
-						inDelimiter = true;
 						continue;
 					}
-
-					fields.Add(new Field
-					{
-						IsQuoted = isQuoted,
-						Start = fieldStartPosition - rowStartPosition,
-						Length = memoryPosition - fieldStartPosition,
-					});
-
-					fieldStartPosition = memoryPosition + 1;
-					isQuoted = false;
-
-					continue;
 				}
-				else if (c == '\r')
+
+				if (c == '\r' || c == '\n')
 				{
-					row++;
-					inLineEnding = true;
-
-					continue;
-				}
-				else if (c == '\n')
-				{
-					row++;
-
-					if (inComment)
-					{
-						// End of commented line.
-						// Skip the line and continue reading.
-						inComment = false;
-						rowStartPosition = memoryPosition + 1;
-						fieldStartPosition = rowStartPosition;
-
-						continue;
-					}
-
-					if (memoryPosition == rowStartPosition && ignoreBlankLines)
-					{
-						// Blank line.
-						// Skip the line and continue reading.
-						rowStartPosition = memoryPosition + 1;
-						fieldStartPosition = rowStartPosition;
-
-						continue;
-					}
-
-					// End of line.
-					fields.Add(new Field
-					{
-						IsQuoted = isQuoted,
-						Start = fieldStartPosition - rowStartPosition,
-						Length = memoryPosition - fieldStartPosition,
-					});
-
-					if (countBytes)
-					{
-						byteCount += encoding.GetByteCount(RawRecord);
-					}
+					ReadLineEnding(ref span);
 
 					return true;
 				}
@@ -505,45 +292,232 @@ namespace CsvHelper
 		}
 
 		/// <summary>
-		/// Fills the buffer.
+		/// Reads the blank line.
 		/// </summary>
-		/// <returns>Value indicating if there is more to read.</returns>
-		private bool FillBuffer()
+		/// <param name="span">The span.</param>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void ReadBlankLine(ref Span<char> span)
 		{
-			if (memoryOwner == null)
+			// Read until a line ending is found.
+			while (true)
 			{
-				memoryOwner = MemoryPool<char>.Shared.Rent(bufferSize);
-				charsRead = reader.Read(memoryOwner.Memory.Span);
+				if (c == '\r' || c == '\n')
+				{
+					NextChar(ref span);
 
-				return charsRead > 0;
+					if (c != '\n')
+					{
+						memoryPosition--;
+						spanPosition = spanPosition == 0 ? 0 : spanPosition - 1;
+						charCount--;
+
+						if (countBytes)
+						{
+							byteCount -= encoding.GetByteCount(new[] { c });
+						}
+					}
+
+					break; ;
+				}
+
+				if (!NextChar(ref span))
+				{
+					break;
+				}
 			}
 
-			// If the row is longer than the buffer, make the buffer larger.
-			if (rowStartPosition == 0)
+			rowStartPosition = memoryPosition;
+			fieldStartPosition = rowStartPosition;
+			row++;
+			rawRow++;
+			isQuoted = false;
+		}
+
+		/// <summary>
+		/// Reads the delimiter.
+		/// </summary>
+		/// <param name="span">The span.</param>
+		/// <returns><c>true</c> if this was a delimiter, othersize <c>false</c>.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private bool ReadDelimiter(ref Span<char> span)
+		{
+			for (var i = 1; i < delimiter.Length; i++)
 			{
-				bufferSize = memoryOwner.Memory.Length * 2;
-				//Console.Write($"{bufferSize} ");
+				NextChar(ref span);
+
+				if (c != delimiter[i])
+				{
+					memoryPosition--;
+					spanPosition = spanPosition == 0 ? 0 : spanPosition - 1;
+					charCount--;
+
+					if (countBytes)
+					{
+						byteCount -= encoding.GetByteCount(new[] { c });
+					}
+
+					return false;
+				}
 			}
 
-			// Copy the remainder of the row onto the new memory.
-			var tempMemoryOwner = MemoryPool<char>.Shared.Rent(bufferSize);
-			memoryOwner.Memory.Slice(rowStartPosition).CopyTo(tempMemoryOwner.Memory);
-			var start = memoryOwner.Memory.Length - rowStartPosition;
-			charsRead = reader.Read(tempMemoryOwner.Memory.Slice(start).Span);
-			if (charsRead == 0)
+			AddField(fieldStartPosition, memoryPosition - fieldStartPosition - delimiter.Length);
+
+			fieldStartPosition = memoryPosition;
+			isQuoted = false;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Reads the line ending.
+		/// </summary>
+		/// <param name="span">The span.</param>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void ReadLineEnding(ref Span<char> span)
+		{
+			row++;
+			rawRow++;
+
+			var hasMoreChars = NextChar(ref span);
+			var charsToRemove = hasMoreChars ? 2 : 1;
+
+			AddField(fieldStartPosition, memoryPosition - fieldStartPosition - charsToRemove);
+
+			if (c != '\n' && hasMoreChars)
+			{
+				// The char isn't part of the line ending.
+				// Move positions back one char.
+				memoryPosition--;
+				spanPosition = spanPosition == 0 ? 0 : spanPosition - 1;
+				charCount--;
+
+				if (countBytes)
+				{
+					byteCount -= encoding.GetByteCount(new[] { c });
+				}
+			}
+		}
+
+		/// <summary>
+		/// Reads the end of file.
+		/// </summary>
+		/// <param name="span">The span.</param>
+		/// <returns><c>true</c> if there is more to read, otherwise <c>false</c>.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private bool ReadEndOfFile(ref Span<char> span)
+		{
+			if (fieldStartPosition < memoryPosition || fields.Count > 0)
+			{
+				row++;
+				rawRow++;
+
+				AddField(fieldStartPosition, memoryPosition - fieldStartPosition);
+
+				return true;
+			}
+
+			return false;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void AddField(int start, int length)
+		{
+			fields.Add(new Field
+			{
+				Start = start - rowStartPosition,
+				Length = length,
+				IsQuoted = isQuoted,
+			});
+		}
+
+		/// <summary>
+		/// Gets the next char and sets it to <see cref="c"/>.
+		/// </summary>
+		/// <param name="span">The span.</param>
+		/// <returns><c>true</c> if there are more characters, otherwise <c>false</c>.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private bool NextChar(ref Span<char> span)
+		{
+			if (!FillBuffers(ref span))
 			{
 				return false;
 			}
 
-			charsRead += start;
-			memoryPosition = start;
-			fieldStartPosition = fieldStartPosition - rowStartPosition;
-			// The memory copied was from the row start, so this is now
-			// at the beginning of the memory.
-			rowStartPosition = 0;
+			cPrev = c;
+			c = span[spanPosition];
 
-			memoryOwner.Dispose();
-			memoryOwner = tempMemoryOwner;
+			memoryPosition++;
+			spanPosition++;
+			charCount++;
+
+			if (countBytes)
+			{
+				byteCount += encoding.GetByteCount(new[] { c });
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Fills the memory and span buffers.
+		/// </summary>
+		/// <param name="span">The span to fill.</param>
+		/// <returns><c>true</c> if there is more to read, otherwise <c>false</c>.</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private bool FillBuffers(ref Span<char> span)
+		{
+			if (memoryPosition >= charsRead)
+			{
+				// Fill memory buffer.
+
+				if (charCount == 0)
+				{
+					// First read.
+					memoryOwner = MemoryPool<char>.Shared.Rent(bufferSize);
+					span = memoryOwner.Memory.Slice(0, Math.Min(1024, memoryOwner.Memory.Length)).Span;
+					charsRead = reader.Read(span);
+
+					memoryPosition = 0;
+					spanPosition = 0;
+
+					return charsRead > 0;
+				}
+
+				// If the row is longer than the buffer, make the buffer larger.
+				if (rowStartPosition == 0 && charsRead > 0)
+				{
+					// TODO: maybe use charsread instead of memory.length
+					bufferSize = Math.Max(charsRead, bufferSize) * 2;
+				}
+
+				// Copy the remaining row onto the new memory.
+				var tempMemoryOwner = MemoryPool<char>.Shared.Rent(bufferSize);
+				var charsLeft = Math.Max(charsRead - rowStartPosition, 0);
+				memoryOwner.Memory.Slice(rowStartPosition, charsLeft).CopyTo(tempMemoryOwner.Memory);
+				charsRead = reader.Read(tempMemoryOwner.Memory.Slice(charsLeft).Span);
+				if (charsRead == 0)
+				{
+					return false;
+				}
+
+				charsRead += charsLeft;
+				memoryPosition = charsLeft;
+				fieldStartPosition = fieldStartPosition - rowStartPosition;
+				rowStartPosition = 0;
+
+				memoryOwner.Dispose();
+				memoryOwner = tempMemoryOwner;
+			}
+
+			if (spanPosition >= span.Length)
+			{
+				// Fill span.
+				var start = memoryPosition;
+				var length = Math.Min(1024, charsRead - start);
+				span = memoryOwner.Memory.Slice(start, length).Span;
+
+				spanPosition = 0;
+			}
 
 			return true;
 		}
@@ -597,251 +571,6 @@ namespace CsvHelper
 			public int Start { get; init; }
 
 			public int Length { get; init; }
-		}
-
-
-
-
-		private int memoryPosition = 0;
-
-		private char c;
-		private char cPrev;
-		private int spanPosition;
-		private bool inQuotes;
-		private bool isQuoted;
-
-		public bool Read2()
-		{
-			fields.Clear();
-			spanPosition = 0;
-			inQuotes = false;
-			isQuoted = false;
-			rowStartPosition = memoryPosition;
-			fieldStartPosition = rowStartPosition;
-
-			var span = Span<char>.Empty;
-
-			while (true)
-			{
-				if (!NextChar(ref span))
-				{
-					return false;
-				}
-
-				if (c == comment && allowComments || fieldStartPosition == memoryPosition - 1 && (c == '\r' || c == '\n') && ignoreBlankLines)
-				{
-					ReadBlankLine(ref span);
-
-					continue;
-				}
-
-				if (c == quote)
-				{
-					inQuotes = !inQuotes;
-					isQuoted = true;
-				}
-
-				if (inQuotes)
-				{
-					// White in quotes, we don't care about anything else.
-					continue;
-				}
-
-				if (c == delimiterFirstChar)
-				{
-					if (ReadDelimiter(ref span))
-					{
-						continue;
-					}
-				}
-
-				if (c == '\r' || c == '\n')
-				{
-					ReadLineEnding(ref span);
-
-					return true;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Reads the blank line.
-		/// </summary>
-		/// <param name="span">The span.</param>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void ReadBlankLine(ref Span<char> span)
-		{
-			// Read until a line ending is found.
-			while (true)
-			{
-				if (c == '\r' || c == '\n')
-				{
-					NextChar(ref span);
-
-					if (c != '\n')
-					{
-						memoryPosition--;
-						spanPosition = spanPosition == 0 ? 0 : spanPosition - 1;
-					}
-
-					break; ;
-				}
-
-				if (!NextChar(ref span))
-				{
-					break; ;
-				}
-			}
-
-			rowStartPosition = memoryPosition;
-			fieldStartPosition = rowStartPosition;
-		}
-
-		/// <summary>
-		/// Reads the delimiter.
-		/// </summary>
-		/// <param name="span">The span.</param>
-		/// <returns><c>true</c> if this was a delimiter, othersize <c>false</c>.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private bool ReadDelimiter(ref Span<char> span)
-		{
-			for (var i = 1; i < delimiter.Length; i++)
-			{
-				NextChar(ref span);
-
-				if (c != delimiter[i])
-				{
-					return false;
-				}
-			}
-
-			AddField(fieldStartPosition, memoryPosition - fieldStartPosition - delimiter.Length);
-
-			fieldStartPosition = memoryPosition;
-
-			return true;
-		}
-
-		/// <summary>
-		/// Reads the line ending.
-		/// </summary>
-		/// <param name="span">The span.</param>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void ReadLineEnding(ref Span<char> span)
-		{
-			row++;
-
-			var charsToRemove = NextChar(ref span) ? 2 : 1;
-
-			AddField(fieldStartPosition, memoryPosition - fieldStartPosition - charsToRemove);
-
-			if (c != '\n')
-			{
-				// The char isn't part of the line ending.
-				// Move positions back one char.
-				memoryPosition--;
-				spanPosition = spanPosition == 0 ? 0 : spanPosition - 1;
-			}
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void AddField(int start, int length)
-		{
-			fields.Add(new Field
-			{
-				Start = start - rowStartPosition,
-				Length = length,
-				IsQuoted = isQuoted,
-			});
-		}
-
-		/// <summary>
-		/// Gets the next char and sets it to <see cref="c"/>.
-		/// </summary>
-		/// <param name="span">The span.</param>
-		/// <returns><c>true</c> if there are more characters, otherwise <c>false</c>.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private bool NextChar(ref Span<char> span)
-		{
-			if (!FillBuffers(ref span))
-			{
-				c = '\0';
-
-				return false;
-			}
-
-			cPrev = c;
-			c = span[spanPosition];
-
-			memoryPosition++;
-			spanPosition++;
-			charCount++;
-
-			return true;
-		}
-
-		/// <summary>
-		/// Fills the memory and span buffers.
-		/// </summary>
-		/// <param name="span">The span to fill.</param>
-		/// <returns><c>true</c> if there is more to read, otherwise <c>false</c>.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private bool FillBuffers(ref Span<char> span)
-		{
-			if (memoryPosition >= charsRead)
-			{
-				// Fill memory buffer.
-
-				if (charCount == 0)
-				{
-					// First read.
-					memoryOwner = MemoryPool<char>.Shared.Rent(bufferSize);
-					span = memoryOwner.Memory.Slice(0, Math.Min(1024, bufferSize)).Span;
-					charsRead = reader.Read(span);
-
-					memoryPosition = 0;
-					spanPosition = 0;
-
-					return charsRead > 0;
-				}
-
-				// If the row is longer than the buffer, make the buffer larger.
-				if (rowStartPosition == 0 && charsRead > 0)
-				{
-					// TODO: maybe use charsread instead of memory.length
-					bufferSize = Math.Max(memoryOwner.Memory.Length, bufferSize) * 2;
-				}
-
-				// Copy the remaining row onto the new memory.
-				var tempMemoryOwner = MemoryPool<char>.Shared.Rent(bufferSize);
-				memoryOwner.Memory.Slice(rowStartPosition).CopyTo(tempMemoryOwner.Memory);
-				var start = memoryOwner.Memory.Length - rowStartPosition;
-				charsRead = reader.Read(tempMemoryOwner.Memory.Slice(start).Span);
-				if (charsRead == 0)
-				{
-					return false;
-				}
-
-				charsRead += start;
-				memoryPosition = start;
-				fieldStartPosition = fieldStartPosition - rowStartPosition;
-				rowStartPosition = 0;
-
-				memoryOwner.Dispose();
-				memoryOwner = tempMemoryOwner;
-			}
-
-			if (spanPosition >= span.Length)
-			{
-				// Fill span.
-				var start = memoryPosition;
-				var length = Math.Min(1024, charsRead - start);
-				span = memoryOwner.Memory.Slice(start, length).Span;
-
-				spanPosition = 0;
-			}
-
-			return true;
 		}
 	}
 }

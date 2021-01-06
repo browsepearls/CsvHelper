@@ -209,7 +209,7 @@ namespace CsvHelper.Configuration
 		/// <returns>The processed field.</returns>
 		public static Span<char> DequoteField(Span<char> span, ProcessFieldOptions options)
 		{
-			if (!options.IsQuoted)
+			if (!options.IsQuoted || options.IgnoreQuotes)
 			{
 				return span;
 			}
@@ -238,6 +238,11 @@ namespace CsvHelper.Configuration
 			for (var i = 0; i < span.Length; i++)
 			{
 				var c = span[i];
+
+				if (options.LineBreakInQuotedFieldIsBadData && (c == '\r' || c == '\n'))
+				{
+					options.BadDataFound?.Invoke(options.Context);
+				}
 
 				if (inEscape)
 				{

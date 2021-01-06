@@ -106,7 +106,8 @@ namespace CsvHelper.Tests.Parsing
 			using (var reader = new StringReader("\"a\rb\""))
 			using (var parser = new CsvParser(reader, config))
 			{
-				Assert.ThrowsException<BadDataException>(() => parser.Read());
+				parser.Read();
+				Assert.ThrowsException<BadDataException>(() => parser.Record);
 			}
 		}
 
@@ -120,7 +121,8 @@ namespace CsvHelper.Tests.Parsing
 			using (var reader = new StringReader("\"a\nb\""))
 			using (var parser = new CsvParser(reader, config))
 			{
-				Assert.ThrowsException<BadDataException>(() => parser.Read());
+				parser.Read();
+				Assert.ThrowsException<BadDataException>(() => parser.Record);
 			}
 		}
 
@@ -134,7 +136,8 @@ namespace CsvHelper.Tests.Parsing
 			using (var reader = new StringReader("\"a\r\nb\""))
 			using (var parser = new CsvParser(reader, config))
 			{
-				Assert.ThrowsException<BadDataException>(() => parser.Read());
+				parser.Read();
+				Assert.ThrowsException<BadDataException>(() => parser.Record);
 			}
 		}
 	}

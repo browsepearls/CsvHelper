@@ -36,6 +36,18 @@ namespace CsvHelper
 		public bool IsQuoted { get; init; }
 
 		/// <summary>
+		/// A value indicating if quotes should be ignored when
+		/// parsing and treated like any other character.
+		/// </summary>
+		public bool IgnoreQuotes { get; init; }
+
+		/// <summary>
+		/// A value indicating if a line break found in a quote field should
+		/// be considered bad data.
+		/// </summary>
+		public bool LineBreakInQuotedFieldIsBadData { get; init; }
+
+		/// <summary>
 		/// The character used to quote fields.
 		/// </summary>
 		public char Quote { get; init; }

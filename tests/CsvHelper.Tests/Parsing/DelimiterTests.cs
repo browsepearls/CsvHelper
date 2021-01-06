@@ -67,15 +67,14 @@ namespace CsvHelper.Tests.Parsing
 				Delimiter = "!#",
 			};
 			var s = new StringBuilder();
-			s.AppendLine("1!#2!!#3");
+			s.AppendLine("1!!#2");
 			using (var reader = new StringReader(s.ToString()))
 			using (var parser = new CsvParser(reader, config))
 			{
 				parser.Read();
 
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2!", parser[1]);
-				Assert.AreEqual("3", parser[2]);
+				Assert.AreEqual("1!", parser[0]);
+				Assert.AreEqual("2", parser[1]);
 			}
 		}
 	}
