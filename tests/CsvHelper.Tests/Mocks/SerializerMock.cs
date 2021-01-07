@@ -16,6 +16,8 @@ namespace CsvHelper.Tests.Mocks
 		private readonly List<string[]> records = new List<string[]>();
 		private readonly bool throwExceptionOnWrite;
 
+		public int Row { get; private set; } = 1;
+
 		public TextWriter TextWriter { get; }
 
 		public ISerializerConfiguration Configuration { get; }
@@ -29,7 +31,8 @@ namespace CsvHelper.Tests.Mocks
 
 		public SerializerMock(bool throwExceptionOnWrite = false)
 		{
-			Context = new WritingContext(new StringWriter(), new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture), false);
+			Configuration = new CsvConfiguration(CultureInfo.InvariantCulture);
+			Context = new WritingContext(this);
 			this.throwExceptionOnWrite = throwExceptionOnWrite;
 		}
 
@@ -45,6 +48,7 @@ namespace CsvHelper.Tests.Mocks
 
 		public void WriteLine()
 		{
+			Row++;
 		}
 
 		public void Dispose()

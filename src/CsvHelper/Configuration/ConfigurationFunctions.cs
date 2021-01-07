@@ -97,11 +97,11 @@ namespace CsvHelper.Configuration
 		{
 			var shouldQuote = !string.IsNullOrEmpty(field) && 
 			(
-				field.Contains(context.WriterConfiguration.QuoteString) // Contains quote
+				field.Contains(context.Writer.Configuration.QuoteString) // Contains quote
 				|| field[0] == ' ' // Starts with a space
 				|| field[field.Length - 1] == ' ' // Ends with a space
 				|| field.IndexOfAny(quoteChars) > -1 // Contains chars that require quotes
-				|| (context.WriterConfiguration.Delimiter.Length > 0 && field.Contains(context.WriterConfiguration.Delimiter)) // Contains delimiter
+				|| (context.Writer.Configuration.Delimiter.Length > 0 && field.Contains(context.Writer.Configuration.Delimiter)) // Contains delimiter
 			);
 
 			return shouldQuote;

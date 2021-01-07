@@ -399,29 +399,6 @@ namespace CsvHelper.Tests
 		}
 
 		[TestMethod]
-		public void WriteHeaderFailsIfHasHeaderRecordIsNotConfiguredTest()
-		{
-			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-			{
-				HasHeaderRecord = false,
-			};
-			using (var stream = new MemoryStream())
-			using (var writer = new StreamWriter(stream))
-			using (var csvWriter = new CsvWriter(writer, config))
-			{
-				csvWriter.Configuration.RegisterClassMap<TestRecordMap>();
-				try
-				{
-					csvWriter.WriteHeader(typeof(TestRecord));
-					Assert.Fail();
-				}
-				catch (WriterException)
-				{
-				}
-			}
-		}
-
-		[TestMethod]
 		public void WriteRecordWithDelimiterInFieldTest()
 		{
 			using (var stream = new MemoryStream())

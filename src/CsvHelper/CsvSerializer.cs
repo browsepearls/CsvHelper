@@ -16,8 +16,24 @@ namespace CsvHelper
 	/// </summary>
 	public class CsvSerializer : ISerializer
 	{
-		private WritingContext context;
+		private readonly TextWriter writer;
+		private readonly WritingContext context;
+		private readonly string delimiter;
+		private readonly bool leaveOpen;
+		private readonly NewLine newLine;
+		private readonly string newLineString;
+		private readonly char[] injectionCharacters;
+		private readonly char injectionEscapeCharacter;
+		private readonly char quote;
+		private readonly bool sanitizeForInjection;
+
+		private int row = 1;
 		private bool disposed;
+
+		/// <summary>
+		/// Gets the current row that's being written to.
+		/// </summary>
+		public virtual int Row => row;
 
 		/// <summary>
 		/// Gets the writing context.
@@ -27,41 +43,36 @@ namespace CsvHelper
 		/// <summary>
 		/// Gets the configuration.
 		/// </summary>
-		public virtual ISerializerConfiguration Configuration => context.SerializerConfiguration;
+		public virtual ISerializerConfiguration Configuration { get; private set; }
 
 		/// <summary>
-		/// Creates a new serializer using the given <see cref="TextWriter" />.
+		/// Initializes a new instance of the <see cref="CsvSerializer"/> class.
 		/// </summary>
-		/// <param name="writer">The <see cref="TextWriter" /> to write the CSV file data to.</param>
-		/// <param name="cultureInfo">The culture information.</param>
-		public CsvSerializer(TextWriter writer, CultureInfo cultureInfo) : this(writer, new Configuration.CsvConfiguration(cultureInfo), false) { }
+		/// <param name="writer">The <see cref="TextWriter"/> to write the CSV data to.</param>
+		/// <param name="culture">The culture.</param>
+		/// <param name="leaveOpen"><c>true</c> to leave the <see cref="TextWriter"/> open after the <see cref="CsvSerializer"/> object is disposed, otherwise <c>false</c>.</param>
+		public CsvSerializer(TextWriter writer, CultureInfo culture, bool leaveOpen = false) : this(writer, new CsvConfiguration(culture) { LeaveOpen = leaveOpen }) { }
 
 		/// <summary>
-		/// Creates a new serializer using the given <see cref="TextWriter" />.
+		/// Initializes a new instance of the <see cref="CsvSerializer"/> class.
 		/// </summary>
-		/// <param name="writer">The <see cref="TextWriter" /> to write the CSV file data to.</param>
-		/// <param name="cultureInfo">The culture information.</param>
-		/// <param name="leaveOpen">true to leave the reader open after the CsvReader object is disposed, otherwise false.</param>
-		public CsvSerializer(TextWriter writer, CultureInfo cultureInfo, bool leaveOpen) : this(writer, new Configuration.CsvConfiguration(cultureInfo), leaveOpen) { }
-
-		/// <summary>
-		/// Creates a new serializer using the given <see cref="TextWriter"/>
-		/// and <see cref="CsvHelper.Configuration.CsvConfiguration"/>.
-		/// </summary>
-		/// <param name="writer">The <see cref="TextWriter"/> to write the CSV file data to.</param>
+		/// <param name="writer">The writer.</param>
 		/// <param name="configuration">The configuration.</param>
-		public CsvSerializer(TextWriter writer, Configuration.CsvConfiguration configuration) : this(writer, configuration, false) { }
-
-		/// <summary>
-		/// Creates a new serializer using the given <see cref="TextWriter"/>
-		/// and <see cref="CsvHelper.Configuration.CsvConfiguration"/>.
-		/// </summary>
-		/// <param name="writer">The <see cref="TextWriter"/> to write the CSV file data to.</param>
-		/// <param name="configuration">The configuration.</param>
-		/// <param name="leaveOpen">true to leave the reader open after the CsvReader object is disposed, otherwise false.</param>
-		public CsvSerializer(TextWriter writer, Configuration.CsvConfiguration configuration, bool leaveOpen)
+		public CsvSerializer(TextWriter writer, CsvConfiguration configuration)
 		{
-			context = new WritingContext(writer, configuration, leaveOpen);
+			this.writer = writer;
+
+			delimiter = configuration.Delimiter;
+			context = new WritingContext(this);
+			injectionCharacters = configuration.InjectionCharacters;
+			injectionEscapeCharacter = configuration.InjectionEscapeCharacter;
+			leaveOpen = configuration.LeaveOpen;
+			newLine = configuration.NewLine;
+			newLineString = configuration.NewLineString;
+			quote = configuration.Quote;
+			sanitizeForInjection = configuration.SanitizeForInjection;
+
+			Configuration = configuration;
 		}
 
 		/// <summary>
@@ -76,14 +87,14 @@ namespace CsvHelper
 			{
 				if (i > 0)
 				{
-					context.Writer.Write(context.SerializerConfiguration.Delimiter);
+					writer.Write(delimiter);
 				}
 
-				var field = Configuration.SanitizeForInjection
+				var field = sanitizeForInjection
 					? SanitizeForInjection(record[i])
 					: record[i];
 
-				context.Writer.Write(field);
+				writer.Write(field);
 			}
 		}
 
@@ -97,14 +108,14 @@ namespace CsvHelper
 			{
 				if (i > 0)
 				{
-					await context.Writer.WriteAsync(context.SerializerConfiguration.Delimiter).ConfigureAwait(false);
+					await writer.WriteAsync(delimiter).ConfigureAwait(false);
 				}
 
-				var field = Configuration.SanitizeForInjection
+				var field = sanitizeForInjection
 					? SanitizeForInjection(record[i])
 					: record[i];
 
-				await context.Writer.WriteAsync(field).ConfigureAwait(false);
+				await writer.WriteAsync(field).ConfigureAwait(false);
 			}
 		}
 
@@ -115,7 +126,8 @@ namespace CsvHelper
 		{
 			// Don't forget about the async method below!
 
-			context.Writer.Write(context.SerializerConfiguration.NewLineString);
+			writer.Write(newLineString);
+			row++;
 		}
 
 		/// <summary>
@@ -123,23 +135,46 @@ namespace CsvHelper
 		/// </summary>
 		public virtual async Task WriteLineAsync()
 		{
-			await context.Writer.WriteAsync(context.SerializerConfiguration.NewLineString).ConfigureAwait(false);
+			await writer.WriteAsync(newLineString).ConfigureAwait(false);
+		}
+
+		/// <summary>
+		/// Sanitizes the field to prevent injection.
+		/// </summary>
+		/// <param name="field">The field to sanitize.</param>
+		protected virtual string SanitizeForInjection(string field)
+		{
+			if (string.IsNullOrEmpty(field))
+			{
+				return field;
+			}
+
+			if (ArrayHelper.Contains(injectionCharacters, field[0]))
+			{
+				return injectionEscapeCharacter + field;
+			}
+
+			if (field[0] == quote && ArrayHelper.Contains(injectionCharacters, field[1]))
+			{
+				return field[0].ToString() + injectionEscapeCharacter.ToString() + field.Substring(1);
+			}
+
+			return field;
 		}
 
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
-		/// <filterpriority>2</filterpriority>
 		public virtual void Dispose()
 		{
-			Dispose(!context?.LeaveOpen ?? true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
 		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// Releases unmanaged and - optionally - managed resources.
 		/// </summary>
-		/// <param name="disposing">True if the instance needs to be disposed of.</param>
+		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
 		protected virtual void Dispose(bool disposing)
 		{
 			if (disposed)
@@ -149,21 +184,24 @@ namespace CsvHelper
 
 			if (disposing)
 			{
-				context.Dispose();
+				// Dispose managed state (managed objects)
+				if (!leaveOpen)
+				{
+					writer?.Dispose();
+				}
 			}
 
-			context = null;
 			disposed = true;
 		}
 
-#if NET47 || NETSTANDARD
+#if !NET45
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		/// <filterpriority>2</filterpriority>
 		public virtual async ValueTask DisposeAsync()
 		{
-			await DisposeAsync(!context?.LeaveOpen ?? true).ConfigureAwait(false);
+			await DisposeAsync(true).ConfigureAwait(false);
 			GC.SuppressFinalize(this);
 		}
 
@@ -178,38 +216,13 @@ namespace CsvHelper
 				return;
 			}
 
-			if (disposing && context != null)
+			if (disposing)
 			{
-				await context.DisposeAsync().ConfigureAwait(false);
+				await writer.DisposeAsync().ConfigureAwait(false);
 			}
 
-			context = null;
 			disposed = true;
 		}
 #endif
-
-		/// <summary>
-		/// Sanitizes the field to prevent injection.
-		/// </summary>
-		/// <param name="field">The field to sanitize.</param>
-		protected virtual string SanitizeForInjection(string field)
-		{
-			if (string.IsNullOrEmpty(field))
-			{
-				return field;
-			}
-
-			if (Configuration.InjectionCharacters.Contains(field[0]))
-			{
-				return Configuration.InjectionEscapeCharacter + field;
-			}
-
-			if (field[0] == Configuration.Quote && Configuration.InjectionCharacters.Contains(field[1]))
-			{
-				return field[0].ToString() + Configuration.InjectionEscapeCharacter.ToString() + field.Substring(1);
-			}
-
-			return field;
-		}
 	}
 }

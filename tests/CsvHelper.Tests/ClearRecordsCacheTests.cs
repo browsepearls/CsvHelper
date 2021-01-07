@@ -48,38 +48,6 @@ namespace CsvHelper.Tests
 			}
 		}
 
-		[TestMethod]
-		public void ClearWriterTest()
-		{
-			using (var stream = new MemoryStream())
-			using (var reader = new StreamReader(stream))
-			using (var writer = new StreamWriter(stream))
-			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-			{
-				csv.Configuration.RegisterClassMap<TestMap1>();
-				var record = new Test { Id = 1, Name = "one" };
-				csv.WriteRecord(record);
-				csv.NextRecord();
-
-				csv.Context.ClearCache(Caches.WriteRecord);
-				csv.Configuration.RegisterClassMap<TestMap2>();
-				record = new Test { Id = 2, Name = "two" };
-				csv.WriteRecord(record);
-				csv.NextRecord();
-
-				writer.Flush();
-				stream.Position = 0;
-
-				var data = reader.ReadToEnd();
-
-				var expected = new StringBuilder();
-				expected.AppendLine("1");
-				expected.AppendLine("two");
-
-				Assert.AreEqual(expected.ToString(), data);
-			}
-		}
-
 		private class Test
 		{
 			public int Id { get; set; }

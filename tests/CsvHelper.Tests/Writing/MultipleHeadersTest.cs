@@ -12,62 +12,62 @@ namespace CsvHelper.Tests.Writing
 {
 	[TestClass]
 	public class MultipleHeadersTest
-	{    
+	{
 		[TestMethod]
 		public void GenericTypeTest()
 		{
-			using( var writer = new StringWriter() )
-			using( var csv = new CsvWriter(writer, CultureInfo.InvariantCulture) )
+			using (var writer = new StringWriter())
+			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
 				csv.WriteHeader<A>();
 				csv.NextRecord();
-				csv.WriteRecord( new A { Id = 1 } );
+				csv.WriteRecord(new A { Id = 1 });
 				csv.NextRecord();
 
 				csv.WriteHeader<B>();
 				csv.NextRecord();
-				csv.WriteRecord( new B { Name = "one" } );
+				csv.WriteRecord(new B { Name = "one" });
 				csv.NextRecord();
 				writer.Flush();
 
 				var expected = new StringBuilder();
-				expected.AppendLine( "Id" );
-				expected.AppendLine( "1" );
-				expected.AppendLine( "Name" );
-				expected.AppendLine( "one" );
+				expected.AppendLine("Id");
+				expected.AppendLine("1");
+				expected.AppendLine("Name");
+				expected.AppendLine("one");
 
-				Assert.AreEqual( expected.ToString(), writer.ToString() );
+				Assert.AreEqual(expected.ToString(), writer.ToString());
 			}
 		}
 
 		[TestMethod]
 		public void DynamicTypeTest()
 		{
-			using( var writer = new StringWriter() )
-			using( var csv = new CsvWriter(writer, CultureInfo.InvariantCulture) )
+			using (var writer = new StringWriter())
+			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
 				dynamic a = new ExpandoObject();
 				a.Id = 1;
-				csv.WriteDynamicHeader( a );
+				csv.WriteDynamicHeader(a);
 				csv.NextRecord();
-				csv.WriteRecord( a );
+				csv.WriteRecord(a);
 				csv.NextRecord();
 
 				dynamic b = new ExpandoObject();
 				b.Name = "one";
-				csv.WriteDynamicHeader( b );
+				csv.WriteDynamicHeader(b);
 				csv.NextRecord();
-				csv.WriteRecord( b );
+				csv.WriteRecord(b);
 				csv.NextRecord();
 				writer.Flush();
 
 				var expected = new StringBuilder();
-				expected.AppendLine( "Id" );
-				expected.AppendLine( "1" );
-				expected.AppendLine( "Name" );
-				expected.AppendLine( "one" );
+				expected.AppendLine("Id");
+				expected.AppendLine("1");
+				expected.AppendLine("Name");
+				expected.AppendLine("one");
 
-				Assert.AreEqual( expected.ToString(), writer.ToString() );
+				Assert.AreEqual(expected.ToString(), writer.ToString());
 			}
 		}
 

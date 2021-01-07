@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using CsvHelper.Configuration;
 
 namespace CsvHelper
@@ -115,6 +116,7 @@ namespace CsvHelper
 			return stack;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private static MemberExpression GetMemberExpression(Expression expression)
 		{
 			MemberExpression memberExpression = null;

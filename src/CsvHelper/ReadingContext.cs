@@ -16,16 +16,30 @@ namespace CsvHelper
 	/// </summary>
 	public class ReadingContext
 	{
+		/// <summary>
+		/// Gets the parser.
+		/// </summary>
 		public IParser Parser { get; private set; }
 
+		/// <summary>
+		/// Gets the reader.
+		/// </summary>
 		public IReader Reader { get; internal set; }
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ReadingContext"/> class.
+		/// </summary>
+		/// <param name="reader">The reader.</param>
 		public ReadingContext(IReader reader)
 		{
 			Reader = reader;
 			Parser = reader.Parser;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ReadingContext"/> class.
+		/// </summary>
+		/// <param name="parser">The parser.</param>
 		public ReadingContext(IParser parser)
 		{
 			Parser = parser;

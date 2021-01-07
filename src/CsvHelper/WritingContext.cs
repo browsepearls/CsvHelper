@@ -14,166 +14,35 @@ namespace CsvHelper
 	/// <summary>
 	/// CSV writing state.
 	/// </summary>
-	public class WritingContext : IDisposable
-#if NET47 || NETSTANDARD
-		, IAsyncDisposable
-#endif
+	public class WritingContext
 	{
-		private bool disposed;
-		private TextWriter writer;
-		private Configuration.CsvConfiguration configuration;
-
 		/// <summary>
-		/// Gets the type actions.
+		/// Gets the writer.
 		/// </summary>
-		public Dictionary<int, Delegate> TypeActions { get; } = new Dictionary<int, Delegate>();
+		public IWriter Writer { get; internal set; }
 
 		/// <summary>
-		/// Gets the type converter options.
+		/// Gets the serializer.
 		/// </summary>
-		public Dictionary<Type, TypeConverterOptions> TypeConverterOptionsCache { get; } = new Dictionary<Type, TypeConverterOptions>();
+		public ISerializer Serializer { get; private set; }
 
 		/// <summary>
-		/// Gets or sets the reusable member map data.
-		/// </summary>
-		public MemberMapData ReusableMemberMapData { get; set; } = new MemberMapData(null);
-
-		/// <summary>
-		/// Gets the writer configuration.
-		/// </summary>
-		public virtual IWriterConfiguration WriterConfiguration => configuration;
-
-		/// <summary>
-		/// Gets the serializer configuration.
-		/// </summary>
-		public virtual ISerializerConfiguration SerializerConfiguration => configuration;
-
-		/// <summary>
-		/// Gets the <see cref="TextWriter"/>.
-		/// </summary>
-		public virtual TextWriter Writer => writer;
-
-		/// <summary>
-		/// Gets a value indicating if the <see cref="Writer"/>
-		/// should be left open when disposing.
-		/// </summary>
-		public virtual bool LeaveOpen { get; set; }
-
-		/// <summary>
-		/// Gets the current row.
-		/// </summary>
-		public virtual int Row { get; set; } = 1;
-
-		/// <summary>
-		/// Get the current record;
-		/// </summary>
-		public virtual List<string> Record { get; } = new List<string>();
-
-		/// <summary>
-		/// Gets a value indicating if the header has been written.
-		/// </summary>
-		public virtual bool HasHeaderBeenWritten { get; set; }
-
-		/// <summary>
-		/// Gets a value indicating if a record has been written.
-		/// </summary>
-		public virtual bool HasRecordBeenWritten { get; set; }
-
-		/// <summary>
-		/// Initializes a new instance.
+		/// Initializes a new instance of the <see cref="WritingContext"/> class.
 		/// </summary>
 		/// <param name="writer">The writer.</param>
-		/// <param name="configuration">The configuration.</param>
-		/// <param name="leaveOpen">A value indicating if the TextWriter should be left open.</param>
-		public WritingContext(TextWriter writer, Configuration.CsvConfiguration configuration, bool leaveOpen)
+		public WritingContext(IWriter writer)
 		{
-			this.writer = writer ?? throw new ArgumentNullException(nameof(writer));
-			this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-			LeaveOpen = leaveOpen;
+			Writer = writer;
+			Serializer = writer.Serializer;
 		}
 
 		/// <summary>
-		/// Clears the specified caches.
+		/// Initializes a new instance of the <see cref="WritingContext"/> class.
 		/// </summary>
-		/// <param name="cache">The caches to clear.</param>
-		public void ClearCache(Caches cache)
+		/// <param name="serializer">The serializer.</param>
+		public WritingContext(ISerializer serializer)
 		{
-			if ((cache & Caches.TypeConverterOptions) == Caches.TypeConverterOptions)
-			{
-				TypeConverterOptionsCache.Clear();
-			}
-
-			if ((cache & Caches.WriteRecord) == Caches.WriteRecord)
-			{
-				TypeActions.Clear();
-			}
+			Serializer = serializer;
 		}
-
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		/// <filterpriority>2</filterpriority>
-		public virtual void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		/// <param name="disposing">True if the instance needs to be disposed of.</param>
-		protected virtual void Dispose(bool disposing)
-		{
-			if (disposed)
-			{
-				return;
-			}
-
-			if (disposing)
-			{
-				writer?.Dispose();
-			}
-
-			writer = null;
-			disposed = true;
-		}
-
-#if NET47 || NETSTANDARD
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		/// <filterpriority>2</filterpriority>
-		public virtual async ValueTask DisposeAsync()
-		{
-			await DisposeAsync(true).ConfigureAwait(false);
-			GC.SuppressFinalize(this);
-		}
-
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		/// <param name="disposing">True if the instance needs to be disposed of.</param>
-		protected virtual async ValueTask DisposeAsync(bool disposing)
-		{
-			if (disposed)
-			{
-				return;
-			}
-
-			if (disposing && writer != null)
-			{
-#if NETSTANDARD2_1
-				await writer.DisposeAsync().ConfigureAwait(false);
-#else
-				await writer.FlushAsync().ConfigureAwait(false);
-				writer.Dispose();
-#endif
-			}
-
-			writer = null;
-			disposed = true;
-		}
-#endif
 	}
 }

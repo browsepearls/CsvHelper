@@ -22,18 +22,18 @@ namespace CsvHelper.Tests.Exceptions
 				null
 			};
 
-			var reader = new CsvReader( parser );
+			var reader = new CsvReader(parser);
 			reader.Read();
 			reader.Read();
 			try
 			{
-				reader.GetField( 2 );
+				reader.GetField(2);
 				Assert.Fail();
 			}
-			catch( MissingFieldException ex )
+			catch (MissingFieldException ex)
 			{
-				Assert.AreEqual( 2, ex.ReadingContext.Parser.Row );
-				Assert.AreEqual( 2, ex.ReadingContext.Reader.CurrentIndex );
+				Assert.AreEqual(2, ex.ReadingContext.Parser.Row);
+				Assert.AreEqual(2, ex.ReadingContext.Reader.CurrentIndex);
 			}
 		}
 
@@ -47,19 +47,19 @@ namespace CsvHelper.Tests.Exceptions
 				null
 			};
 
-			var reader = new CsvReader( parser );
+			var reader = new CsvReader(parser);
 			reader.Read();
 			reader.Read();
 			try
 			{
-				reader.GetField<int>( 2 );
+				reader.GetField<int>(2);
 				Assert.Fail();
 			}
-			catch( MissingFieldException ex )
+			catch (MissingFieldException ex)
 			{
-				Assert.AreEqual( 2, ex.ReadingContext.Parser.Row );
+				Assert.AreEqual(2, ex.ReadingContext.Parser.Row);
 				//Assert.AreEqual( ex.Type, typeof( int ) );
-				Assert.AreEqual( 2, ex.ReadingContext.Reader.CurrentIndex );
+				Assert.AreEqual(2, ex.ReadingContext.Reader.CurrentIndex);
 			}
 		}
 
@@ -73,14 +73,14 @@ namespace CsvHelper.Tests.Exceptions
 				null
 			};
 
-			var reader = new CsvReader( parser );
+			var reader = new CsvReader(parser);
 			reader.Read();
 			try
 			{
 				reader.GetRecord<Simple>();
 				Assert.Fail();
 			}
-			catch( TypeConverterException ex )
+			catch (TypeConverterException ex)
 			{
 				//var expected = "Row: '2' (1 based)\r\n" +
 				//        "Type: 'CsvHelper.Tests.Exceptions.ExceptionMessageTests+Simple'\r\n" +
@@ -89,9 +89,9 @@ namespace CsvHelper.Tests.Exceptions
 				//        "Field Value: 'a'\r\n";
 				//Assert.AreEqual( expected, ex.Data["CsvHelper"] );
 
-				Assert.AreEqual( 2, ex.ReadingContext.Parser.Row );
+				Assert.AreEqual(2, ex.ReadingContext.Parser.Row);
 				//Assert.AreEqual( typeof( Simple ), ex.Type );
-				Assert.AreEqual( 0, ex.ReadingContext.Reader.CurrentIndex );
+				Assert.AreEqual(0, ex.ReadingContext.Reader.CurrentIndex);
 			}
 		}
 
@@ -105,18 +105,18 @@ namespace CsvHelper.Tests.Exceptions
 				null
 			};
 
-			var reader = new CsvReader( parser );
+			var reader = new CsvReader(parser);
 			reader.Read();
 			try
 			{
-				reader.GetRecord( typeof( Simple ) );
+				reader.GetRecord(typeof(Simple));
 				Assert.Fail();
 			}
-			catch( TypeConverterException ex )
+			catch (TypeConverterException ex)
 			{
-				Assert.AreEqual( 2, ex.ReadingContext.Parser.Row );
+				Assert.AreEqual(2, ex.ReadingContext.Parser.Row);
 				//Assert.AreEqual( typeof( Simple ), ex.Type );
-				Assert.AreEqual( 0, ex.ReadingContext.Reader.CurrentIndex );
+				Assert.AreEqual(0, ex.ReadingContext.Reader.CurrentIndex);
 			}
 		}
 
@@ -130,17 +130,17 @@ namespace CsvHelper.Tests.Exceptions
 				null
 			};
 
-			var reader = new CsvReader( parser );
+			var reader = new CsvReader(parser);
 			try
 			{
 				reader.GetRecords<Simple>().ToList();
 				Assert.Fail();
 			}
-			catch( TypeConverterException ex )
+			catch (TypeConverterException ex)
 			{
-				Assert.AreEqual( 2, ex.ReadingContext.Parser.Row );
+				Assert.AreEqual(2, ex.ReadingContext.Parser.Row);
 				//Assert.AreEqual( typeof( Simple ), ex.Type );
-				Assert.AreEqual( 0, ex.ReadingContext.Reader.CurrentIndex );
+				Assert.AreEqual(0, ex.ReadingContext.Reader.CurrentIndex);
 			}
 		}
 
@@ -154,17 +154,17 @@ namespace CsvHelper.Tests.Exceptions
 				null
 			};
 
-			var reader = new CsvReader( parser );
+			var reader = new CsvReader(parser);
 			try
 			{
-				reader.GetRecords( typeof( Simple ) ).ToList();
+				reader.GetRecords(typeof(Simple)).ToList();
 				Assert.Fail();
 			}
-			catch( TypeConverterException ex )
+			catch (TypeConverterException ex)
 			{
-				Assert.AreEqual( 2, ex.ReadingContext.Parser.Row );
+				Assert.AreEqual(2, ex.ReadingContext.Parser.Row);
 				//Assert.AreEqual( typeof( Simple ), ex.Type );
-				Assert.AreEqual( 0, ex.ReadingContext.Reader.CurrentIndex );
+				Assert.AreEqual(0, ex.ReadingContext.Reader.CurrentIndex);
 			}
 		}
 
@@ -178,36 +178,36 @@ namespace CsvHelper.Tests.Exceptions
 				null
 			};
 
-			var reader = new CsvReader( parser );
+			var reader = new CsvReader(parser);
 			reader.Read();
 			reader.ReadHeader();
 			reader.Read();
 			try
 			{
-				reader.GetField( "c" );
+				reader.GetField("c");
 				Assert.Fail();
 			}
-			catch( MissingFieldException ex )
+			catch (MissingFieldException ex)
 			{
-				Assert.AreEqual( 2, ex.ReadingContext.Parser.Row );
-				Assert.AreEqual( -1, ex.ReadingContext.Reader.CurrentIndex );
+				Assert.AreEqual(2, ex.ReadingContext.Parser.Row);
+				Assert.AreEqual(-1, ex.ReadingContext.Reader.CurrentIndex);
 			}
 		}
 
 		[TestMethod]
 		public void WriteRecordGenericTest()
 		{
-			var serializer = new SerializerMock( true );
-			var writer = new CsvWriter( serializer );
+			var serializer = new SerializerMock(true);
+			var writer = new CsvWriter(serializer);
 			try
 			{
-				writer.WriteRecord( new Simple() );
-			    writer.NextRecord();
-			    Assert.Fail();
+				writer.WriteRecord(new Simple());
+				writer.NextRecord();
+				Assert.Fail();
 			}
-			catch( CsvHelperException ex )
+			catch (CsvHelperException ex)
 			{
-				Assert.AreEqual( 1, ex.WritingContext.Row );
+				Assert.AreEqual(1, ex.WritingContext.Serializer.Row);
 			}
 		}
 

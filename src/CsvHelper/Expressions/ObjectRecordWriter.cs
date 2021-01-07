@@ -32,9 +32,9 @@ namespace CsvHelper.Expressions
 		{
 			var type = Writer.GetTypeForRecord(record);
 
-			if (Writer.Context.WriterConfiguration.Maps[type] == null)
+			if (Writer.Configuration.Maps[type] == null)
 			{
-				Writer.Context.WriterConfiguration.Maps.Add(Writer.Context.WriterConfiguration.AutoMap(type));
+				Writer.Configuration.Maps.Add(Writer.Configuration.AutoMap(type));
 			}
 
 			var recordParameter = Expression.Parameter(typeof(T), "record");
@@ -43,7 +43,7 @@ namespace CsvHelper.Expressions
 			// Get a list of all the members so they will
 			// be sorted properly.
 			var members = new MemberMapCollection();
-			members.AddMembers(Writer.Context.WriterConfiguration.Maps[type]);
+			members.AddMembers(Writer.Configuration.Maps[type]);
 
 			if (members.Count == 0)
 			{
@@ -93,10 +93,10 @@ namespace CsvHelper.Expressions
 						continue;
 					}
 
-					fieldExpression = ExpressionManager.CreateGetMemberExpression(recordParameterConverted, Writer.Context.WriterConfiguration.Maps[type], memberMap);
+					fieldExpression = ExpressionManager.CreateGetMemberExpression(recordParameterConverted, Writer.Configuration.Maps[type], memberMap);
 
 					var typeConverterExpression = Expression.Constant(memberMap.Data.TypeConverter);
-					memberMap.Data.TypeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = Writer.Context.WriterConfiguration.CultureInfo }, Writer.Context.WriterConfiguration.TypeConverterOptionsCache.GetOptions(memberMap.Data.Member.MemberType()), memberMap.Data.TypeConverterOptions);
+					memberMap.Data.TypeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = Writer.Configuration.CultureInfo }, Writer.Configuration.TypeConverterOptionsCache.GetOptions(memberMap.Data.Member.MemberType()), memberMap.Data.TypeConverterOptions);
 
 					var method = typeof(ITypeConverter).GetMethod(nameof(ITypeConverter.ConvertToString));
 					fieldExpression = Expression.Convert(fieldExpression, typeof(object));

@@ -14,6 +14,8 @@ namespace CsvHelper.Expressions
 	/// </summary>
 	public abstract class RecordWriter
 	{
+		private readonly Dictionary<int, Delegate> typeActions = new Dictionary<int, Delegate>();
+
 		/// <summary>
 		/// Gets the writer.
 		/// </summary>
@@ -69,9 +71,9 @@ namespace CsvHelper.Expressions
 
 			int typeKey = typeKeyName.GetHashCode();
 
-			if (!Writer.Context.TypeActions.TryGetValue(typeKey, out Delegate action))
+			if (!typeActions.TryGetValue(typeKey, out Delegate action))
 			{
-				Writer.Context.TypeActions[typeKey] = action = CreateWriteDelegate(record);
+				typeActions[typeKey] = action = CreateWriteDelegate(record);
 			}
 
 			return (Action<T>)action;

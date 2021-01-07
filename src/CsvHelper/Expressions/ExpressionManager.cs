@@ -319,7 +319,7 @@ namespace CsvHelper.Expressions
 				var isValueType = memberMap.Data.Member.MemberType().GetTypeInfo().IsValueType;
 				var isGenericType = isValueType && memberMap.Data.Member.MemberType().GetTypeInfo().IsGenericType;
 				Type memberType;
-				if (isValueType && !isGenericType && !writer.Context.WriterConfiguration.UseNewObjectForNullReferenceMembers)
+				if (isValueType && !isGenericType && !writer.Configuration.UseNewObjectForNullReferenceMembers)
 				{
 					memberType = typeof(Nullable<>).MakeGenericType(memberMap.Data.Member.MemberType());
 					memberExpression = Expression.Convert(memberExpression, memberType);

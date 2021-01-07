@@ -27,9 +27,33 @@ namespace CsvHelper
 	public class CsvWriter : IWriter
 	{
 		private readonly Lazy<RecordManager> recordManager;
-		private WritingContext context;
+		private readonly ISerializer serializer;
+		private readonly WritingContext context;
+		private readonly IWriterConfiguration configuration;
+		private readonly TypeConverterCache typeConverterCache;
+		private readonly TrimOptions trimOptions;
+		private readonly Func<string, WritingContext, bool> shouldQuote;
+		private readonly MemberMapData reusableMemberMapData = new MemberMapData(null);
+		private readonly List<string> record = new List<string>();
+		private readonly Dictionary<Type, TypeConverterOptions> typeConverterOptionsCache = new Dictionary<Type, TypeConverterOptions>();
+		private readonly string quoteString;
+		private readonly string doubleQuoteString;
+		private readonly char quote;
+		private readonly CultureInfo cultureInfo;
+		private readonly char comment;
+		private readonly bool hasHeaderRecord;
+		private readonly bool includePrivateMembers;
+		private readonly IComparer<string> dynamicPropertySort;
+
 		private bool disposed;
-		private ISerializer serializer;
+		private int row;
+		private bool hasHeaderBeenWritten;
+		private bool hasRecordBeenWritten;
+
+		/// <summary>
+		/// Gets the serializer.
+		/// </summary>
+		public virtual ISerializer Serializer => serializer;
 
 		/// <summary>
 		/// Gets the writing context.
@@ -39,47 +63,47 @@ namespace CsvHelper
 		/// <summary>
 		/// Gets the configuration.
 		/// </summary>
-		public virtual IWriterConfiguration Configuration => context.WriterConfiguration;
+		public virtual IWriterConfiguration Configuration => configuration;
 
 		/// <summary>
-		/// Creates a new CSV writer using the given <see cref="TextWriter" />.
+		/// Initializes a new instance of the <see cref="CsvWriter"/> class.
 		/// </summary>
-		/// <param name="writer">The writer used to write the CSV file.</param>
-		/// <param name="cultureInfo">The culture information.</param>
-		public CsvWriter(TextWriter writer, CultureInfo cultureInfo) : this(new CsvSerializer(writer, new Configuration.CsvConfiguration(cultureInfo), false)) { }
+		/// <param name="writer">The writer.</param>
+		/// <param name="culture">The culture.</param>
+		/// <param name="leaveOpen"><c>true</c> to leave the <see cref="TextWriter"/> open after the <see cref="CsvWriter"/> object is disposed, otherwise <c>false</c>.</param>
+		public CsvWriter(TextWriter writer, CultureInfo culture, bool leaveOpen = false) : this(new CsvSerializer(writer, culture, leaveOpen)) { }
 
 		/// <summary>
-		/// Creates a new CSV writer using the given <see cref="TextWriter" />.
+		/// Initializes a new instance of the <see cref="CsvWriter"/> class.
 		/// </summary>
-		/// <param name="writer">The writer used to write the CSV file.</param>
-		/// <param name="cultureInfo">The culture information.</param>
-		/// <param name="leaveOpen">true to leave the writer open after the CsvWriter object is disposed, otherwise false.</param>
-		public CsvWriter(TextWriter writer, CultureInfo cultureInfo, bool leaveOpen) : this(new CsvSerializer(writer, new Configuration.CsvConfiguration(cultureInfo), leaveOpen)) { }
-
-		/// <summary>
-		/// Creates a new CSV writer using the given <see cref="TextWriter"/>.
-		/// </summary>
-		/// <param name="writer">The <see cref="StreamWriter"/> use to write the CSV file.</param>
+		/// <param name="writer">The writer.</param>
 		/// <param name="configuration">The configuration.</param>
-		public CsvWriter(TextWriter writer, Configuration.CsvConfiguration configuration) : this(new CsvSerializer(writer, configuration, false)) { }
+		public CsvWriter(TextWriter writer, CsvConfiguration configuration) : this(new CsvSerializer(writer, configuration)) { }
 
 		/// <summary>
-		/// Creates a new CSV writer using the given <see cref="TextWriter"/>.
-		/// </summary>
-		/// <param name="writer">The <see cref="StreamWriter"/> use to write the CSV file.</param>
-		/// <param name="configuration">The configuration.</param>
-		/// <param name="leaveOpen">true to leave the writer open after the CsvWriter object is disposed, otherwise false.</param>
-		public CsvWriter(TextWriter writer, Configuration.CsvConfiguration configuration, bool leaveOpen) : this(new CsvSerializer(writer, configuration, leaveOpen)) { }
-
-		/// <summary>
-		/// Creates a new CSV writer using the given <see cref="ISerializer"/>.
+		/// Initializes a new instance of the <see cref="CsvWriter"/> class.
 		/// </summary>
 		/// <param name="serializer">The serializer.</param>
+		/// <exception cref="ConfigurationException">The {nameof(ISerializer)} configuration must implement {nameof(IWriterConfiguration)} to be used in {nameof(CsvWriter)}.</exception>
 		public CsvWriter(ISerializer serializer)
 		{
-			this.serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-			context = serializer.Context as WritingContext ?? throw new InvalidOperationException($"For {nameof(ISerializer)} to be used in {nameof(CsvWriter)}, {nameof(ISerializer.Context)} must also implement {nameof(WritingContext)}.");
+			configuration = serializer.Configuration as IWriterConfiguration ?? throw new ConfigurationException($"The {nameof(ISerializer)} configuration must implement {nameof(IWriterConfiguration)} to be used in {nameof(CsvWriter)}.");
+			this.serializer = serializer;
+			context = serializer.Context ?? throw new InvalidOperationException($"For {nameof(ISerializer)} to be used in {nameof(CsvWriter)}, {nameof(ISerializer.Context)} must also implement {nameof(WritingContext)}.");
+			context.Writer = this;
 			recordManager = new Lazy<RecordManager>(() => ObjectResolver.Current.Resolve<RecordManager>(this));
+
+			comment = configuration.Comment;
+			cultureInfo = configuration.CultureInfo;
+			doubleQuoteString = configuration.DoubleQuoteString;
+			dynamicPropertySort = configuration.DynamicPropertySort;
+			hasHeaderRecord = configuration.HasHeaderRecord;
+			includePrivateMembers = configuration.IncludePrivateMembers;
+			quote = configuration.Quote;
+			quoteString = configuration.QuoteString;
+			shouldQuote = configuration.ShouldQuote;
+			trimOptions = configuration.TrimOptions;
+			typeConverterCache = configuration.TypeConverterCache;
 		}
 
 		/// <summary>
@@ -111,14 +135,14 @@ namespace CsvHelper
 		/// <param name="field">The field to write.</param>
 		public virtual void WriteField(string field)
 		{
-			if (field != null && (context.WriterConfiguration.TrimOptions & TrimOptions.Trim) == TrimOptions.Trim)
+			if (field != null && (trimOptions & TrimOptions.Trim) == TrimOptions.Trim)
 			{
 				field = field.Trim();
 			}
 
-			var shouldQuote = context.WriterConfiguration.ShouldQuote(field, context);
+			var shouldQuoteResult = shouldQuote(field, context);
 
-			WriteField(field, shouldQuote);
+			WriteField(field, shouldQuoteResult);
 		}
 
 		/// <summary>
@@ -138,15 +162,15 @@ namespace CsvHelper
 			// All quotes must be doubled.
 			if (shouldQuote && !string.IsNullOrEmpty(field))
 			{
-				field = field.Replace(context.WriterConfiguration.QuoteString, context.WriterConfiguration.DoubleQuoteString);
+				field = field.Replace(quoteString, doubleQuoteString);
 			}
 
 			if (shouldQuote)
 			{
-				field = context.WriterConfiguration.Quote + field + context.WriterConfiguration.Quote;
+				field = quote + field + quote;
 			}
 
-			context.Record.Add(field);
+			record.Add(field);
 		}
 
 		/// <summary>
@@ -160,7 +184,7 @@ namespace CsvHelper
 		public virtual void WriteField<T>(T field)
 		{
 			var type = field == null ? typeof(string) : field.GetType();
-			var converter = Configuration.TypeConverterCache.GetConverter(type);
+			var converter = typeConverterCache.GetConverter(type);
 			WriteField(field, converter);
 		}
 
@@ -176,16 +200,16 @@ namespace CsvHelper
 		public virtual void WriteField<T>(T field, ITypeConverter converter)
 		{
 			var type = field == null ? typeof(string) : field.GetType();
-			context.ReusableMemberMapData.TypeConverter = converter;
-			if (!context.TypeConverterOptionsCache.TryGetValue(type, out TypeConverterOptions typeConverterOptions))
+			reusableMemberMapData.TypeConverter = converter;
+			if (!typeConverterOptionsCache.TryGetValue(type, out TypeConverterOptions typeConverterOptions))
 			{
-				typeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = context.WriterConfiguration.CultureInfo }, context.WriterConfiguration.TypeConverterOptionsCache.GetOptions(type));
-				context.TypeConverterOptionsCache.Add(type, typeConverterOptions);
+				typeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = cultureInfo }, configuration.TypeConverterOptionsCache.GetOptions(type));
+				typeConverterOptionsCache.Add(type, typeConverterOptions);
 			}
 
-			context.ReusableMemberMapData.TypeConverterOptions = typeConverterOptions;
+			reusableMemberMapData.TypeConverterOptions = typeConverterOptions;
 
-			var fieldString = converter.ConvertToString(field, this, context.ReusableMemberMapData);
+			var fieldString = converter.ConvertToString(field, this, reusableMemberMapData);
 			WriteConvertedField(fieldString);
 		}
 
@@ -201,7 +225,7 @@ namespace CsvHelper
 		/// <param name="field">The field to write.</param>
 		public virtual void WriteField<T, TConverter>(T field)
 		{
-			var converter = Configuration.TypeConverterCache.GetConverter<TConverter>();
+			var converter = typeConverterCache.GetConverter<TConverter>();
 			WriteField(field, converter);
 		}
 
@@ -212,8 +236,8 @@ namespace CsvHelper
 		{
 			// Don't forget about the async method below!
 
-			serializer.Write(context.Record.ToArray());
-			context.Record.Clear();
+			serializer.Write(record.ToArray());
+			record.Clear();
 		}
 
 		/// <summary>
@@ -221,8 +245,8 @@ namespace CsvHelper
 		/// </summary>
 		public virtual async Task FlushAsync()
 		{
-			await serializer.WriteAsync(context.Record.ToArray()).ConfigureAwait(false);
-			context.Record.Clear();
+			await serializer.WriteAsync(record.ToArray()).ConfigureAwait(false);
+			record.Clear();
 		}
 
 		/// <summary>
@@ -237,7 +261,7 @@ namespace CsvHelper
 			{
 				Flush();
 				serializer.WriteLine();
-				context.Row++;
+				row++;
 			}
 			catch (Exception ex)
 			{
@@ -255,7 +279,7 @@ namespace CsvHelper
 			{
 				await FlushAsync().ConfigureAwait(false);
 				await serializer.WriteLineAsync().ConfigureAwait(false);
-				context.Row++;
+				row++;
 			}
 			catch (Exception ex)
 			{
@@ -266,10 +290,10 @@ namespace CsvHelper
 		/// <summary>
 		/// Writes a comment.
 		/// </summary>
-		/// <param name="comment">The comment to write.</param>
-		public virtual void WriteComment(string comment)
+		/// <param name="text">The comment to write.</param>
+		public virtual void WriteComment(string text)
 		{
-			WriteField(context.WriterConfiguration.Comment + comment, false);
+			WriteField(comment + text, false);
 		}
 
 		/// <summary>
@@ -292,28 +316,18 @@ namespace CsvHelper
 				throw new ArgumentNullException(nameof(type));
 			}
 
-			if (!context.WriterConfiguration.HasHeaderRecord)
-			{
-				throw new WriterException(context, "Configuration.HasHeaderRecord is false. This will need to be enabled to write the header.");
-			}
-
-			if (context.HasRecordBeenWritten)
-			{
-				throw new WriterException(context, "Records have already been written. You can't write the header after writing records has started.");
-			}
-
 			if (type == typeof(object))
 			{
 				return;
 			}
 
-			if (context.WriterConfiguration.Maps[type] == null)
+			if (configuration.Maps[type] == null)
 			{
-				context.WriterConfiguration.Maps.Add(context.WriterConfiguration.AutoMap(type));
+				configuration.Maps.Add(configuration.AutoMap(type));
 			}
 
 			var members = new MemberMapCollection();
-			members.AddMembers(context.WriterConfiguration.Maps[type]);
+			members.AddMembers(configuration.Maps[type]);
 
 			foreach (var member in members)
 			{
@@ -334,7 +348,7 @@ namespace CsvHelper
 				}
 			}
 
-			context.HasHeaderBeenWritten = true;
+			hasHeaderBeenWritten = true;
 		}
 
 		/// <summary>
@@ -348,21 +362,11 @@ namespace CsvHelper
 				throw new ArgumentNullException(nameof(record));
 			}
 
-			if (!context.WriterConfiguration.HasHeaderRecord)
-			{
-				throw new WriterException(context, "Configuration.HasHeaderRecord is false. This will need to be enabled to write the header.");
-			}
-
-			if (context.HasRecordBeenWritten)
-			{
-				throw new WriterException(context, "Records have already been written. You can't write the header after writing records has started.");
-			}
-
 			var metaObject = record.GetMetaObject(Expression.Constant(record));
 			var names = metaObject.GetDynamicMemberNames();
-			if (Configuration.DynamicPropertySort != null)
+			if (dynamicPropertySort != null)
 			{
-				names = names.OrderBy(name => name, Configuration.DynamicPropertySort);
+				names = names.OrderBy(name => name, dynamicPropertySort);
 			}
 
 			foreach (var name in names)
@@ -370,7 +374,7 @@ namespace CsvHelper
 				WriteField(name);
 			}
 
-			context.HasHeaderBeenWritten = true;
+			hasHeaderBeenWritten = true;
 		}
 
 		/// <summary>
@@ -382,7 +386,7 @@ namespace CsvHelper
 		{
 			if (record is IDynamicMetaObjectProvider dynamicRecord)
 			{
-				if (context.WriterConfiguration.HasHeaderRecord && !context.HasHeaderBeenWritten)
+				if (hasHeaderRecord && !hasHeaderBeenWritten)
 				{
 					WriteDynamicHeader(dynamicRecord);
 					NextRecord();
@@ -392,7 +396,7 @@ namespace CsvHelper
 			try
 			{
 				recordManager.Value.Write(record);
-				context.HasHeaderBeenWritten = true;
+				hasHeaderBeenWritten = true;
 			}
 			catch (Exception ex)
 			{
@@ -416,7 +420,7 @@ namespace CsvHelper
 
 					if (record is IDynamicMetaObjectProvider dynamicObject)
 					{
-						if (context.WriterConfiguration.HasHeaderRecord && !context.HasHeaderBeenWritten)
+						if (hasHeaderRecord && !hasHeaderBeenWritten)
 						{
 							WriteDynamicHeader(dynamicObject);
 							NextRecord();
@@ -427,7 +431,7 @@ namespace CsvHelper
 						// If records is a List<dynamic>, the header hasn't been written yet.
 						// Write the header based on the record type.
 						var isPrimitive = recordType.GetTypeInfo().IsPrimitive;
-						if (context.WriterConfiguration.HasHeaderRecord && !context.HasHeaderBeenWritten && !isPrimitive)
+						if (hasHeaderRecord && !hasHeaderBeenWritten && !isPrimitive)
 						{
 							WriteHeader(recordType);
 							NextRecord();
@@ -467,10 +471,10 @@ namespace CsvHelper
 				// This is because typeof( T ) = Object.
 				var recordType = typeof(T);
 				var isPrimitive = recordType.GetTypeInfo().IsPrimitive;
-				if (context.WriterConfiguration.HasHeaderRecord && !context.HasHeaderBeenWritten && !isPrimitive && recordType != typeof(object))
+				if (hasHeaderRecord && !hasHeaderBeenWritten && !isPrimitive && recordType != typeof(object))
 				{
 					WriteHeader(recordType);
-					if (context.HasHeaderBeenWritten)
+					if (hasHeaderBeenWritten)
 					{
 						NextRecord();
 					}
@@ -486,7 +490,7 @@ namespace CsvHelper
 
 					if (record is IDynamicMetaObjectProvider dynamicObject)
 					{
-						if (context.WriterConfiguration.HasHeaderRecord && !context.HasHeaderBeenWritten)
+						if (hasHeaderRecord && !hasHeaderBeenWritten)
 						{
 							WriteDynamicHeader(dynamicObject);
 							NextRecord();
@@ -497,7 +501,7 @@ namespace CsvHelper
 						// If records is a List<dynamic>, the header hasn't been written yet.
 						// Write the header based on the record type.
 						isPrimitive = recordType.GetTypeInfo().IsPrimitive;
-						if (context.WriterConfiguration.HasHeaderRecord && !context.HasHeaderBeenWritten && !isPrimitive)
+						if (hasHeaderRecord && !hasHeaderBeenWritten && !isPrimitive)
 						{
 							WriteHeader(recordType);
 							NextRecord();
@@ -538,7 +542,7 @@ namespace CsvHelper
 
 					if (record is IDynamicMetaObjectProvider dynamicObject)
 					{
-						if (context.WriterConfiguration.HasHeaderRecord && !context.HasHeaderBeenWritten)
+						if (hasHeaderRecord && !hasHeaderBeenWritten)
 						{
 							WriteDynamicHeader(dynamicObject);
 							await NextRecordAsync().ConfigureAwait(false);
@@ -549,7 +553,7 @@ namespace CsvHelper
 						// If records is a List<dynamic>, the header hasn't been written yet.
 						// Write the header based on the record type.
 						var isPrimitive = recordType.GetTypeInfo().IsPrimitive;
-						if (context.WriterConfiguration.HasHeaderRecord && !context.HasHeaderBeenWritten && !isPrimitive)
+						if (hasHeaderRecord && !hasHeaderBeenWritten && !isPrimitive)
 						{
 							WriteHeader(recordType);
 							await NextRecordAsync().ConfigureAwait(false);
@@ -589,10 +593,10 @@ namespace CsvHelper
 				// This is because typeof( T ) = Object.
 				var recordType = typeof(T);
 				var isPrimitive = recordType.GetTypeInfo().IsPrimitive;
-				if (context.WriterConfiguration.HasHeaderRecord && !context.HasHeaderBeenWritten && !isPrimitive && recordType != typeof(object))
+				if (hasHeaderRecord && !hasHeaderBeenWritten && !isPrimitive && recordType != typeof(object))
 				{
 					WriteHeader(recordType);
-					if (context.HasHeaderBeenWritten)
+					if (hasHeaderBeenWritten)
 					{
 						await NextRecordAsync().ConfigureAwait(false);
 					}
@@ -608,7 +612,7 @@ namespace CsvHelper
 
 					if (record is IDynamicMetaObjectProvider dynamicObject)
 					{
-						if (context.WriterConfiguration.HasHeaderRecord && !context.HasHeaderBeenWritten)
+						if (hasHeaderRecord && !hasHeaderBeenWritten)
 						{
 							WriteDynamicHeader(dynamicObject);
 							await NextRecordAsync().ConfigureAwait(false);
@@ -619,7 +623,7 @@ namespace CsvHelper
 						// If records is a List<dynamic>, the header hasn't been written yet.
 						// Write the header based on the record type.
 						isPrimitive = recordType.GetTypeInfo().IsPrimitive;
-						if (context.WriterConfiguration.HasHeaderRecord && !context.HasHeaderBeenWritten && !isPrimitive)
+						if (hasHeaderRecord && !hasHeaderBeenWritten && !isPrimitive)
 						{
 							WriteHeader(recordType);
 							await NextRecordAsync().ConfigureAwait(false);
@@ -661,7 +665,7 @@ namespace CsvHelper
 				cantWrite = cantWrite ||
 				// Properties that don't have a public getter
 				// and we are honoring the accessor modifier.
-				property.GetGetMethod() == null && !context.WriterConfiguration.IncludePrivateMembers ||
+				property.GetGetMethod() == null && !includePrivateMembers ||
 				// Properties that don't have a getter at all.
 				property.GetGetMethod(true) == null;
 			}
@@ -693,7 +697,7 @@ namespace CsvHelper
 		/// <filterpriority>2</filterpriority>
 		public void Dispose()
 		{
-			Dispose(!context?.LeaveOpen ?? true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
@@ -715,19 +719,17 @@ namespace CsvHelper
 				serializer?.Dispose();
 			}
 
-			serializer = null;
-			context = null;
 			disposed = true;
 		}
 
-#if NET47 || NETSTANDARD
+#if !NET45
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		/// <filterpriority>2</filterpriority>
 		public async ValueTask DisposeAsync()
 		{
-			await DisposeAsync(!context?.LeaveOpen ?? true).ConfigureAwait(false);
+			await DisposeAsync(true).ConfigureAwait(false);
 			GC.SuppressFinalize(this);
 		}
 
@@ -749,8 +751,6 @@ namespace CsvHelper
 				await serializer.DisposeAsync().ConfigureAwait(false);
 			}
 
-			serializer = null;
-			context = null;
 			disposed = true;
 		}
 #endif

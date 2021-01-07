@@ -194,7 +194,7 @@ namespace CsvHelper
 		/// </returns>
 		public long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length)
 		{
-			var chars = csv.GetField(i).ToArray();
+			var chars = csv.GetField(i).ToCharArray();
 
 			Array.Copy(chars, fieldoffset, buffer, bufferoffset, length);
 
