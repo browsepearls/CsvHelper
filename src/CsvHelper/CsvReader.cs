@@ -276,7 +276,7 @@ namespace CsvHelper
 		/// <returns>True if there are more records, otherwise false.</returns>
 		public virtual async Task<bool> ReadAsync()
 		{
-			while (parser.Read() && Configuration.ShouldSkipRecord(parser.Record)) { }
+			while (await parser.ReadAsync() && Configuration.ShouldSkipRecord(parser.Record)) { }
 
 			record = parser.Record;
 
