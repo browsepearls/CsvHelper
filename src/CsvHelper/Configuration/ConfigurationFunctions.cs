@@ -197,7 +197,7 @@ namespace CsvHelper.Configuration
 
 			if ((options.TrimOptions & TrimOptions.Trim) == TrimOptions.Trim)
 			{
-				span = Trim(span, options.WhiteSpaceChars);
+				span = ArrayHelper.Trim(span, options.WhiteSpaceChars);
 			}
 
 			return span;
@@ -321,59 +321,10 @@ namespace CsvHelper.Configuration
 
 			if ((options.TrimOptions & TrimOptions.InsideQuotes) == TrimOptions.InsideQuotes)
 			{
-				span = Trim(span, options.WhiteSpaceChars);
+				span = ArrayHelper.Trim(span, options.WhiteSpaceChars);
 			}
 
 			return span;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private static Span<char> Trim(Span<char> span, params char[] trimChars)
-		{
-			var start = 0;
-			var end = span.Length - 1;
-
-			// Trim start.
-			for (var i = start; i <= end; i++)
-			{
-				if (ArrayContains(trimChars, span[i]))
-				{
-					start++;
-				}
-				else
-				{
-					break;
-				}
-			}
-
-			// Trim end.
-			for (var i = end; i >= start; i--)
-			{
-				if (ArrayContains(trimChars, span[i]))
-				{
-					end--;
-				}
-				else
-				{
-					break;
-				}
-			}
-
-			return span.Slice(start, end - start + 1);
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private static bool ArrayContains(char[] array, char c)
-		{
-			for (var i = 0; i < array.Length; i++)
-			{
-				if (array[i] == c)
-				{
-					return true;
-				}
-			}
-
-			return false;
 		}
 
 		[DebuggerDisplay("Start = {Start}, Length = {Length}")]
