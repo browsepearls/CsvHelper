@@ -31,7 +31,7 @@ namespace CsvHelper.Tests.Reading
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<ValidateMap>();
+				csv.Context.RegisterClassMap<ValidateMap>();
 				Assert.ThrowsException<FieldValidationException>(() => csv.GetRecords<Test>().ToList());
 			}
 		}
@@ -54,7 +54,7 @@ namespace CsvHelper.Tests.Reading
 				stream.Position = 0;
 
 				var logger = new StringBuilder();
-				csv.Configuration.RegisterClassMap(new LogInsteadMap(logger));
+				csv.Context.RegisterClassMap(new LogInsteadMap(logger));
 				csv.GetRecords<Test>().ToList();
 
 				var expected = new StringBuilder();
@@ -81,7 +81,7 @@ namespace CsvHelper.Tests.Reading
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<CustomExceptionMap>();
+				csv.Context.RegisterClassMap<CustomExceptionMap>();
 				Assert.ThrowsException<CustomException>(() => csv.GetRecords<Test>().ToList());
 			}
 		}

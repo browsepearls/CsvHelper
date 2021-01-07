@@ -24,18 +24,7 @@ namespace CsvHelper.Configuration
 		private char quote = '"';
 		private string quoteString = "\"";
 		private string doubleQuoteString = "\"\"";
-		private readonly ClassMapCollection maps;
 		private NewLine newLine;
-
-		/// <summary>
-		/// Gets or sets the <see cref="TypeConverterOptionsCache"/>.
-		/// </summary>
-		public virtual TypeConverterOptionsCache TypeConverterOptionsCache { get; init; } = new TypeConverterOptionsCache();
-
-		/// <summary>
-		/// Gets or sets the <see cref="TypeConverterOptionsCache"/>.
-		/// </summary>
-		public virtual TypeConverterCache TypeConverterCache { get; init; } = new TypeConverterCache();
 
 		/// <summary>
 		/// Gets a value indicating whether to leave the <see cref="TextReader"/> open after the <see cref="CsvReader"/> object is disposed.
@@ -58,7 +47,7 @@ namespace CsvHelper.Configuration
 		/// You can supply your own function to do other things like logging the issue instead of throwing an exception.
 		/// Arguments: (isValid, headerNames, headerNameIndex, context)
 		/// </summary>
-		public virtual Action<InvalidHeader[], ReadingContext> HeaderValidated { get; init; } = ConfigurationFunctions.HeaderValidated;
+		public virtual Action<InvalidHeader[], CsvContext> HeaderValidated { get; init; } = ConfigurationFunctions.HeaderValidated;
 
 		/// <summary>
 		/// Gets or sets the function that is called when a missing field is found. The default function will
@@ -66,7 +55,7 @@ namespace CsvHelper.Configuration
 		/// like logging the issue instead of throwing an exception.
 		/// Arguments: (headerNames, index, context)
 		/// </summary>
-		public virtual Action<string[], int, ReadingContext> MissingFieldFound { get; init; } = ConfigurationFunctions.MissingFieldFound;
+		public virtual Action<string[], int, CsvContext> MissingFieldFound { get; init; } = ConfigurationFunctions.MissingFieldFound;
 
 		/// <summary>
 		/// Gets or sets the function that is called when bad field data is found. A field
@@ -75,7 +64,7 @@ namespace CsvHelper.Configuration
 		/// instead of throwing an exception.
 		/// Arguments: context
 		/// </summary>
-		public virtual Action<ReadingContext> BadDataFound { get; init; } = ConfigurationFunctions.BadDataFound;
+		public virtual Action<CsvContext> BadDataFound { get; init; } = ConfigurationFunctions.BadDataFound;
 
 		/// <summary>
 		/// Gets or sets the function that is called when a reading exception occurs.
@@ -161,7 +150,7 @@ namespace CsvHelper.Configuration
 		/// Gets the name to use for the property of the dynamic object.
 		/// Arguments: (readingContext, fieldIndex)
 		/// </summary>
-		public virtual Func<ReadingContext, int, string> GetDynamicPropertyName { get; init; } = ConfigurationFunctions.GetDynamicPropertyName;
+		public virtual Func<CsvContext, int, string> GetDynamicPropertyName { get; init; } = ConfigurationFunctions.GetDynamicPropertyName;
 
 		/// <summary>
 		/// Processes a raw field.
@@ -318,7 +307,7 @@ namespace CsvHelper.Configuration
 		/// when writing.
 		/// Arguments: field, context
 		/// </summary>
-		public Func<string, WritingContext, bool> ShouldQuote { get; init; } = ConfigurationFunctions.ShouldQuote;
+		public Func<string, CsvContext, bool> ShouldQuote { get; init; } = ConfigurationFunctions.ShouldQuote;
 
 		/// <summary>
 		/// Gets or sets the character used to denote
@@ -392,11 +381,6 @@ namespace CsvHelper.Configuration
 		public virtual Func<Type, string, string> ReferenceHeaderPrefix { get; init; }
 
 		/// <summary>
-		/// The configured <see cref="ClassMap"/>s.
-		/// </summary>
-		public virtual ClassMapCollection Maps => maps;
-
-		/// <summary>
 		/// Gets or sets the newline to use when writing.
 		/// </summary>
 		public virtual NewLine NewLine
@@ -448,113 +432,9 @@ namespace CsvHelper.Configuration
 		/// <param name="cultureInfo">The culture information.</param>
 		public CsvConfiguration(CultureInfo cultureInfo)
 		{
-			maps = new ClassMapCollection(this);
 			CultureInfo = cultureInfo;
 			delimiter = cultureInfo.TextInfo.ListSeparator;
 			NewLine = cultureInfo == CultureInfo.InvariantCulture ? NewLine.CRLF : NewLine.Environment;
-		}
-
-		/// <summary>
-		/// Use a <see cref="ClassMap{T}" /> to configure mappings.
-		/// When using a class map, no members are mapped by default.
-		/// Only member specified in the mapping are used.
-		/// </summary>
-		/// <typeparam name="TMap">The type of mapping class to use.</typeparam>
-		public virtual TMap RegisterClassMap<TMap>() where TMap : ClassMap
-		{
-			var map = ObjectResolver.Current.Resolve<TMap>();
-			RegisterClassMap(map);
-
-			return map;
-		}
-
-		/// <summary>
-		/// Use a <see cref="ClassMap{T}" /> to configure mappings.
-		/// When using a class map, no members are mapped by default.
-		/// Only members specified in the mapping are used.
-		/// </summary>
-		/// <param name="classMapType">The type of mapping class to use.</param>
-		public virtual ClassMap RegisterClassMap(Type classMapType)
-		{
-			if (!typeof(ClassMap).IsAssignableFrom(classMapType))
-			{
-				throw new ArgumentException("The class map type must inherit from CsvClassMap.");
-			}
-
-			var map = (ClassMap)ObjectResolver.Current.Resolve(classMapType);
-			RegisterClassMap(map);
-
-			return map;
-		}
-
-		/// <summary>
-		/// Registers the class map.
-		/// </summary>
-		/// <param name="map">The class map to register.</param>
-		public virtual void RegisterClassMap(ClassMap map)
-		{
-			if (map.MemberMaps.Count == 0 && map.ReferenceMaps.Count == 0 && map.ParameterMaps.Count == 0)
-			{
-				throw new ConfigurationException("No mappings were specified in the CsvClassMap.");
-			}
-
-			Maps.Add(map);
-		}
-
-		/// <summary>
-		/// Unregisters the class map.
-		/// </summary>
-		/// <typeparam name="TMap">The map type to unregister.</typeparam>
-		public virtual void UnregisterClassMap<TMap>()
-			where TMap : ClassMap
-		{
-			UnregisterClassMap(typeof(TMap));
-		}
-
-		/// <summary>
-		/// Unregisters the class map.
-		/// </summary>
-		/// <param name="classMapType">The map type to unregister.</param>
-		public virtual void UnregisterClassMap(Type classMapType)
-		{
-			maps.Remove(classMapType);
-		}
-
-		/// <summary>
-		/// Unregisters all class maps.
-		/// </summary>
-		public virtual void UnregisterClassMap()
-		{
-			maps.Clear();
-		}
-
-		/// <summary>
-		/// Generates a <see cref="ClassMap"/> for the type.
-		/// </summary>
-		/// <typeparam name="T">The type to generate the map for.</typeparam>
-		/// <returns>The generate map.</returns>
-		public virtual ClassMap<T> AutoMap<T>()
-		{
-			var map = ObjectResolver.Current.Resolve<DefaultClassMap<T>>();
-			map.AutoMap(this);
-			maps.Add(map);
-
-			return map;
-		}
-
-		/// <summary>
-		/// Generates a <see cref="ClassMap"/> for the type.
-		/// </summary>
-		/// <param name="type">The type to generate for the map.</param>
-		/// <returns>The generate map.</returns>
-		public virtual ClassMap AutoMap(Type type)
-		{
-			var mapType = typeof(DefaultClassMap<>).MakeGenericType(type);
-			var map = (ClassMap)ObjectResolver.Current.Resolve(mapType);
-			map.AutoMap(this);
-			maps.Add(map);
-
-			return map;
 		}
 	}
 }

@@ -30,7 +30,7 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add(string.Empty);
+				csv.Context.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add(string.Empty);
 				var records = csv.GetRecords<Test>().ToList();
 
 				Assert.IsNull(records[0].Id);
@@ -54,7 +54,7 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestMap>();
+				csv.Context.RegisterClassMap<TestMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
 				Assert.IsNull(records[0].Id);
@@ -78,8 +78,8 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add("null");
-				csv.Configuration.RegisterClassMap<TestMap>();
+				csv.Context.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add("null");
+				csv.Context.RegisterClassMap<TestMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
 				Assert.IsNull(records[0].Id);

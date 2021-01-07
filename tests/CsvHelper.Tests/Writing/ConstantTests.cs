@@ -28,7 +28,7 @@ namespace CsvHelper.Tests.Writing
 					new Test { Id = 2, Name = "two" }
 				};
 
-				csv.Configuration.RegisterClassMap<TestStringMap>();
+				csv.Context.RegisterClassMap<TestStringMap>();
 				csv.WriteRecords(records);
 				writer.Flush();
 				stream.Position = 0;
@@ -59,7 +59,7 @@ namespace CsvHelper.Tests.Writing
 					new Test { Id = 1, Name = "one" },
 				};
 
-				csv.Configuration.RegisterClassMap<TestNullMap>();
+				csv.Context.RegisterClassMap<TestNullMap>();
 				csv.WriteRecords(records);
 				writer.Flush();
 
@@ -83,7 +83,7 @@ namespace CsvHelper.Tests.Writing
 					new Test { Id = 1, Name = "one" },
 				};
 
-				csv.Configuration.RegisterClassMap<TestIntMap>();
+				csv.Context.RegisterClassMap<TestIntMap>();
 				csv.WriteRecords(records);
 				writer.Flush();
 

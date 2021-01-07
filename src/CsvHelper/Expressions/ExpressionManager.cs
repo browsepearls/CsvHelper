@@ -368,7 +368,7 @@ namespace CsvHelper.Expressions
 		/// <param name="fieldExpression">The field expression.</param>
 		public virtual Expression CreateTypeConverterExpression(MemberMap memberMap, Expression fieldExpression)
 		{
-			memberMap.Data.TypeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = reader.Configuration.CultureInfo }, reader.Configuration.TypeConverterOptionsCache.GetOptions(memberMap.Data.Member.MemberType()), memberMap.Data.TypeConverterOptions);
+			memberMap.Data.TypeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = reader.Configuration.CultureInfo }, reader.Context.TypeConverterOptionsCache.GetOptions(memberMap.Data.Member.MemberType()), memberMap.Data.TypeConverterOptions);
 
 			Expression typeConverterFieldExpression = Expression.Call(Expression.Constant(memberMap.Data.TypeConverter), nameof(ITypeConverter.ConvertFromString), null, fieldExpression, Expression.Constant(reader), Expression.Constant(memberMap.Data));
 			typeConverterFieldExpression = Expression.Convert(typeConverterFieldExpression, memberMap.Data.Member.MemberType());
@@ -386,7 +386,7 @@ namespace CsvHelper.Expressions
 			parameterMap.Data.TypeConverterOptions = TypeConverterOptions.Merge
 			(
 				new TypeConverterOptions { CultureInfo = reader.Configuration.CultureInfo },
-				reader.Configuration.TypeConverterOptionsCache.GetOptions(parameterMap.Data.Parameter.ParameterType),
+				reader.Context.TypeConverterOptionsCache.GetOptions(parameterMap.Data.Parameter.ParameterType),
 				parameterMap.Data.TypeConverterOptions
 			);
 

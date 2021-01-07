@@ -35,7 +35,7 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestIndexMap>();
+				csv.Context.RegisterClassMap<TestIndexMap>();
 
 				try
 				{
@@ -67,7 +67,7 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestIndexMap>();
+				csv.Context.RegisterClassMap<TestIndexMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
 				var list = records[0].Dictionary;
@@ -92,7 +92,7 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestDefaultMap>();
+				csv.Context.RegisterClassMap<TestDefaultMap>();
 
 				try
 				{
@@ -119,7 +119,7 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestNamedMap>();
+				csv.Context.RegisterClassMap<TestNamedMap>();
 				try
 				{
 					var records = csv.GetRecords<Test>().ToList();
@@ -145,7 +145,7 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestNamedMap>();
+				csv.Context.RegisterClassMap<TestNamedMap>();
 				try
 				{
 					var records = csv.GetRecords<Test>().ToList();

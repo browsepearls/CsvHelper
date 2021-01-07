@@ -174,7 +174,7 @@ namespace CsvHelper.Tests.Reading
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestMap>();
+				csv.Context.RegisterClassMap<TestMap>();
 				var records = csv.GetRecords<Test>().ToList();
 				Assert.AreEqual(1, missingFieldExceptionCount);
 				Assert.AreEqual(1, columnCountChangeExceptionCount);

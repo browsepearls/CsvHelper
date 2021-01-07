@@ -16,12 +16,13 @@ namespace CsvHelper.Tests.Configuration
 		{
 			var parentMap = new ParentMap();
 			var childMap = new ChildMap();
-			var c = new ClassMapCollection( new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture) );
-			c.Add( parentMap );
-			c.Add( childMap );
+			var context = new CsvContext(new CsvConfiguration(CultureInfo.InvariantCulture));
+			var c = new ClassMapCollection(context);
+			c.Add(parentMap);
+			c.Add(childMap);
 
-			var map = c[typeof( Child )];
-			Assert.AreEqual( childMap, map );
+			var map = c[typeof(Child)];
+			Assert.AreEqual(childMap, map);
 		}
 
 		private class Parent { }

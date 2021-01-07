@@ -20,7 +20,7 @@ namespace CsvHelper.Tests.AttributeMapping
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
 				var records = csv.GetRecords<FormatTestClass>().ToList();
-				var actual = csv.Configuration.Maps.Find<FormatTestClass>().MemberMaps[1].Data.TypeConverterOptions.Formats[0];
+				var actual = csv.Context.Maps.Find<FormatTestClass>().MemberMaps[1].Data.TypeConverterOptions.Formats[0];
 
 				Assert.AreEqual("abc", actual);
 			}

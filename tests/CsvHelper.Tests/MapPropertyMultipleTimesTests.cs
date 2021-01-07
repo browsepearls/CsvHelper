@@ -28,7 +28,7 @@ namespace CsvHelper.Tests
 					new Test { Id = 1, Name = "one" }
 				};
 
-				csv.Configuration.RegisterClassMap<TestMap>();
+				csv.Context.RegisterClassMap<TestMap>();
 				csv.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;
@@ -59,7 +59,7 @@ namespace CsvHelper.Tests
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestMap>();
+				csv.Context.RegisterClassMap<TestMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
 				Assert.AreEqual(2, records[0].Id);

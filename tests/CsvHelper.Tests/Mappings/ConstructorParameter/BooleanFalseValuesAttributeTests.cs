@@ -18,7 +18,8 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 		public void AutoMap_WithBooleanFalseValuesAttribute_CreatesParameterMaps()
 		{
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture);
-			var map = config.AutoMap<Foo>();
+			var context = new CsvContext(config);
+			var map = context.AutoMap<Foo>();
 
 			Assert.AreEqual(2, map.ParameterMaps.Count);
 			Assert.AreEqual(0, map.ParameterMaps[0].Data.TypeConverterOptions.BooleanTrueValues.Count);

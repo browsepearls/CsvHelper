@@ -21,7 +21,7 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.RegisterClassMap<AMap>();
+				csv.Context.RegisterClassMap<AMap>();
 
 				writer.WriteLine("AId,BId,CId,DId");
 				writer.WriteLine("a1,b1,c1,d1");

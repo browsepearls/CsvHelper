@@ -32,7 +32,7 @@ namespace CsvHelper.Tests.Mappings
 				var member = type.GetProperty("AId");
 				map.Map(type, member).Constant(4);
 
-				csv.Configuration.RegisterClassMap(map);
+				csv.Context.RegisterClassMap(map);
 				var records = csv.GetRecords<A>().ToList();
 
 				Assert.AreEqual(4, records[0].AId);
@@ -57,7 +57,7 @@ namespace CsvHelper.Tests.Mappings
 				var member = type.GetProperty("AId");
 				map.Map(type, member).Default(4);
 
-				csv.Configuration.RegisterClassMap(map);
+				csv.Context.RegisterClassMap(map);
 				var records = csv.GetRecords<A>().ToList();
 
 				Assert.AreEqual(4, records[0].AId);

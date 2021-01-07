@@ -175,7 +175,7 @@ namespace CsvHelper.Tests
 			data.AppendLine("1");
 			using (var csv = new CsvReader(new StringReader(data.ToString()), CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.RegisterClassMap<HasIgnoredPropertyMap>();
+				csv.Context.RegisterClassMap<HasIgnoredPropertyMap>();
 				var records = csv.GetRecords<Test>().ToList();
 				var record = records[0];
 				Assert.AreEqual(1, record.Id);
@@ -188,7 +188,7 @@ namespace CsvHelper.Tests
 		{
 			using (var csv = new CsvReader(new StringReader("Id"), CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.RegisterClassMap<HasIndexNoNameMap>();
+				csv.Context.RegisterClassMap<HasIndexNoNameMap>();
 
 				csv.Read();
 				csv.ReadHeader();
@@ -201,7 +201,7 @@ namespace CsvHelper.Tests
 		{
 			using (var csv = new CsvReader(new StringReader("Id"), CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.RegisterClassMap<HasIndexAndNameMap>();
+				csv.Context.RegisterClassMap<HasIndexAndNameMap>();
 
 				csv.Read();
 				csv.ReadHeader();

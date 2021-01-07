@@ -17,8 +17,8 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 		[TestMethod]
 		public void AutoMap_WithNameAttributes_ConfiguresParameterMaps()
 		{
-			var config = new CsvConfiguration(CultureInfo.InvariantCulture);
-			var map = config.AutoMap<Foo>();
+			var context = new CsvContext(new CsvConfiguration(CultureInfo.InvariantCulture));
+			var map = context.AutoMap<Foo>();
 
 			Assert.AreEqual(2, map.ParameterMaps.Count);
 			Assert.AreEqual(0, map.ParameterMaps[0].Data.NameIndex);

@@ -20,7 +20,7 @@ namespace CsvHelper.Tests.Mappings
 			using (var reader = new StreamReader(stream))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				Assert.ThrowsException<MissingMethodException>(() => csv.Configuration.RegisterClassMap<TestMap>());
+				Assert.ThrowsException<MissingMethodException>(() => csv.Context.RegisterClassMap<TestMap>());
 			}
 		}
 

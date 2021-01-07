@@ -28,7 +28,7 @@ namespace CsvHelper.Tests.TypeConversion
 				null
 			};
 			var csv = new CsvReader(parserMock);
-			csv.Configuration.RegisterClassMap<TestMap>();
+			csv.Context.RegisterClassMap<TestMap>();
 			var list = csv.GetRecords<Test>().ToList();
 		}
 

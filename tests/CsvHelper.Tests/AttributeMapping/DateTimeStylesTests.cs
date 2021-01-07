@@ -20,7 +20,7 @@ namespace CsvHelper.Tests.AttributeMapping
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
 				var records = csv.GetRecords<DateTimeStylesTestClass>().ToList();
-				var actual = csv.Configuration.Maps.Find<DateTimeStylesTestClass>().MemberMaps[1].Data.TypeConverterOptions.DateTimeStyle;
+				var actual = csv.Context.Maps.Find<DateTimeStylesTestClass>().MemberMaps[1].Data.TypeConverterOptions.DateTimeStyle;
 
 				Assert.AreEqual(DateTimeStyles.AdjustToUniversal, actual);
 			}

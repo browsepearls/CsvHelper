@@ -28,7 +28,7 @@ namespace CsvHelper.Tests.Writing
 			using (var writer = new StringWriter())
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.RegisterClassMap<FooMap>();
+				csv.Context.RegisterClassMap<FooMap>();
 				csv.WriteRecords(records);
 
 				Assert.AreEqual("\r\n\r\n", writer.ToString());

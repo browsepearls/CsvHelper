@@ -26,7 +26,7 @@ namespace CsvHelper.Tests.DataTableTests
 			using (var reader = new StringReader(s.ToString()))
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add("null");
+				csv.Context.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add("null");
 				var dataReader = new CsvDataReader(csv);
 				dataReader.Read();
 
@@ -200,7 +200,7 @@ namespace CsvHelper.Tests.DataTableTests
 			using (var reader = new StringReader(s.ToString()))
 			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add("null");
+				csv.Context.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add("null");
 
 				var dataReader = new CsvDataReader(csv);
 				Assert.IsFalse(dataReader.IsDBNull(0));
@@ -220,7 +220,7 @@ namespace CsvHelper.Tests.DataTableTests
 			using (var reader = new StringReader(s.ToString()))
 			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add("null");
+				csv.Context.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add("null");
 
 				var dataReader = new CsvDataReader(csv);
 				Assert.AreEqual(string.Empty, dataReader.GetValue(0));

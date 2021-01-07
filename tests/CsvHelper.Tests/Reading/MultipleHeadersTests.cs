@@ -58,8 +58,8 @@ namespace CsvHelper.Tests.Reading
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<AlphaMap>();
-				csv.Configuration.RegisterClassMap<OmegaMap>();
+				csv.Context.RegisterClassMap<AlphaMap>();
+				csv.Context.RegisterClassMap<OmegaMap>();
 
 				csv.Read();
 				csv.ReadHeader();

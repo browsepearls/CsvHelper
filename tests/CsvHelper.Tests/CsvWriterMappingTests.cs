@@ -28,7 +28,7 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csvWriter.Configuration.RegisterClassMap<MultipleNamesClassMap>();
+				csvWriter.Context.RegisterClassMap<MultipleNamesClassMap>();
 				csvWriter.WriteRecords(records);
 
 				writer.Flush();
@@ -63,7 +63,7 @@ namespace CsvHelper.Tests
 						Name3 = "3"
 					}
 				};
-				csv.Configuration.RegisterClassMap<SameNameMultipleTimesClassMap>();
+				csv.Context.RegisterClassMap<SameNameMultipleTimesClassMap>();
 				csv.WriteRecords(records);
 				writer.Flush();
 				stream.Position = 0;
@@ -92,7 +92,7 @@ namespace CsvHelper.Tests
 					new TestClass { IntColumn = 1 }
 				};
 
-				csv.Configuration.RegisterClassMap<ConvertUsingMap>();
+				csv.Context.RegisterClassMap<ConvertUsingMap>();
 				csv.WriteRecords(records);
 				writer.Flush();
 				stream.Position = 0;
@@ -121,7 +121,7 @@ namespace CsvHelper.Tests
 					new TestClass { IntColumn = 1 }
 				};
 
-				csv.Configuration.RegisterClassMap<ConvertUsingBlockMap>();
+				csv.Context.RegisterClassMap<ConvertUsingBlockMap>();
 				csv.WriteRecords(records);
 				writer.Flush();
 				stream.Position = 0;
@@ -150,7 +150,7 @@ namespace CsvHelper.Tests
 					new TestClass { IntColumn = 1 }
 				};
 
-				csv.Configuration.RegisterClassMap<ConvertUsingConstantMap>();
+				csv.Context.RegisterClassMap<ConvertUsingConstantMap>();
 				csv.WriteRecords(records);
 				writer.Flush();
 				stream.Position = 0;
@@ -181,7 +181,7 @@ namespace CsvHelper.Tests
 					new MultipleNamesClass { IntColumn = 1, StringColumn = "test" }
 				};
 
-				csv.Configuration.RegisterClassMap<ConvertUsingNullMap>();
+				csv.Context.RegisterClassMap<ConvertUsingNullMap>();
 				csv.WriteRecords(records);
 				writer.Flush();
 				stream.Position = 0;

@@ -13,12 +13,15 @@ namespace CsvHelper
 	/// </summary>
 	public interface IWriterRow
 	{
+		/// <summary>
+		/// Gets the serializer.
+		/// </summary>
 		ISerializer Serializer { get; }
 
 		/// <summary>
 		/// Gets the writing context.
 		/// </summary>
-		WritingContext Context { get; }
+		CsvContext Context { get; }
 
 		/// <summary>
 		/// Gets or sets the configuration.

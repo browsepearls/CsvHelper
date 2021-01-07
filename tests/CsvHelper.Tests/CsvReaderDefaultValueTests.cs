@@ -28,7 +28,7 @@ namespace CsvHelper.Tests
 				writer.Flush();
 				stream.Position = 0;
 
-				csvReader.Configuration.RegisterClassMap<TestMap>();
+				csvReader.Context.RegisterClassMap<TestMap>();
 
 				var records = csvReader.GetRecords<Test>().ToList();
 
@@ -58,7 +58,7 @@ namespace CsvHelper.Tests
 				writer.Flush();
 				stream.Position = 0;
 
-				csvReader.Configuration.RegisterClassMap<TestStringMap>();
+				csvReader.Context.RegisterClassMap<TestStringMap>();
 
 				var records = csvReader.GetRecords<Test>().ToList();
 

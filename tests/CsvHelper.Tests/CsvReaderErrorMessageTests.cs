@@ -35,7 +35,7 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var csvReader = new CsvReader(reader, config))
 			{
-				csvReader.Configuration.RegisterClassMap<Test1Map>();
+				csvReader.Context.RegisterClassMap<Test1Map>();
 				writer.WriteLine(",one");
 				writer.WriteLine("2,two");
 				writer.Flush();
@@ -48,8 +48,8 @@ namespace CsvHelper.Tests
 				}
 				catch (TypeConverterException ex)
 				{
-					Assert.AreEqual(1, ex.ReadingContext.Parser.Row);
-					Assert.AreEqual(0, ex.ReadingContext.Reader.CurrentIndex);
+					Assert.AreEqual(1, ex.Context.Parser.Row);
+					Assert.AreEqual(0, ex.Context.Reader.CurrentIndex);
 				}
 			}
 		}
@@ -66,7 +66,7 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var csvReader = new CsvReader(reader, config))
 			{
-				csvReader.Configuration.RegisterClassMap<Test1Map>();
+				csvReader.Context.RegisterClassMap<Test1Map>();
 				writer.WriteLine("IntColumn,StringColumn");
 				writer.WriteLine("1,one");
 				writer.WriteLine(",two");
@@ -80,8 +80,8 @@ namespace CsvHelper.Tests
 				}
 				catch (TypeConverterException ex)
 				{
-					Assert.AreEqual(3, ex.ReadingContext.Parser.Row);
-					Assert.AreEqual(0, ex.ReadingContext.Reader.CurrentIndex);
+					Assert.AreEqual(3, ex.Context.Parser.Row);
+					Assert.AreEqual(0, ex.Context.Reader.CurrentIndex);
 				}
 			}
 		}
@@ -98,7 +98,7 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var csvReader = new CsvReader(reader, config))
 			{
-				csvReader.Configuration.RegisterClassMap<Test1Map>();
+				csvReader.Context.RegisterClassMap<Test1Map>();
 				writer.WriteLine("IntColumn,StringColumn");
 				writer.WriteLine("# comment");
 				writer.WriteLine();
@@ -114,8 +114,8 @@ namespace CsvHelper.Tests
 				}
 				catch (TypeConverterException ex)
 				{
-					Assert.AreEqual(4, ex.ReadingContext.Parser.Row);
-					Assert.AreEqual(0, ex.ReadingContext.Reader.CurrentIndex);
+					Assert.AreEqual(4, ex.Context.Parser.Row);
+					Assert.AreEqual(0, ex.Context.Reader.CurrentIndex);
 				}
 			}
 		}
@@ -128,7 +128,7 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csvReader.Configuration.RegisterClassMap<Test1Map>();
+				csvReader.Context.RegisterClassMap<Test1Map>();
 				writer.WriteLine("IntColumn,StringColumn");
 				writer.WriteLine();
 				writer.WriteLine("one,one");
@@ -143,8 +143,8 @@ namespace CsvHelper.Tests
 				}
 				catch (TypeConverterException ex)
 				{
-					Assert.AreEqual(3, ex.ReadingContext.Parser.Row);
-					Assert.AreEqual(0, ex.ReadingContext.Reader.CurrentIndex);
+					Assert.AreEqual(3, ex.Context.Parser.Row);
+					Assert.AreEqual(0, ex.Context.Reader.CurrentIndex);
 				}
 			}
 		}
@@ -157,7 +157,7 @@ namespace CsvHelper.Tests
 			using (var reader = new StreamReader(stream))
 			using (var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
-				csvReader.Configuration.RegisterClassMap<Test2Map>();
+				csvReader.Context.RegisterClassMap<Test2Map>();
 				writer.WriteLine("StringColumn,IntColumn");
 				writer.WriteLine("one,");
 				writer.WriteLine("two,2");
@@ -171,8 +171,8 @@ namespace CsvHelper.Tests
 				}
 				catch (TypeConverterException ex)
 				{
-					Assert.AreEqual(2, ex.ReadingContext.Parser.Row);
-					Assert.AreEqual(1, ex.ReadingContext.Reader.CurrentIndex);
+					Assert.AreEqual(2, ex.Context.Parser.Row);
+					Assert.AreEqual(1, ex.Context.Reader.CurrentIndex);
 				}
 			}
 		}
@@ -195,7 +195,7 @@ namespace CsvHelper.Tests
 
 				try
 				{
-					csvReader.Configuration.RegisterClassMap<Test3Map>();
+					csvReader.Context.RegisterClassMap<Test3Map>();
 					var records = csvReader.GetRecords<Test3>().ToList();
 				}
 				catch (ReaderException)

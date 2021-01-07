@@ -19,7 +19,7 @@ namespace CsvHelper.Tests.Mocks
 		private string[] record;
 		private int row;
 
-		public ReadingContext Context { get; private set; }
+		public CsvContext Context { get; private set; }
 
 		public IParserConfiguration Configuration { get; private set; }
 
@@ -40,7 +40,7 @@ namespace CsvHelper.Tests.Mocks
 		public ParserMock(CsvConfiguration configuration)
 		{
 			Configuration = configuration;
-			Context = new ReadingContext(this);
+			Context = new CsvContext(this);
 		}
 
 		public bool Read()

@@ -32,7 +32,7 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.RegisterClassMap<TestClassMap>();
+				csv.Context.RegisterClassMap<TestClassMap>();
 				csv.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;

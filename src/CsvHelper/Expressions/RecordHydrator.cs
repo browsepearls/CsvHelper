@@ -69,12 +69,12 @@ namespace CsvHelper.Expressions
 		{
 			var recordType = typeof(T);
 
-			if (reader.Context.Reader.Configuration.Maps[recordType] == null)
+			if (reader.Context.Maps[recordType] == null)
 			{
-				reader.Context.Reader.Configuration.Maps.Add(reader.Context.Reader.Configuration.AutoMap(recordType));
+				reader.Context.Maps.Add(reader.Context.AutoMap(recordType));
 			}
 
-			var mapping = reader.Context.Reader.Configuration.Maps[recordType];
+			var mapping = reader.Context.Maps[recordType];
 
 			var recordTypeParameter = Expression.Parameter(recordType, "record");
 			var memberAssignments = new List<Expression>();

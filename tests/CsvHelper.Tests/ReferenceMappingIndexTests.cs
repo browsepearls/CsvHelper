@@ -29,7 +29,7 @@ namespace CsvHelper.Tests
 			};
 
 			var csv = new CsvReader(parserMock);
-			csv.Configuration.RegisterClassMap<AMap>();
+			csv.Context.RegisterClassMap<AMap>();
 
 			var records = csv.GetRecords<A>().ToList();
 			Assert.AreEqual(1, records[0].Id);

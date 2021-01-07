@@ -27,7 +27,7 @@ namespace CsvHelper.Tests
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestMap1>();
+				csv.Context.RegisterClassMap<TestMap1>();
 				csv.Read();
 				var record = csv.GetRecord<Test>();
 
@@ -36,9 +36,8 @@ namespace CsvHelper.Tests
 				Assert.AreEqual(null, record.Name);
 
 				stream.Position = 0;
-				//csv.Context.ClearCache(Caches.ReadRecord);
 
-				csv.Configuration.RegisterClassMap<TestMap2>();
+				csv.Context.RegisterClassMap<TestMap2>();
 				csv.Read();
 				record = csv.GetRecord<Test>();
 

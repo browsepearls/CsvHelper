@@ -15,12 +15,12 @@ namespace CsvHelper
 		/// <summary>
 		/// Method to call when bad data is detected.
 		/// </summary>
-		public Action<ReadingContext> BadDataFound { get; init; }
+		public Action<CsvContext> BadDataFound { get; init; }
 
 		/// <summary>
 		/// The reading context.
 		/// </summary>
-		public ReadingContext Context { get; init; }
+		public CsvContext Context { get; init; }
 
 		/// <summary>
 		/// The escape character used to escape a quote inside a field.

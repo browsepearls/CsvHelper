@@ -27,8 +27,8 @@ namespace CsvHelper
 		private readonly bool allowComments;
 		private readonly TrimOptions trimOptions;
 		private readonly char[] whiteSpaceChars;
-		private readonly ReadingContext context;
-		private readonly Action<ReadingContext> badDataFound;
+		private readonly CsvContext context;
+		private readonly Action<CsvContext> badDataFound;
 		private readonly ProcessFieldFunc processField;
 		private readonly PreDequoteFieldFunc preDequoteField;
 		private readonly DequoteFieldFunc dequoteField;
@@ -130,7 +130,7 @@ namespace CsvHelper
 		/// <summary>
 		/// Gets the reading context.
 		/// </summary>
-		public ReadingContext Context => context;
+		public CsvContext Context => context;
 
 		/// <summary>
 		/// Gets the configuration.
@@ -185,12 +185,13 @@ namespace CsvHelper
 		public CsvParser(TextReader reader, CsvConfiguration configuration)
 		{
 			this.reader = reader;
+			Configuration = configuration;
 
 			allowComments = configuration.AllowComments;
 			badDataFound = configuration.BadDataFound;
 			bufferSize = configuration.BufferSize;
 			comment = configuration.Comment;
-			context = new ReadingContext(this);
+			context = new CsvContext(this);
 			countBytes = configuration.CountBytes;
 			delimiter = configuration.Delimiter;
 			delimiterFirstChar = delimiter[0];
@@ -207,8 +208,6 @@ namespace CsvHelper
 			quote = configuration.Quote;
 			trimOptions = configuration.TrimOptions;
 			whiteSpaceChars = configuration.WhiteSpaceChars;
-
-			Configuration = configuration;
 		}
 
 		/// <summary>

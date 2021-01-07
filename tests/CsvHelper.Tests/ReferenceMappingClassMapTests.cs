@@ -47,7 +47,7 @@ namespace CsvHelper.Tests
 			parserMock.Add(row);
 
 			var reader = new CsvReader(parserMock);
-			reader.Configuration.RegisterClassMap<PersonMap>();
+			reader.Context.RegisterClassMap<PersonMap>();
 			reader.Read();
 			var person = reader.GetRecord<Person>();
 
@@ -98,7 +98,7 @@ namespace CsvHelper.Tests
 			};
 
 			var reader = new CsvReader(parserMock);
-			reader.Configuration.RegisterClassMap<OnlyReferencesMap>();
+			reader.Context.RegisterClassMap<OnlyReferencesMap>();
 			reader.Read();
 			var person = reader.GetRecord<Person>();
 		}

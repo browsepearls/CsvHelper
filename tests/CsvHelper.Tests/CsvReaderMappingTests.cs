@@ -27,7 +27,7 @@ namespace CsvHelper.Tests
 
 			var csvReader = new CsvReader(parserMock);
 			// csvReader.Configuration.HeaderValidated = (isValid, headerNames, headerNameIndex, context) => {};
-			csvReader.Configuration.RegisterClassMap<ConvertUsingClassMap>();
+			csvReader.Context.RegisterClassMap<ConvertUsingClassMap>();
 
 			var records = csvReader.GetRecords<MultipleNamesClass>().ToList();
 
@@ -51,7 +51,7 @@ namespace CsvHelper.Tests
 			};
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.RegisterClassMap<MultipleNamesClassMap>();
+			csvReader.Context.RegisterClassMap<MultipleNamesClassMap>();
 
 			var records = csvReader.GetRecords<MultipleNamesClass>().ToList();
 
@@ -78,7 +78,7 @@ namespace CsvHelper.Tests
 			};
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.RegisterClassMap<ConvertUsingMap>();
+			csvReader.Context.RegisterClassMap<ConvertUsingMap>();
 
 			var records = csvReader.GetRecords<TestClass>().ToList();
 
@@ -102,7 +102,7 @@ namespace CsvHelper.Tests
 			};
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.RegisterClassMap<CovarianceClassMap>();
+			csvReader.Context.RegisterClassMap<CovarianceClassMap>();
 
 			var records = csvReader.GetRecords<CovarianceClass>().ToList();
 		}
@@ -122,7 +122,7 @@ namespace CsvHelper.Tests
 			};
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.RegisterClassMap<ConvertUsingBlockMap>();
+			csvReader.Context.RegisterClassMap<ConvertUsingBlockMap>();
 
 			var records = csvReader.GetRecords<TestClass>().ToList();
 
@@ -147,7 +147,7 @@ namespace CsvHelper.Tests
 			};
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.RegisterClassMap<ConvertUsingConstantMap>();
+			csvReader.Context.RegisterClassMap<ConvertUsingConstantMap>();
 
 			var records = csvReader.GetRecords<TestClass>().ToList();
 
@@ -168,7 +168,7 @@ namespace CsvHelper.Tests
 			};
 
 			var csv = new CsvReader(parserMock);
-			csv.Configuration.RegisterClassMap<SameNameMultipleTimesClassMap>();
+			csv.Context.RegisterClassMap<SameNameMultipleTimesClassMap>();
 
 			var records = csv.GetRecords<SameNameMultipleTimesClass>().ToList();
 

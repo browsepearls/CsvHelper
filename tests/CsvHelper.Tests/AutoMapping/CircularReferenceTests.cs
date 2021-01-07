@@ -14,14 +14,16 @@ namespace CsvHelper.Tests.AutoMapping
 		public void SelfCircularDependencyTest()
 		{
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
-			var map = config.AutoMap<SelfCircularA>();
+			var context = new CsvContext(config);
+			var map = context.AutoMap<SelfCircularA>();
 		}
 
 		[TestMethod]
 		public void CircularDependencyTest()
 		{
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
-			var map = config.AutoMap<ACircular>();
+			var context = new CsvContext(config);
+			var map = context.AutoMap<ACircular>();
 			Assert.IsNotNull( map );
 			Assert.AreEqual( 1, map.MemberMaps.Count );
 			Assert.AreEqual( 1, map.ReferenceMaps.Count );
@@ -33,7 +35,8 @@ namespace CsvHelper.Tests.AutoMapping
 		public void CircularDependencyWithMultiplePropertiesTest()
 		{
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
-			var map = config.AutoMap<A>();
+			var context = new CsvContext(config);
+			var map = context.AutoMap<A>();
 			Assert.AreEqual( 1, map.MemberMaps.Count );
 			Assert.AreEqual( 3, map.ReferenceMaps.Count );
 		}

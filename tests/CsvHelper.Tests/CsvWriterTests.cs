@@ -69,7 +69,7 @@ namespace CsvHelper.Tests
 			var stream = new MemoryStream();
 			var writer = new StreamWriter(stream) { AutoFlush = true };
 			var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-			csv.Configuration.RegisterClassMap<TestRecordMap>();
+			csv.Context.RegisterClassMap<TestRecordMap>();
 
 			csv.WriteRecord(record);
 			csv.NextRecord();
@@ -97,7 +97,7 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream) { AutoFlush = true })
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.RegisterClassMap<TestRecordNoIndexesMap>();
+				csv.Context.RegisterClassMap<TestRecordNoIndexesMap>();
 
 				csv.WriteRecord(record);
 				csv.NextRecord();
@@ -136,7 +136,7 @@ namespace CsvHelper.Tests
 			var stream = new MemoryStream();
 			var writer = new StreamWriter(stream) { AutoFlush = true };
 			var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-			csv.Configuration.RegisterClassMap<TestRecordMap>();
+			csv.Context.RegisterClassMap<TestRecordMap>();
 
 			csv.WriteRecords(records);
 
@@ -158,7 +158,7 @@ namespace CsvHelper.Tests
 			var stream = new MemoryStream();
 			var writer = new StreamWriter(stream) { AutoFlush = true };
 			var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-			csv.Configuration.RegisterClassMap<TestRecordMap>();
+			csv.Context.RegisterClassMap<TestRecordMap>();
 
 			csv.WriteRecords(records);
 
@@ -194,7 +194,7 @@ namespace CsvHelper.Tests
 			var stream = new MemoryStream();
 			var writer = new StreamWriter(stream) { AutoFlush = true };
 			var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-			csv.Configuration.RegisterClassMap<TestRecordMap>();
+			csv.Context.RegisterClassMap<TestRecordMap>();
 
 			csv.WriteRecords(records);
 
@@ -218,7 +218,7 @@ namespace CsvHelper.Tests
 			var stream = new MemoryStream();
 			var writer = new StreamWriter(stream) { AutoFlush = true };
 			var csv = new CsvWriter(writer, config);
-			csv.Configuration.RegisterClassMap<TestRecordMap>();
+			csv.Context.RegisterClassMap<TestRecordMap>();
 			csv.WriteRecord(new TestRecord());
 			csv.NextRecord();
 
@@ -243,7 +243,7 @@ namespace CsvHelper.Tests
 			var stream = new MemoryStream();
 			var writer = new StreamWriter(stream) { AutoFlush = true };
 			var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-			csv.Configuration.RegisterClassMap<TestRecordMap>();
+			csv.Context.RegisterClassMap<TestRecordMap>();
 
 			csv.WriteRecord(record);
 			csv.NextRecord();
@@ -288,7 +288,7 @@ namespace CsvHelper.Tests
 			var stream = new MemoryStream();
 			var writer = new StreamWriter(stream) { AutoFlush = true };
 			var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-			csv.Configuration.RegisterClassMap<PersonMap>();
+			csv.Context.RegisterClassMap<PersonMap>();
 
 			csv.WriteRecord(record);
 			csv.NextRecord();
@@ -324,7 +324,7 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csvWriter = new CsvWriter(writer, config))
 			{
-				csvWriter.Configuration.RegisterClassMap<TestRecordMap>();
+				csvWriter.Context.RegisterClassMap<TestRecordMap>();
 				csvWriter.WriteRecord(record);
 				csvWriter.NextRecord();
 
@@ -360,7 +360,7 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csvWriter = new CsvWriter(writer, config))
 			{
-				csvWriter.Configuration.RegisterClassMap<TestRecordMap>();
+				csvWriter.Context.RegisterClassMap<TestRecordMap>();
 				csvWriter.WriteRecord(record);
 				csvWriter.NextRecord();
 
@@ -384,7 +384,7 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csvWriter.Configuration.RegisterClassMap<TestRecordMap>();
+				csvWriter.Context.RegisterClassMap<TestRecordMap>();
 				csvWriter.WriteHeader(typeof(TestRecord));
 				csvWriter.NextRecord();
 
@@ -506,7 +506,7 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.RegisterClassMap<TestRecordMap>();
+				csv.Context.RegisterClassMap<TestRecordMap>();
 
 				var record = new TestRecord
 				{
@@ -656,7 +656,7 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.RegisterClassMap<TestStructParentMap>();
+				csv.Context.RegisterClassMap<TestStructParentMap>();
 				csv.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;
@@ -760,7 +760,7 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.RegisterClassMap<TestWithStaticMap>();
+				csv.Context.RegisterClassMap<TestWithStaticMap>();
 
 				TestWithStatic.Name = "one";
 				var records = new List<TestWithStatic>

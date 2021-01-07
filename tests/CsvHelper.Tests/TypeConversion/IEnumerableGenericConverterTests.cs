@@ -35,7 +35,7 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestIndexMap>();
+				csv.Context.RegisterClassMap<TestIndexMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
 				var list = records[0].List.ToList();
@@ -60,7 +60,7 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestIndexMap>();
+				csv.Context.RegisterClassMap<TestIndexMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
 				var list = records[0].List.ToList();
@@ -85,7 +85,7 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestDefaultMap>();
+				csv.Context.RegisterClassMap<TestDefaultMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
 				var list = records[0].List.ToList();
@@ -110,7 +110,7 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestNamedMap>();
+				csv.Context.RegisterClassMap<TestNamedMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
 				var list = records[0].List.ToList();
@@ -135,7 +135,7 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestNamedMap>();
+				csv.Context.RegisterClassMap<TestNamedMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
 				var list = records[0].List.ToList();
@@ -163,7 +163,7 @@ namespace CsvHelper.Tests.TypeConversion
 				{
 					new Test { List = new List<int?> { 1, 2, 3 } }
 				};
-				csv.Configuration.RegisterClassMap<TestIndexMap>();
+				csv.Context.RegisterClassMap<TestIndexMap>();
 				csv.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;
@@ -186,7 +186,7 @@ namespace CsvHelper.Tests.TypeConversion
 				{
 					new Test { List = new List<int?> { 1, 2, 3 } }
 				};
-				csv.Configuration.RegisterClassMap<TestIndexMap>();
+				csv.Context.RegisterClassMap<TestIndexMap>();
 				csv.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;

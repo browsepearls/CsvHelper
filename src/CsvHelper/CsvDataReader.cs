@@ -504,7 +504,7 @@ namespace CsvHelper
 		public bool IsDBNull(int i)
 		{
 			var field = csv.GetField(i);
-			var nullValues = csv.Configuration.TypeConverterOptionsCache.GetOptions<string>().NullValues;
+			var nullValues = csv.Context.TypeConverterOptionsCache.GetOptions<string>().NullValues;
 
 			return nullValues.Contains(field);
 		}

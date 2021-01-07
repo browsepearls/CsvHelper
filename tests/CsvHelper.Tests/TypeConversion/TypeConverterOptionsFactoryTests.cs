@@ -54,7 +54,7 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csvReader.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
+				csvReader.Context.TypeConverterOptionsCache.AddOptions<int>(options);
 				csvReader.Read();
 				Assert.AreEqual(1234, csvReader.GetField<int>(0));
 				Assert.AreEqual(5678, csvReader.GetField(typeof(int), 1));
@@ -79,7 +79,7 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csvReader.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
+				csvReader.Context.TypeConverterOptionsCache.AddOptions<int>(options);
 				csvReader.GetRecords<Test>().ToList();
 			}
 		}
@@ -102,8 +102,8 @@ namespace CsvHelper.Tests.TypeConversion
 				writer.Flush();
 				stream.Position = 0;
 
-				csvReader.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
-				csvReader.Configuration.RegisterClassMap<TestMap>();
+				csvReader.Context.TypeConverterOptionsCache.AddOptions<int>(options);
+				csvReader.Context.RegisterClassMap<TestMap>();
 				csvReader.GetRecords<Test>().ToList();
 			}
 		}
@@ -122,7 +122,7 @@ namespace CsvHelper.Tests.TypeConversion
 			using (var writer = new StreamWriter(stream))
 			using (var csvWriter = new CsvWriter(writer, config))
 			{
-				csvWriter.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
+				csvWriter.Context.TypeConverterOptionsCache.AddOptions<int>(options);
 				csvWriter.WriteField(1234);
 				csvWriter.NextRecord();
 				writer.Flush();
@@ -151,7 +151,7 @@ namespace CsvHelper.Tests.TypeConversion
 				{
 					new Test { Number = 1234, NumberOverridenInMap = 5678 },
 				};
-				csvWriter.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
+				csvWriter.Context.TypeConverterOptionsCache.AddOptions<int>(options);
 				csvWriter.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;
@@ -179,8 +179,8 @@ namespace CsvHelper.Tests.TypeConversion
 				{
 					new Test { Number = 1234, NumberOverridenInMap = 5678 },
 				};
-				csvWriter.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
-				csvWriter.Configuration.RegisterClassMap<TestMap>();
+				csvWriter.Context.TypeConverterOptionsCache.AddOptions<int>(options);
+				csvWriter.Context.RegisterClassMap<TestMap>();
 				csvWriter.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;

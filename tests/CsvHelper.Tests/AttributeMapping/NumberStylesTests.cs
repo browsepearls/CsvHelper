@@ -20,7 +20,7 @@ namespace CsvHelper.Tests.AttributeMapping
 			using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
 			{
 				var records = csv.GetRecords<NumberStylesTestClass>().ToList();
-				var actual = csv.Configuration.Maps.Find<NumberStylesTestClass>().MemberMaps[1].Data.TypeConverterOptions.NumberStyles;
+				var actual = csv.Context.Maps.Find<NumberStylesTestClass>().MemberMaps[1].Data.TypeConverterOptions.NumberStyles;
 
 				Assert.AreEqual(NumberStyles.AllowCurrencySymbol, actual);
 			}

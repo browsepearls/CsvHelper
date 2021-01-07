@@ -22,7 +22,8 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 		public void AutoMap_WithCultureInfoAttributes_ConfiguresParameterMaps()
 		{
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture);
-			var map = config.AutoMap<Foo>();
+			var context = new CsvContext(config);
+			var map = context.AutoMap<Foo>();
 
 			Assert.AreEqual(2, map.ParameterMaps.Count);
 			Assert.IsNull(map.ParameterMaps[0].Data.TypeConverterOptions.CultureInfo);

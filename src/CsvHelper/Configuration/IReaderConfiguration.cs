@@ -28,7 +28,7 @@ namespace CsvHelper.Configuration
 		/// You can supply your own function to do other things like logging the issue instead of throwing an exception.
 		/// Arguments: (isValid, headerNames, headerNameIndex, context)
 		/// </summary>
-		Action<InvalidHeader[], ReadingContext> HeaderValidated { get; }
+		Action<InvalidHeader[], CsvContext> HeaderValidated { get; }
 
 		/// <summary>
 		/// Gets the function that is called when a missing field is found. The default function will
@@ -36,7 +36,7 @@ namespace CsvHelper.Configuration
 		/// like logging the issue instead of throwing an exception.
 		/// Arguments: (headerNames, index, context)
 		/// </summary>
-		Action<string[], int, ReadingContext> MissingFieldFound { get; }
+		Action<string[], int, CsvContext> MissingFieldFound { get; }
 
 		/// <summary>
 		/// Gets the function that is called when a reading exception occurs.
@@ -51,16 +51,6 @@ namespace CsvHelper.Configuration
 		/// Gets the culture info used to read an write CSV files.
 		/// </summary>
 		CultureInfo CultureInfo { get; }
-
-		/// <summary>
-		/// Gets the <see cref="TypeConverterOptionsCache"/>.
-		/// </summary>
-		TypeConverterOptionsCache TypeConverterOptionsCache { get; }
-
-		/// <summary>
-		/// Gets the <see cref="TypeConverterCache"/>.
-		/// </summary>
-		TypeConverterCache TypeConverterCache { get; }
 
 		/// <summary>
 		/// Prepares the header field for matching against a member name.
@@ -88,7 +78,7 @@ namespace CsvHelper.Configuration
 		/// Gets the name to use for the property of the dynamic object.
 		/// Arguments: (readingContext, fieldIndex)
 		/// </summary>
-		Func<ReadingContext, int, string> GetDynamicPropertyName { get; }
+		Func<CsvContext, int, string> GetDynamicPropertyName { get; }
 
 		/// <summary>
 		/// Gets a value indicating whether references
@@ -133,63 +123,5 @@ namespace CsvHelper.Configuration
 		/// Default is Properties.
 		/// </summary>
 		MemberTypes MemberTypes { get; }
-
-		/// <summary>
-		/// The configured <see cref="ClassMap"/>s.
-		/// </summary>
-		ClassMapCollection Maps { get; }
-
-		/// <summary>
-		/// Use a <see cref="ClassMap{T}" /> to configure mappings.
-		/// When using a class map, no members are mapped by default.
-		/// Only member specified in the mapping are used.
-		/// </summary>
-		/// <typeparam name="TMap">The type of mapping class to use.</typeparam>
-		TMap RegisterClassMap<TMap>() where TMap : ClassMap;
-
-		/// <summary>
-		/// Use a <see cref="ClassMap{T}" /> to configure mappings.
-		/// When using a class map, no member are mapped by default.
-		/// Only member specified in the mapping are used.
-		/// </summary>
-		/// <param name="classMapType">The type of mapping class to use.</param>
-		ClassMap RegisterClassMap(Type classMapType);
-
-		/// <summary>
-		/// Registers the class map.
-		/// </summary>
-		/// <param name="map">The class map to register.</param>
-		void RegisterClassMap(ClassMap map);
-
-		/// <summary>
-		/// Unregisters the class map.
-		/// </summary>
-		/// <typeparam name="TMap">The map type to unregister.</typeparam>
-		void UnregisterClassMap<TMap>() where TMap : ClassMap;
-
-		/// <summary>
-		/// Unregisters the class map.
-		/// </summary>
-		/// <param name="classMapType">The map type to unregister.</param>
-		void UnregisterClassMap(Type classMapType);
-
-		/// <summary>
-		/// Unregisters all class maps.
-		/// </summary>
-		void UnregisterClassMap();
-
-		/// <summary>
-		/// Generates a <see cref="ClassMap"/> for the type.
-		/// </summary>
-		/// <typeparam name="T">The type to generate the map for.</typeparam>
-		/// <returns>The generate map.</returns>
-		ClassMap<T> AutoMap<T>();
-
-		/// <summary>
-		/// Generates a <see cref="ClassMap"/> for the type.
-		/// </summary>
-		/// <param name="type">The type to generate for the map.</param>
-		/// <returns>The generate map.</returns>
-		ClassMap AutoMap(Type type);
 	}
 }

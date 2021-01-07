@@ -17,7 +17,7 @@ namespace CsvHelper
 	public class CsvSerializer : ISerializer
 	{
 		private readonly TextWriter writer;
-		private readonly WritingContext context;
+		private readonly CsvContext context;
 		private readonly string delimiter;
 		private readonly bool leaveOpen;
 		private readonly NewLine newLine;
@@ -38,7 +38,7 @@ namespace CsvHelper
 		/// <summary>
 		/// Gets the writing context.
 		/// </summary>
-		public virtual WritingContext Context => context;
+		public virtual CsvContext Context => context;
 
 		/// <summary>
 		/// Gets the configuration.
@@ -61,9 +61,10 @@ namespace CsvHelper
 		public CsvSerializer(TextWriter writer, CsvConfiguration configuration)
 		{
 			this.writer = writer;
+			Configuration = configuration;
 
 			delimiter = configuration.Delimiter;
-			context = new WritingContext(this);
+			context = new CsvContext(this);
 			injectionCharacters = configuration.InjectionCharacters;
 			injectionEscapeCharacter = configuration.InjectionEscapeCharacter;
 			leaveOpen = configuration.LeaveOpen;
@@ -71,8 +72,6 @@ namespace CsvHelper
 			newLineString = configuration.NewLineString;
 			quote = configuration.Quote;
 			sanitizeForInjection = configuration.SanitizeForInjection;
-
-			Configuration = configuration;
 		}
 
 		/// <summary>

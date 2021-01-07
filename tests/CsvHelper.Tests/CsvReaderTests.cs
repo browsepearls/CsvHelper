@@ -365,7 +365,7 @@ namespace CsvHelper.Tests
 			};
 
 			var csv = new CsvReader(csvParserMock);
-			csv.Configuration.RegisterClassMap<TestRecordMap>();
+			csv.Context.RegisterClassMap<TestRecordMap>();
 			csv.Read();
 			var record = csv.GetRecord<TestRecord>();
 
@@ -404,7 +404,7 @@ namespace CsvHelper.Tests
 			};
 
 			var csv = new CsvReader(csvParserMock);
-			csv.Configuration.RegisterClassMap<TestRecordMap>();
+			csv.Context.RegisterClassMap<TestRecordMap>();
 			csv.Read();
 			var record = (TestRecord)csv.GetRecord(typeof(TestRecord));
 
@@ -439,7 +439,7 @@ namespace CsvHelper.Tests
 			};
 
 			var csv = new CsvReader(csvParserMock);
-			csv.Configuration.RegisterClassMap<TestRecordMap>();
+			csv.Context.RegisterClassMap<TestRecordMap>();
 			var records = csv.GetRecords<TestRecord>().ToList();
 
 			Assert.AreEqual(2, records.Count);
@@ -479,7 +479,7 @@ namespace CsvHelper.Tests
 			};
 
 			var csv = new CsvReader(csvParserMock);
-			csv.Configuration.RegisterClassMap<TestRecordMap>();
+			csv.Context.RegisterClassMap<TestRecordMap>();
 			var records = csv.GetRecords(typeof(TestRecord)).ToList();
 
 			Assert.AreEqual(2, records.Count);
@@ -518,7 +518,7 @@ namespace CsvHelper.Tests
 			};
 
 			var csv = new CsvReader(csvParserMock);
-			csv.Configuration.RegisterClassMap<TestRecordDuplicateHeaderNamesMap>();
+			csv.Context.RegisterClassMap<TestRecordDuplicateHeaderNamesMap>();
 			var records = csv.GetRecords<TestRecordDuplicateHeaderNames>().ToList();
 
 			Assert.AreEqual(2, records.Count);
@@ -756,7 +756,7 @@ namespace CsvHelper.Tests
 				writer.Flush();
 				stream.Position = 0;
 
-				csvReader.Configuration.RegisterClassMap<TestRecordMap>();
+				csvReader.Context.RegisterClassMap<TestRecordMap>();
 				var records = csvReader.GetRecords<TestRecord>();
 				Assert.AreEqual(2, records.Count());
 				Assert.AreEqual(0, records.Count());
@@ -828,7 +828,7 @@ namespace CsvHelper.Tests
 				null,
 			};
 			var csv = new CsvReader(parserMock);
-			csv.Configuration.RegisterClassMap<TestStructParentMap>();
+			csv.Context.RegisterClassMap<TestStructParentMap>();
 			var records = csv.GetRecords<TestStructParent>().ToList();
 			Assert.IsNotNull(records);
 			Assert.AreEqual(1, records.Count);
@@ -933,7 +933,7 @@ namespace CsvHelper.Tests
 			using (var writer = new StreamWriter(stream))
 			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.RegisterClassMap<SimpleMap>();
+				csv.Context.RegisterClassMap<SimpleMap>();
 
 				writer.WriteLine("Id,Name");
 				writer.WriteLine("1,one");

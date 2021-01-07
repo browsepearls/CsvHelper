@@ -53,7 +53,7 @@ namespace CsvHelper.Tests.Reading
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<ChildMap>();
+				csv.Context.RegisterClassMap<ChildMap>();
 
 				var records = csv.GetRecords<Child>().ToList();
 				Assert.AreEqual(1, records[0].Id);

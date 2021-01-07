@@ -21,7 +21,7 @@ namespace CsvHelper.Tests.AttributeMapping
 			{
 				var records = csv.GetRecords<CultureInfoTestClass>().ToList();
 				var expected = CultureInfo.GetCultureInfo("jp");
-				var actual = csv.Configuration.Maps.Find<CultureInfoTestClass>().MemberMaps[1].Data.TypeConverterOptions.CultureInfo;
+				var actual = csv.Context.Maps.Find<CultureInfoTestClass>().MemberMaps[1].Data.TypeConverterOptions.CultureInfo;
 
 				Assert.AreEqual(expected, actual);
 			}

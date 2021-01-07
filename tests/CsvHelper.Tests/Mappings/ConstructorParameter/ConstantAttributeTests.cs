@@ -18,7 +18,8 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 		public void AutoMap_WithConstantAttributes_ConfiguresParameterMaps()
 		{
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture);
-			var map = config.AutoMap<Foo>();
+			var context = new CsvContext(config);
+			var map = context.AutoMap<Foo>();
 
 			Assert.AreEqual(2, map.ParameterMaps.Count);
 			Assert.IsFalse(map.ParameterMaps[0].Data.IsConstantSet);

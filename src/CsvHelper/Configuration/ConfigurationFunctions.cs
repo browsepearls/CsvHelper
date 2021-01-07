@@ -21,7 +21,7 @@ namespace CsvHelper.Configuration
 		/// <summary>
 		/// Throws a <see cref="ValidationException"/> if <paramref name="invalidHeaders"/> is not empty.
 		/// </summary>
-		public static void HeaderValidated(InvalidHeader[] invalidHeaders, ReadingContext context)
+		public static void HeaderValidated(InvalidHeader[] invalidHeaders, CsvContext context)
 		{
 			if (invalidHeaders.Count() == 0)
 			{
@@ -46,7 +46,7 @@ namespace CsvHelper.Configuration
 		/// <summary>
 		/// Throws a <c>MissingFieldException</c>.
 		/// </summary>
-		public static void MissingFieldFound(string[] headerNames, int index, ReadingContext context)
+		public static void MissingFieldFound(string[] headerNames, int index, CsvContext context)
 		{
 			var messagePostfix = $"You can ignore missing fields by setting {nameof(MissingFieldFound)} to null.";
 
@@ -72,7 +72,7 @@ namespace CsvHelper.Configuration
 		/// <summary>
 		/// Throws a <see cref="BadDataException"/>.
 		/// </summary>
-		public static void BadDataFound(ReadingContext context)
+		public static void BadDataFound(CsvContext context)
 		{
 			throw new BadDataException(context, $"You can ignore bad data by setting {nameof(BadDataFound)} to null.");
 		}
@@ -93,7 +93,7 @@ namespace CsvHelper.Configuration
 		/// <param name="field">The field.</param>
 		/// <param name="context">The context.</param>
 		/// <returns></returns>
-		public static bool ShouldQuote(string field, WritingContext context)
+		public static bool ShouldQuote(string field, CsvContext context)
 		{
 			var shouldQuote = !string.IsNullOrEmpty(field) && 
 			(
@@ -157,7 +157,7 @@ namespace CsvHelper.Configuration
 		/// </summary>
 		/// <param name="context">The <see cref="ReadingContext"/>.</param>
 		/// <param name="fieldIndex">The field index of the header to get the name for.</param>
-		public static string GetDynamicPropertyName(ReadingContext context, int fieldIndex)
+		public static string GetDynamicPropertyName(CsvContext context, int fieldIndex)
 		{
 			if (context.Reader.HeaderRecord == null)
 			{

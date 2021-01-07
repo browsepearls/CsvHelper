@@ -47,7 +47,7 @@ namespace CsvHelper.Tests.Mappings
 			};
 			using (var csv = new CsvReader(parserMock))
 			{
-				csv.Configuration.RegisterClassMap<BarMap>();
+				csv.Context.RegisterClassMap<BarMap>();
 				var records = csv.GetRecords<Bar>().ToList();
 
 				Assert.AreEqual(1, records.Count);
@@ -87,7 +87,7 @@ namespace CsvHelper.Tests.Mappings
 			using (var writer = new StringWriter())
 			using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				csv.Configuration.RegisterClassMap<BarMap>();
+				csv.Context.RegisterClassMap<BarMap>();
 				csv.WriteRecords(records);
 
 				var expected = new StringBuilder();

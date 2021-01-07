@@ -34,9 +34,9 @@ namespace CsvHelper.Expressions
 			var memberMapData = new MemberMapData(null)
 			{
 				Index = 0,
-				TypeConverter = Reader.Configuration.TypeConverterCache.GetConverter(recordType)
+				TypeConverter = Reader.Context.TypeConverterCache.GetConverter(recordType)
 			};
-			memberMapData.TypeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = Reader.Context.Reader.Configuration.CultureInfo }, Reader.Configuration.TypeConverterOptionsCache.GetOptions(recordType));
+			memberMapData.TypeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = Reader.Configuration.CultureInfo }, Reader.Context.TypeConverterOptionsCache.GetOptions(recordType));
 
 			fieldExpression = Expression.Call(Expression.Constant(memberMapData.TypeConverter), "ConvertFromString", null, fieldExpression, Expression.Constant(Reader), Expression.Constant(memberMapData));
 			fieldExpression = Expression.Convert(fieldExpression, recordType);

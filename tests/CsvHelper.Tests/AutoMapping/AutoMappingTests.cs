@@ -249,10 +249,10 @@ namespace CsvHelper.Tests.AutoMapping
 		[TestMethod]
 		public void AutoMapEnumerableTest()
 		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
+			var context = new CsvContext(new CsvConfiguration(CultureInfo.InvariantCulture));
 			try
 			{
-				config.AutoMap(typeof(List<string>));
+				context.AutoMap(typeof(List<string>));
 				Assert.Fail();
 			}
 			catch (ConfigurationException) { }
@@ -261,9 +261,9 @@ namespace CsvHelper.Tests.AutoMapping
 		[TestMethod]
 		public void AutoMapWithExistingMapTest()
 		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
+			var context = new CsvContext(new CsvConfiguration(CultureInfo.InvariantCulture));
 			var existingMap = new SimpleMap();
-			config.Maps.Add(existingMap);
+			context.Maps.Add(existingMap);
 			var data = new
 			{
 				Simple = new Simple
@@ -272,7 +272,7 @@ namespace CsvHelper.Tests.AutoMapping
 					Name = "one"
 				}
 			};
-			var map = config.AutoMap(data.GetType());
+			var map = context.AutoMap(data.GetType());
 
 			Assert.IsNotNull(map);
 			Assert.AreEqual(0, map.MemberMaps.Count);
@@ -291,7 +291,8 @@ namespace CsvHelper.Tests.AutoMapping
 			{
 				ReferenceHeaderPrefix = (type, name) => $"{name}."
 			};
-			var map = config.AutoMap<Nested>();
+			var context = new CsvContext(config);
+			var map = context.AutoMap<Nested>();
 			Assert.AreEqual("Simple1.Id", map.ReferenceMaps[0].Data.Mapping.MemberMaps[0].Data.Names[0]);
 			Assert.AreEqual("Simple1.Name", map.ReferenceMaps[0].Data.Mapping.MemberMaps[1].Data.Names[0]);
 			Assert.AreEqual("Simple2.Id", map.ReferenceMaps[1].Data.Mapping.MemberMaps[0].Data.Names[0]);
@@ -302,7 +303,8 @@ namespace CsvHelper.Tests.AutoMapping
 		public void AutoMapWithDefaultConstructor()
 		{
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
-			ClassMap map = config.AutoMap<SimpleReferenceHasNoDefaultConstructor>();
+			var context = new CsvContext(config);
+			ClassMap map = context.AutoMap<SimpleReferenceHasNoDefaultConstructor>();
 
 			Assert.AreEqual("Id", map.MemberMaps[0].Data.Names[0]);
 			Assert.AreEqual("Name", map.ReferenceMaps[0].Data.Mapping.MemberMaps[0].Data.Names[0]);
@@ -313,7 +315,8 @@ namespace CsvHelper.Tests.AutoMapping
 		public void AutoMapWithNoDefaultConstructor()
 		{
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
-			var map = config.AutoMap<SimpleHasNoDefaultConstructorReferenceHasNoDefaultConstructor>();
+			var context = new CsvContext(config);
+			var map = context.AutoMap<SimpleHasNoDefaultConstructorReferenceHasNoDefaultConstructor>();
 
 			Assert.AreEqual("Id", map.MemberMaps[0].Data.Names[0]);
 			Assert.AreEqual("id", map.ParameterMaps[0].Data.Names[0]);

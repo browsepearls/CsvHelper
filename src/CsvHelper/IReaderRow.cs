@@ -14,8 +14,14 @@ namespace CsvHelper
 	/// </summary>
 	public interface IReaderRow
 	{
+		/// <summary>
+		/// Gets the field index the reader is currently on.
+		/// </summary>
 		int CurrentIndex { get; }
 
+		/// <summary>
+		/// Gets the header record.
+		/// </summary>
 		string[] HeaderRecord { get; }
 
 		/// <summary>
@@ -26,7 +32,7 @@ namespace CsvHelper
 		/// <summary>
 		/// Gets the reading context.
 		/// </summary>
-		ReadingContext Context { get; }
+		CsvContext Context { get; }
 
 		/// <summary>
 		/// Gets or sets the configuration.

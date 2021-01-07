@@ -91,7 +91,7 @@ namespace CsvHelper.Tests.Mappings
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<APublicMap>();
+				csv.Context.RegisterClassMap<APublicMap>();
 				var records = csv.GetRecords<APublic>().ToList();
 
 				Assert.AreEqual(1, records.Count);
@@ -119,7 +119,7 @@ namespace CsvHelper.Tests.Mappings
 						}
 					}
 				};
-				csv.Configuration.RegisterClassMap<APublicMap>();
+				csv.Context.RegisterClassMap<APublicMap>();
 				csv.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;
@@ -205,7 +205,7 @@ namespace CsvHelper.Tests.Mappings
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<APrivateMap>();
+				csv.Context.RegisterClassMap<APrivateMap>();
 				var records = csv.GetRecords<APrivate>().ToList();
 
 				Assert.AreEqual(1, records.Count);
@@ -226,7 +226,7 @@ namespace CsvHelper.Tests.Mappings
 				{
 					new APrivate( 1, "one" )
 				};
-				csv.Configuration.RegisterClassMap<APrivateMap>();
+				csv.Context.RegisterClassMap<APrivateMap>();
 				csv.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;

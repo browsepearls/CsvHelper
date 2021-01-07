@@ -28,7 +28,7 @@ namespace CsvHelper
 		private readonly MemberMapData reusableMemberMapData = new MemberMapData(null);
 		private readonly IReaderConfiguration configuration;
 
-		private ReadingContext context;
+		private CsvContext context;
 		private bool disposed;
 		private IParser parser;
 		private int columnCount;
@@ -37,14 +37,20 @@ namespace CsvHelper
 		private string[] headerRecord;
 		private string[] record;
 
+		/// <summary>
+		/// Gets the field index the reader is currently on.
+		/// </summary>
 		public virtual int CurrentIndex => currentIndex;
 
+		/// <summary>
+		/// Gets the header record.
+		/// </summary>
 		public virtual string[] HeaderRecord => headerRecord;
 
 		/// <summary>
 		/// Gets the reading context.
 		/// </summary>
-		public virtual ReadingContext Context => context;
+		public virtual CsvContext Context => context;
 
 		/// <summary>
 		/// Gets the configuration.
@@ -87,7 +93,7 @@ namespace CsvHelper
 			detectColumnCountChanges = configuration.DetectColumnCountChanges;
 
 			this.parser = parser ?? throw new ArgumentNullException(nameof(parser));
-			context = parser.Context ?? throw new InvalidOperationException($"For {nameof(IParser)} to be used in {nameof(CsvReader)}, {nameof(IParser.Context)} must also implement {nameof(ReadingContext)}.");
+			context = parser.Context ?? throw new InvalidOperationException($"For {nameof(IParser)} to be used in {nameof(CsvReader)}, {nameof(IParser.Context)} must also implement {nameof(CsvContext)}.");
 			context.Reader = this;
 			recordManager = new Lazy<RecordManager>(() => ObjectResolver.Current.Resolve<RecordManager>(this));
 		}
@@ -138,12 +144,12 @@ namespace CsvHelper
 				throw new InvalidOperationException($"The header must be read before it can be validated.");
 			}
 
-			if (configuration.Maps[type] == null)
+			if (context.Maps[type] == null)
 			{
-				configuration.Maps.Add(configuration.AutoMap(type));
+				context.Maps.Add(context.AutoMap(type));
 			}
 
-			var map = configuration.Maps[type];
+			var map = context.Maps[type];
 			var invalidHeaders = new List<InvalidHeader>();
 			ValidateHeader(map, invalidHeaders);
 
@@ -420,7 +426,7 @@ namespace CsvHelper
 		{
 			CheckHasBeenRead();
 
-			var converter = Configuration.TypeConverterCache.GetConverter(type);
+			var converter = context.TypeConverterCache.GetConverter(type);
 			return GetField(type, index, converter);
 		}
 
@@ -435,7 +441,7 @@ namespace CsvHelper
 		{
 			CheckHasBeenRead();
 
-			var converter = Configuration.TypeConverterCache.GetConverter(type);
+			var converter = context.TypeConverterCache.GetConverter(type);
 			return GetField(type, name, converter);
 		}
 
@@ -451,7 +457,7 @@ namespace CsvHelper
 		{
 			CheckHasBeenRead();
 
-			var converter = Configuration.TypeConverterCache.GetConverter(type);
+			var converter = context.TypeConverterCache.GetConverter(type);
 			return GetField(type, name, index, converter);
 		}
 
@@ -471,7 +477,7 @@ namespace CsvHelper
 			reusableMemberMapData.TypeConverter = converter;
 			if (!typeConverterOptionsCache.TryGetValue(type, out TypeConverterOptions typeConverterOptions))
 			{
-				typeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = configuration.CultureInfo }, configuration.TypeConverterOptionsCache.GetOptions(type));
+				typeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = configuration.CultureInfo }, context.TypeConverterOptionsCache.GetOptions(type));
 				typeConverterOptionsCache.Add(type, typeConverterOptions);
 			}
 
@@ -524,7 +530,7 @@ namespace CsvHelper
 		{
 			CheckHasBeenRead();
 
-			var converter = Configuration.TypeConverterCache.GetConverter<T>();
+			var converter = context.TypeConverterCache.GetConverter<T>();
 			return GetField<T>(index, converter);
 		}
 
@@ -538,7 +544,7 @@ namespace CsvHelper
 		{
 			CheckHasBeenRead();
 
-			var converter = Configuration.TypeConverterCache.GetConverter<T>();
+			var converter = context.TypeConverterCache.GetConverter<T>();
 			return GetField<T>(name, converter);
 		}
 
@@ -555,7 +561,7 @@ namespace CsvHelper
 		{
 			CheckHasBeenRead();
 
-			var converter = Configuration.TypeConverterCache.GetConverter<T>();
+			var converter = context.TypeConverterCache.GetConverter<T>();
 			return GetField<T>(name, index, converter);
 		}
 
@@ -680,7 +686,7 @@ namespace CsvHelper
 		{
 			CheckHasBeenRead();
 
-			var converter = Configuration.TypeConverterCache.GetConverter(type);
+			var converter = context.TypeConverterCache.GetConverter(type);
 			return TryGetField(type, index, converter, out field);
 		}
 
@@ -695,7 +701,7 @@ namespace CsvHelper
 		{
 			CheckHasBeenRead();
 
-			var converter = Configuration.TypeConverterCache.GetConverter(type);
+			var converter = context.TypeConverterCache.GetConverter(type);
 			return TryGetField(type, name, converter, out field);
 		}
 
@@ -713,7 +719,7 @@ namespace CsvHelper
 		{
 			CheckHasBeenRead();
 
-			var converter = Configuration.TypeConverterCache.GetConverter(type);
+			var converter = context.TypeConverterCache.GetConverter(type);
 			return TryGetField(type, name, index, converter, out field);
 		}
 
@@ -803,7 +809,7 @@ namespace CsvHelper
 		{
 			CheckHasBeenRead();
 
-			var converter = Configuration.TypeConverterCache.GetConverter<T>();
+			var converter = context.TypeConverterCache.GetConverter<T>();
 			return TryGetField(index, converter, out field);
 		}
 
@@ -818,7 +824,7 @@ namespace CsvHelper
 		{
 			CheckHasBeenRead();
 
-			var converter = Configuration.TypeConverterCache.GetConverter<T>();
+			var converter = context.TypeConverterCache.GetConverter<T>();
 			return TryGetField(name, converter, out field);
 		}
 
@@ -836,7 +842,7 @@ namespace CsvHelper
 		{
 			CheckHasBeenRead();
 
-			var converter = Configuration.TypeConverterCache.GetConverter<T>();
+			var converter = context.TypeConverterCache.GetConverter<T>();
 			return TryGetField(name, index, converter, out field);
 		}
 

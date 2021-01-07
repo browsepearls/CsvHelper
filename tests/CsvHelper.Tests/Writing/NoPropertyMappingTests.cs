@@ -28,7 +28,7 @@ namespace CsvHelper.Tests.Writing
 					new Test { Id = 2 }
 				};
 
-				csv.Configuration.RegisterClassMap<TestWithNameMap>();
+				csv.Context.RegisterClassMap<TestWithNameMap>();
 				csv.WriteRecords(list);
 
 				writer.Flush();
@@ -59,7 +59,7 @@ namespace CsvHelper.Tests.Writing
 					new Test { Id = 2 }
 				};
 
-				csv.Configuration.RegisterClassMap<TestWithNoNameMap>();
+				csv.Context.RegisterClassMap<TestWithNoNameMap>();
 				csv.WriteRecords(list);
 
 				writer.Flush();
@@ -94,7 +94,7 @@ namespace CsvHelper.Tests.Writing
 					new Test { Id = 2 }
 				};
 
-				csv.Configuration.RegisterClassMap<TestWithNameMap>();
+				csv.Context.RegisterClassMap<TestWithNameMap>();
 				csv.WriteRecords(list);
 
 				writer.Flush();
@@ -128,7 +128,7 @@ namespace CsvHelper.Tests.Writing
 					new Test { Id = 2 }
 				};
 
-				csv.Configuration.RegisterClassMap<TestWithNoNameMap>();
+				csv.Context.RegisterClassMap<TestWithNoNameMap>();
 				csv.WriteRecords(list);
 
 				writer.Flush();
@@ -162,7 +162,7 @@ namespace CsvHelper.Tests.Writing
 					new Test { Id = 2, Name = "two" }
 				};
 
-				csv.Configuration.RegisterClassMap<TestMapOutOfOrderWithEmptyFieldsMap>();
+				csv.Context.RegisterClassMap<TestMapOutOfOrderWithEmptyFieldsMap>();
 				csv.WriteRecords(list);
 
 				writer.Flush();

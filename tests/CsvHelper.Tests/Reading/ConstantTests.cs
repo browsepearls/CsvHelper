@@ -27,7 +27,7 @@ namespace CsvHelper.Tests.Reading
 			};
 
 			var csv = new CsvReader(parser);
-			csv.Configuration.RegisterClassMap<TestStringMap>();
+			csv.Context.RegisterClassMap<TestStringMap>();
 			var records = csv.GetRecords<Test>().ToList();
 
 			Assert.AreEqual(1, records[0].Id);
@@ -53,7 +53,7 @@ namespace CsvHelper.Tests.Reading
 			};
 
 			var csv = new CsvReader(parser);
-			csv.Configuration.RegisterClassMap<TestNullMap>();
+			csv.Context.RegisterClassMap<TestNullMap>();
 			var records = csv.GetRecords<Test>().ToList();
 
 			Assert.AreEqual(1, records[0].Id);
@@ -72,7 +72,7 @@ namespace CsvHelper.Tests.Reading
 			using (var reader = new StringReader("1,one\r\n"))
 			using (var csv = new CsvReader(reader, config))
 			{
-				csv.Configuration.RegisterClassMap<TestIntMap>();
+				csv.Context.RegisterClassMap<TestIntMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
 				Assert.AreEqual(-1, records[0].Id);

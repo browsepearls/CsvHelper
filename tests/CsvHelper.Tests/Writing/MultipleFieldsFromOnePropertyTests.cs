@@ -28,7 +28,7 @@ namespace CsvHelper.Tests.Writing
 				{
 					new Test { Dob = DateTime.Parse( "9/6/2017" ) }
 				};
-				csv.Configuration.RegisterClassMap<TestMap>();
+				csv.Context.RegisterClassMap<TestMap>();
 				csv.WriteRecords(records);
 				writer.Flush();
 				stream.Position = 0;
@@ -54,7 +54,7 @@ namespace CsvHelper.Tests.Writing
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<TestMap>();
+				csv.Context.RegisterClassMap<TestMap>();
 				var records = csv.GetRecords<Test>().ToList();
 
 				Assert.AreEqual(DateTime.Parse("9/8/2017"), records[0].Dob);

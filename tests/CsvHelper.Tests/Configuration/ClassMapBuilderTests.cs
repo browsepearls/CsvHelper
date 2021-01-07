@@ -114,7 +114,7 @@ namespace CsvHelper.Tests.Configuration
 			public string[] CurrentRecord { get; }
 			public int Row { get; }
 
-			public ReadingContext Context => throw new NotImplementedException();
+			public CsvContext Context => throw new NotImplementedException();
 
 			public int CurrentIndex => throw new NotImplementedException();
 

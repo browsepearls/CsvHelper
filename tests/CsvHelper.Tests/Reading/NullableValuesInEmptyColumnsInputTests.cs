@@ -28,7 +28,7 @@ namespace CsvHelper.Tests.Reading
 
 			using (var csv = new CsvReader(parser))
 			{
-				csv.Configuration.TypeConverterOptionsCache.GetOptions<int?>().NullValues.Add(string.Empty);
+				csv.Context.TypeConverterOptionsCache.GetOptions<int?>().NullValues.Add(string.Empty);
 
 				// Read header row, assert header row columns:
 				Assert.IsTrue(csv.Read());
@@ -68,7 +68,7 @@ namespace CsvHelper.Tests.Reading
 
 			using (var csv = new CsvReader(parser))
 			{
-				csv.Configuration.TypeConverterOptionsCache.GetOptions<int?>().NullValues.Add(string.Empty);
+				csv.Context.TypeConverterOptionsCache.GetOptions<int?>().NullValues.Add(string.Empty);
 
 				// Read header row, assert header row columns:
 				Assert.IsTrue(csv.Read());
@@ -133,7 +133,7 @@ namespace CsvHelper.Tests.Reading
 
 			using (var csv = new CsvReader(parser))
 			{
-				csv.Configuration.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add(string.Empty); // Read empty fields as nulls instead of `""`.
+				csv.Context.TypeConverterOptionsCache.GetOptions<string>().NullValues.Add(string.Empty); // Read empty fields as nulls instead of `""`.
 
 				// Read header row, assert header row columns:
 				Assert.IsTrue(csv.Read());

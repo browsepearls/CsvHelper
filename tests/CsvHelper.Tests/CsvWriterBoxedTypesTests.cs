@@ -33,7 +33,7 @@ namespace CsvHelper.Tests
 					new A { Id = 2, Name = "two" },
 				};
 
-				csv.Configuration.RegisterClassMap<AMap>();
+				csv.Context.RegisterClassMap<AMap>();
 				csv.WriteRecords(recordsTyped);
 				csv.WriteRecords(recordsBoxed);
 				writer.Flush();

@@ -19,18 +19,19 @@ namespace CsvHelper.Tests.Culture
 		public void AddGetRemoveTest()
 		{
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
+			var context = new CsvContext(config);
 			var customOptions = new TypeConverterOptions
 			{
 				Formats = new string[] { "custom" },
 			};
-			config.TypeConverterOptionsCache.AddOptions<string>(customOptions);
-			var options = config.TypeConverterOptionsCache.GetOptions<string>();
+			context.TypeConverterOptionsCache.AddOptions<string>(customOptions);
+			var options = context.TypeConverterOptionsCache.GetOptions<string>();
 
 			Assert.AreEqual(customOptions.Formats, options.Formats);
 
-			config.TypeConverterOptionsCache.RemoveOptions<string>();
+			context.TypeConverterOptionsCache.RemoveOptions<string>();
 
-			options = config.TypeConverterOptionsCache.GetOptions<string>();
+			options = context.TypeConverterOptionsCache.GetOptions<string>();
 
 			Assert.AreNotEqual(customOptions.Formats, options.Formats);
 		}
@@ -52,7 +53,7 @@ namespace CsvHelper.Tests.Culture
 				stream.Position = 0;
 
 				var options = new TypeConverterOptions { NumberStyles = NumberStyles.AllowThousands };
-				csvReader.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
+				csvReader.Context.TypeConverterOptionsCache.AddOptions<int>(options);
 				csvReader.Read();
 				Assert.AreEqual(1234, csvReader.GetField<int>(0));
 				Assert.AreEqual(5678, csvReader.GetField(typeof(int), 1));
@@ -100,7 +101,7 @@ namespace CsvHelper.Tests.Culture
 				stream.Position = 0;
 
 				var options = new TypeConverterOptions { NumberStyles = NumberStyles.AllowThousands };
-				csvReader.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
+				csvReader.Context.TypeConverterOptionsCache.AddOptions<int>(options);
 				csvReader.GetRecords<Test>().ToList();
 			}
 		}
@@ -122,8 +123,8 @@ namespace CsvHelper.Tests.Culture
 				stream.Position = 0;
 
 				var options = new TypeConverterOptions { NumberStyles = NumberStyles.AllowThousands };
-				csvReader.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
-				csvReader.Configuration.RegisterClassMap<TestMap>();
+				csvReader.Context.TypeConverterOptionsCache.AddOptions<int>(options);
+				csvReader.Context.RegisterClassMap<TestMap>();
 				csvReader.GetRecords<Test>().ToList();
 			}
 		}
@@ -141,7 +142,7 @@ namespace CsvHelper.Tests.Culture
 			using (var csvWriter = new CsvWriter(writer, config))
 			{
 				var options = new TypeConverterOptions { Formats = new string[] { "c" } };
-				csvWriter.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
+				csvWriter.Context.TypeConverterOptionsCache.AddOptions<int>(options);
 				csvWriter.WriteField(1234);
 				csvWriter.NextRecord();
 				writer.Flush();
@@ -169,7 +170,7 @@ namespace CsvHelper.Tests.Culture
 					new Test { Number = 1234, NumberOverridenInMap = 5678 },
 				};
 				var options = new TypeConverterOptions { Formats = new string[] { "c" } };
-				csvWriter.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
+				csvWriter.Context.TypeConverterOptionsCache.AddOptions<int>(options);
 				csvWriter.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;
@@ -196,8 +197,8 @@ namespace CsvHelper.Tests.Culture
 					new Test { Number = 1234, NumberOverridenInMap = 5678 },
 				};
 				var options = new TypeConverterOptions { Formats = new string[] { "c" } };
-				csvWriter.Configuration.TypeConverterOptionsCache.AddOptions<int>(options);
-				csvWriter.Configuration.RegisterClassMap<TestMap>();
+				csvWriter.Context.TypeConverterOptionsCache.AddOptions<int>(options);
+				csvWriter.Context.RegisterClassMap<TestMap>();
 				csvWriter.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;

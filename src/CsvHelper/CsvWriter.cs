@@ -28,11 +28,11 @@ namespace CsvHelper
 	{
 		private readonly Lazy<RecordManager> recordManager;
 		private readonly ISerializer serializer;
-		private readonly WritingContext context;
+		private readonly CsvContext context;
 		private readonly IWriterConfiguration configuration;
 		private readonly TypeConverterCache typeConverterCache;
 		private readonly TrimOptions trimOptions;
-		private readonly Func<string, WritingContext, bool> shouldQuote;
+		private readonly Func<string, CsvContext, bool> shouldQuote;
 		private readonly MemberMapData reusableMemberMapData = new MemberMapData(null);
 		private readonly List<string> record = new List<string>();
 		private readonly Dictionary<Type, TypeConverterOptions> typeConverterOptionsCache = new Dictionary<Type, TypeConverterOptions>();
@@ -58,7 +58,7 @@ namespace CsvHelper
 		/// <summary>
 		/// Gets the writing context.
 		/// </summary>
-		public virtual WritingContext Context => context;
+		public virtual CsvContext Context => context;
 
 		/// <summary>
 		/// Gets the configuration.
@@ -89,7 +89,7 @@ namespace CsvHelper
 		{
 			configuration = serializer.Configuration as IWriterConfiguration ?? throw new ConfigurationException($"The {nameof(ISerializer)} configuration must implement {nameof(IWriterConfiguration)} to be used in {nameof(CsvWriter)}.");
 			this.serializer = serializer;
-			context = serializer.Context ?? throw new InvalidOperationException($"For {nameof(ISerializer)} to be used in {nameof(CsvWriter)}, {nameof(ISerializer.Context)} must also implement {nameof(WritingContext)}.");
+			context = serializer.Context ?? throw new InvalidOperationException($"For {nameof(ISerializer)} to be used in {nameof(CsvWriter)}, {nameof(ISerializer.Context)} must also implement {nameof(CsvContext)}.");
 			context.Writer = this;
 			recordManager = new Lazy<RecordManager>(() => ObjectResolver.Current.Resolve<RecordManager>(this));
 
@@ -103,7 +103,7 @@ namespace CsvHelper
 			quoteString = configuration.QuoteString;
 			shouldQuote = configuration.ShouldQuote;
 			trimOptions = configuration.TrimOptions;
-			typeConverterCache = configuration.TypeConverterCache;
+			typeConverterCache = context.TypeConverterCache;
 		}
 
 		/// <summary>
@@ -203,7 +203,7 @@ namespace CsvHelper
 			reusableMemberMapData.TypeConverter = converter;
 			if (!typeConverterOptionsCache.TryGetValue(type, out TypeConverterOptions typeConverterOptions))
 			{
-				typeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = cultureInfo }, configuration.TypeConverterOptionsCache.GetOptions(type));
+				typeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = cultureInfo }, context.TypeConverterOptionsCache.GetOptions(type));
 				typeConverterOptionsCache.Add(type, typeConverterOptions);
 			}
 
@@ -321,13 +321,13 @@ namespace CsvHelper
 				return;
 			}
 
-			if (configuration.Maps[type] == null)
+			if (context.Maps[type] == null)
 			{
-				configuration.Maps.Add(configuration.AutoMap(type));
+				context.Maps.Add(context.AutoMap(type));
 			}
 
 			var members = new MemberMapCollection();
-			members.AddMembers(configuration.Maps[type]);
+			members.AddMembers(context.Maps[type]);
 
 			foreach (var member in members)
 			{

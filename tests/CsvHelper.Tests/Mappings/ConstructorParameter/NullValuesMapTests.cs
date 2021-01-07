@@ -37,7 +37,7 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 			};
 			using (var csv = new CsvReader(parser))
 			{
-				csv.Configuration.RegisterClassMap<FooMap>();
+				csv.Context.RegisterClassMap<FooMap>();
 				var records = csv.GetRecords<Foo>().ToList();
 
 				Assert.AreEqual(1, records.Count);
@@ -60,7 +60,7 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 			};
 			using (var csv = new CsvReader(parser))
 			{
-				csv.Configuration.RegisterClassMap<FooMap>();
+				csv.Context.RegisterClassMap<FooMap>();
 
 				var records = csv.GetRecords<Foo>().ToList();
 
@@ -81,7 +81,7 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 			using (var serializer = new SerializerMock())
 			using (var csv = new CsvWriter(serializer))
 			{
-				csv.Configuration.RegisterClassMap<FooMap>();
+				csv.Context.RegisterClassMap<FooMap>();
 				csv.WriteRecords(records);
 
 				Assert.AreEqual(2, serializer.Records.Count);

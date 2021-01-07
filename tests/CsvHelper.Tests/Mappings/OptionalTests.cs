@@ -29,7 +29,7 @@ namespace CsvHelper.Tests.Mappings
 			};
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.RegisterClassMap<FooOptionalIntMap>();
+			csvReader.Context.RegisterClassMap<FooOptionalIntMap>();
 
 			var records = csvReader.GetRecords<Foo>().ToList();
 
@@ -53,7 +53,7 @@ namespace CsvHelper.Tests.Mappings
 			};
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.RegisterClassMap<FooOptionalIntMap>();
+			csvReader.Context.RegisterClassMap<FooOptionalIntMap>();
 
 			var records = csvReader.GetRecords<Foo>().ToList();
 
@@ -79,7 +79,7 @@ namespace CsvHelper.Tests.Mappings
 			};
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.RegisterClassMap<FooOptionalIntDefaultMap>();
+			csvReader.Context.RegisterClassMap<FooOptionalIntDefaultMap>();
 
 			var records = csvReader.GetRecords<Foo>().ToList();
 
@@ -105,7 +105,7 @@ namespace CsvHelper.Tests.Mappings
 			};
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.RegisterClassMap<FooOptionalStringIntDefaultMap>();
+			csvReader.Context.RegisterClassMap<FooOptionalStringIntDefaultMap>();
 
 			var records = csvReader.GetRecords<Foo>().ToList();
 
@@ -131,7 +131,7 @@ namespace CsvHelper.Tests.Mappings
 			};
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.RegisterClassMap<FooOptionalStringMap>();
+			csvReader.Context.RegisterClassMap<FooOptionalStringMap>();
 
 			var records = csvReader.GetRecords<Foo>().ToList();
 
@@ -157,7 +157,7 @@ namespace CsvHelper.Tests.Mappings
 			};
 
 			var csvReader = new CsvReader(parserMock);
-			csvReader.Configuration.RegisterClassMap<FooOptionalStringDefaultMap>();
+			csvReader.Context.RegisterClassMap<FooOptionalStringDefaultMap>();
 
 			var records = csvReader.GetRecords<Foo>().ToList();
 

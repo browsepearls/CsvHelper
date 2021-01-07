@@ -41,7 +41,7 @@ namespace CsvHelper.Tests.Defaults
 					},
 				};
 
-				csv.Configuration.RegisterClassMap<AMap>();
+				csv.Context.RegisterClassMap<AMap>();
 				csv.WriteRecords(records);
 
 				writer.Flush();
@@ -79,7 +79,7 @@ namespace CsvHelper.Tests.Defaults
 					},
 				};
 
-				csv.Configuration.RegisterClassMap<AMap>();
+				csv.Context.RegisterClassMap<AMap>();
 				csv.WriteRecords(records);
 
 				writer.Flush();

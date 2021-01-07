@@ -27,7 +27,7 @@ namespace CsvHelper.Tests.Mappings
 				writer.Flush();
 				stream.Position = 0;
 
-				csv.Configuration.RegisterClassMap<AMap>();
+				csv.Context.RegisterClassMap<AMap>();
 				var records = csv.GetRecords<A>().ToList();
 
 				Assert.AreEqual("p1", records[0].P1);
@@ -60,7 +60,7 @@ namespace CsvHelper.Tests.Mappings
 					}
 				};
 
-				csv.Configuration.RegisterClassMap<AMap>();
+				csv.Context.RegisterClassMap<AMap>();
 				csv.WriteRecords(list);
 				writer.Flush();
 				stream.Position = 0;
@@ -77,7 +77,8 @@ namespace CsvHelper.Tests.Mappings
 		public void ChangeMemberMapTest()
 		{
 			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture);
-			var map = config.AutoMap<A>();
+			var context = new CsvContext(config);
+			var map = context.AutoMap<A>();
 			map.Map(m => m.B.C.P3).Index(3);
 		}
 

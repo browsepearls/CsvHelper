@@ -39,7 +39,7 @@ namespace CsvHelper.Configuration
 		/// instead of throwing an exception.
 		/// Arguments: context
 		/// </summary>
-		Action<ReadingContext> BadDataFound { get; }
+		Action<CsvContext> BadDataFound { get; }
 
 		/// <summary>
 		/// Gets a value indicating if a line break found in a quote field should

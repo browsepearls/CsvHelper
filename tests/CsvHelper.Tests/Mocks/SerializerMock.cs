@@ -27,12 +27,12 @@ namespace CsvHelper.Tests.Mocks
 			get { return records; }
 		}
 
-		public WritingContext Context { get; }
+		public CsvContext Context { get; }
 
 		public SerializerMock(bool throwExceptionOnWrite = false)
 		{
 			Configuration = new CsvConfiguration(CultureInfo.InvariantCulture);
-			Context = new WritingContext(this);
+			Context = new CsvContext(this);
 			this.throwExceptionOnWrite = throwExceptionOnWrite;
 		}
 
