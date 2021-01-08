@@ -92,7 +92,7 @@ namespace CsvHelper.Tests.Parsing
 
 				parser.Read();
 
-				Assert.AreEqual("2\"two", parser[1]);
+				Assert.AreEqual("2\"two", parser[1].ToString());
 			}
 		}
 

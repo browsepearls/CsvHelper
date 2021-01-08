@@ -281,7 +281,7 @@ namespace CsvHelper.Tests
 			public ConvertUsingClassMap()
 			{
 				Map(m => m.IntColumn).Name("int2");
-				Map(m => m.StringColumn).ConvertUsing(row => row.GetField("string.3"));
+				Map(m => m.StringColumn).ConvertUsing(row => row.GetField<string>("string.3"));
 			}
 		}
 	}

@@ -23,7 +23,7 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, config))
 			{
 				parser.Read();
-				Assert.AreEqual("\"a\"", parser[0]);
+				Assert.AreEqual("\"a\"", parser[0].ToString());
 			}
 		}
 
@@ -38,7 +38,7 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, config))
 			{
 				parser.Read();
-				Assert.AreEqual("\"a\"", parser[0]);
+				Assert.AreEqual("\"a\"", parser[0].ToString());
 			}
 		}
 
@@ -54,7 +54,7 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, config))
 			{
 				parser.Read();
-				Assert.AreEqual("\"a\"", parser[0]);
+				Assert.AreEqual("\"a\"", parser[0].ToString());
 			}
 		}
 
@@ -70,7 +70,7 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, config))
 			{
 				parser.Read();
-				Assert.AreEqual("\"a\"", parser[0]);
+				Assert.AreEqual("\"a\"", parser[0].ToString());
 			}
 		}
 
@@ -86,7 +86,7 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, config))
 			{
 				parser.Read();
-				Assert.AreEqual("\"a\"", parser[0]);
+				Assert.AreEqual("\"a\"", parser[0].ToString());
 			}
 		}
 

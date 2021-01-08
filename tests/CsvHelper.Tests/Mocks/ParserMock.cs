@@ -27,13 +27,13 @@ namespace CsvHelper.Tests.Mocks
 
 		public string[] Record => record;
 
-		public Span<char> RawRecord => Span<char>.Empty;
+		public ReadOnlySpan<char> RawRecord => Span<char>.Empty;
 
 		public int Row => row;
 
 		public int RawRow => row;
 
-		public string this[int index] => record[index];
+		public ReadOnlySpan<char> this[int index] => record[index];
 
 		public ParserMock() : this(new CsvConfiguration(CultureInfo.InvariantCulture)) { }
 

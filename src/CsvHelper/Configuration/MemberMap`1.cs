@@ -212,10 +212,18 @@ namespace CsvHelper.Configuration
 		/// <summary>
 		/// Specifies an expression to be used to validate a field when reading.
 		/// </summary>
-		/// <param name="validateExpression"></param>
-		public virtual new MemberMap<TClass, TMember> Validate(Func<string, bool> validateExpression)
+		/// <param name="validateFunc">The validation function.</param>
+		public virtual new MemberMap<TClass, TMember> Validate(ValidateFunc validateFunc)
 		{
-			Data.ValidateExpression = (Expression<Func<string, bool>>)(x => validateExpression(x));
+			var fieldParameter = Expression.Parameter(typeof(ReadOnlySpan<char>), "fieldToValidate");
+			var methodExpression = Expression.Call(
+				Expression.Constant(validateFunc.Target),
+				validateFunc.Method,
+				fieldParameter
+			);
+			var lambdaExpression = Expression.Lambda<ValidateFunc>(methodExpression, fieldParameter);
+
+			Data.ValidateExpression = lambdaExpression;
 
 			return this;
 		}

@@ -59,11 +59,12 @@ namespace CsvHelper.TypeConversion
 		/// <param name="row">The <see cref="IReaderRow"/> for the current record.</param>
 		/// <param name="memberMapData">The <see cref="MemberMapData"/> for the member being created.</param>
 		/// <returns>The object created from the string.</returns>
-		public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+		public override object ConvertFromString(ReadOnlySpan<char> text, IReaderRow row, MemberMapData memberMapData)
 		{
-			if (text != null && nameValues.ContainsKey(text))
+			var s = text.ToString();
+			if (text != null && nameValues.ContainsKey(s))
 			{
-				return nameValues[text];
+				return nameValues[s];
 			}
 
 #if NET45 || NET47 || NETSTANDARD2_0
@@ -76,7 +77,7 @@ namespace CsvHelper.TypeConversion
 				return base.ConvertFromString(text, row, memberMapData);
 			}
 #else
-			if (Enum.TryParse(type, text, out var value))
+			if (Enum.TryParse(type, s, out var value))
 			{
 				return value;
 			}

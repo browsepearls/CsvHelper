@@ -104,7 +104,7 @@ namespace CsvHelper
 
 				for (var i = 0; i < fields.Count; i++)
 				{
-					record[i] = this[i];
+					record[i] = this[i].ToString();
 				}
 
 				return record;
@@ -114,7 +114,7 @@ namespace CsvHelper
 		/// <summary>
 		/// Gets the raw record for the current row.
 		/// </summary>
-		public Span<char> RawRecord
+		public ReadOnlySpan<char> RawRecord
 		{
 			get
 			{
@@ -142,7 +142,7 @@ namespace CsvHelper
 		/// </summary>
 		/// <param name="index">The index.</param>
 		/// <returns>The field.</returns>
-		public string this[int index]
+		public ReadOnlySpan<char> this[int index]
 		{
 			get
 			{
@@ -162,10 +162,10 @@ namespace CsvHelper
 					WhiteSpaceChars = whiteSpaceChars,
 				};
 
-				var span = memoryOwner.Memory.Slice(fields[index].Start + rowStartPosition, fields[index].Length).Span;
+				ReadOnlySpan<char> span = memoryOwner.Memory.Slice(fields[index].Start + rowStartPosition, fields[index].Length).Span;
 				span = processField(span, options);
 
-				return span.ToString();
+				return span;
 			}
 		}
 

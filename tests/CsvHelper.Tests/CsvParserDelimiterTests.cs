@@ -32,16 +32,16 @@ namespace CsvHelper.Tests
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
-				Assert.AreEqual("3", parser[2]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
+				Assert.AreEqual("3", parser[2].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("4", parser[0]);
-				Assert.AreEqual("5", parser[1]);
-				Assert.AreEqual("6", parser[2]);
+				Assert.AreEqual("4", parser[0].ToString());
+				Assert.AreEqual("5", parser[1].ToString());
+				Assert.AreEqual("6", parser[2].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsFalse(hasRecords);
@@ -68,16 +68,16 @@ namespace CsvHelper.Tests
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
-				Assert.AreEqual("3", parser[2]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
+				Assert.AreEqual("3", parser[2].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("4", parser[0]);
-				Assert.AreEqual("5", parser[1]);
-				Assert.AreEqual("6", parser[2]);
+				Assert.AreEqual("4", parser[0].ToString());
+				Assert.AreEqual("5", parser[1].ToString());
+				Assert.AreEqual("6", parser[2].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsFalse(hasRecords);
@@ -104,16 +104,16 @@ namespace CsvHelper.Tests
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
-				Assert.AreEqual("3", parser[2]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
+				Assert.AreEqual("3", parser[2].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("4", parser[0]);
-				Assert.AreEqual("5", parser[1]);
-				Assert.AreEqual("6", parser[2]);
+				Assert.AreEqual("4", parser[0].ToString());
+				Assert.AreEqual("5", parser[1].ToString());
+				Assert.AreEqual("6", parser[2].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsFalse(hasRecords);
@@ -140,16 +140,16 @@ namespace CsvHelper.Tests
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("", parser[0]);
-				Assert.AreEqual("", parser[1]);
-				Assert.AreEqual("", parser[2]);
+				Assert.AreEqual("", parser[0].ToString());
+				Assert.AreEqual("", parser[1].ToString());
+				Assert.AreEqual("", parser[2].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("", parser[0]);
-				Assert.AreEqual("", parser[1]);
-				Assert.AreEqual("", parser[2]);
+				Assert.AreEqual("", parser[0].ToString());
+				Assert.AreEqual("", parser[1].ToString());
+				Assert.AreEqual("", parser[2].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsFalse(hasRecords);
@@ -176,16 +176,16 @@ namespace CsvHelper.Tests
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("", parser[0]);
-				Assert.AreEqual("", parser[1]);
-				Assert.AreEqual("", parser[2]);
+				Assert.AreEqual("", parser[0].ToString());
+				Assert.AreEqual("", parser[1].ToString());
+				Assert.AreEqual("", parser[2].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("", parser[0]);
-				Assert.AreEqual("", parser[1]);
-				Assert.AreEqual("", parser[2]);
+				Assert.AreEqual("", parser[0].ToString());
+				Assert.AreEqual("", parser[1].ToString());
+				Assert.AreEqual("", parser[2].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsFalse(hasRecords);
@@ -212,16 +212,16 @@ namespace CsvHelper.Tests
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
-				Assert.AreEqual("", parser[2]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
+				Assert.AreEqual("", parser[2].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("4", parser[0]);
-				Assert.AreEqual("5", parser[1]);
-				Assert.AreEqual("", parser[2]);
+				Assert.AreEqual("4", parser[0].ToString());
+				Assert.AreEqual("5", parser[1].ToString());
+				Assert.AreEqual("", parser[2].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsFalse(hasRecords);
@@ -248,16 +248,16 @@ namespace CsvHelper.Tests
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
-				Assert.AreEqual("", parser[2]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
+				Assert.AreEqual("", parser[2].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("4", parser[0]);
-				Assert.AreEqual("5", parser[1]);
-				Assert.AreEqual("", parser[2]);
+				Assert.AreEqual("4", parser[0].ToString());
+				Assert.AreEqual("5", parser[1].ToString());
+				Assert.AreEqual("", parser[2].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsFalse(hasRecords);
@@ -341,8 +341,8 @@ namespace CsvHelper.Tests
 				var hasRecords = parser.Read();
 				Assert.IsTrue(hasRecords);
 				Assert.AreEqual(2, parser.Count);
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
 
 				hasRecords = parser.Read();
 				Assert.IsFalse(hasRecords);

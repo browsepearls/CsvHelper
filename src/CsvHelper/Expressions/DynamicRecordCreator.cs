@@ -49,7 +49,7 @@ namespace CsvHelper.Expressions
 				{
 					var propertyName = Reader.Configuration.GetDynamicPropertyName(Reader.Context, i);
 					var field = Reader.GetField(i);
-					dict.Add(propertyName, field);
+					dict.Add(propertyName, field.ToString());
 				}
 			}
 

@@ -108,7 +108,8 @@ namespace CsvHelper.Expressions
 						{
 							if (parameterMap.Data.IsDefaultSet || parameterMap.Data.IsOptional)
 							{
-								var defaultExpression = CreateDefaultExpression(parameterMap, Expression.Constant(string.Empty));
+								var emptySpanExpression = Expression.Convert(Expression.Call(typeof(Span<char>), "get_Empty", null), typeof(ReadOnlySpan<char>));
+								var defaultExpression = CreateDefaultExpression(parameterMap, emptySpanExpression);
 								argumentExpressions.Add(defaultExpression);
 								continue;
 							}
@@ -121,7 +122,8 @@ namespace CsvHelper.Expressions
 					{
 						// If there wasn't an index explicitly, use a default value since constructors need all
 						// arguments to be created.
-						var defaultExpression = CreateDefaultExpression(parameterMap, Expression.Constant(string.Empty));
+						var emptySpanExpression = Expression.Convert(Expression.Call(typeof(Span<char>), "get_Empty", null), typeof(ReadOnlySpan<char>));
+						var defaultExpression = CreateDefaultExpression(parameterMap, emptySpanExpression);
 						argumentExpressions.Add(defaultExpression);
 						continue;
 					}
@@ -132,7 +134,7 @@ namespace CsvHelper.Expressions
 					}
 
 					// Get the field using the field index.
-					var method = typeof(IReaderRow).GetProperty("Item", typeof(string), new[] { typeof(int) }).GetGetMethod();
+					var method = typeof(IReaderRow).GetProperty("Item", typeof(ReadOnlySpan<char>), new[] { typeof(int) }).GetGetMethod();
 					Expression fieldExpression = Expression.Call(Expression.Constant(reader), method, Expression.Constant(index, typeof(int)));
 
 					if (parameterMap.Data.IsDefaultSet)
@@ -226,7 +228,8 @@ namespace CsvHelper.Expressions
 				{
 					if (memberMap.Data.IsDefaultSet)
 					{
-						return CreateDefaultExpression(memberMap, Expression.Constant(string.Empty));
+						var emptySpanExpression = Expression.Convert(Expression.Call(typeof(Span<char>), "get_Empty", null), typeof(ReadOnlySpan<char>));
+						return CreateDefaultExpression(memberMap, emptySpanExpression);
 					}
 
 					// Skip if the index was not found.
@@ -240,16 +243,19 @@ namespace CsvHelper.Expressions
 			}
 
 			// Get the field using the field index.
-			var method = typeof(IReaderRow).GetProperty("Item", typeof(string), new[] { typeof(int) }).GetGetMethod();
+			var method = typeof(IReaderRow).GetProperty("Item", typeof(ReadOnlySpan<char>), new[] { typeof(int) }).GetGetMethod();
 			Expression fieldExpression = Expression.Call(Expression.Constant(reader), method, Expression.Constant(index, typeof(int)));
 
 			// Validate the field.
 			if (memberMap.Data.ValidateExpression != null)
 			{
-				var validateExpression = Expression.IsFalse(Expression.Invoke(memberMap.Data.ValidateExpression, fieldExpression));
 				var validationExceptionConstructor = typeof(FieldValidationException).GetConstructors().OrderBy(c => c.GetParameters().Length).First();
-				var newValidationExceptionExpression = Expression.New(validationExceptionConstructor, Expression.Constant(reader.Context), fieldExpression);
+				var spanToStringExpression = Expression.Call(fieldExpression, nameof(Span<char>.ToString), null);
+				var newValidationExceptionExpression = Expression.New(validationExceptionConstructor, Expression.Constant(reader.Context), spanToStringExpression);
 				var throwExpression = Expression.Throw(newValidationExceptionExpression);
+
+				var validateExpression = Expression.IsFalse(Expression.Invoke(memberMap.Data.ValidateExpression, fieldExpression));
+
 				fieldExpression = Expression.Block(
 					// If the validate method returns false, throw an exception.
 					Expression.IfThen(validateExpression, throwExpression),
@@ -368,9 +374,20 @@ namespace CsvHelper.Expressions
 		/// <param name="fieldExpression">The field expression.</param>
 		public virtual Expression CreateTypeConverterExpression(MemberMap memberMap, Expression fieldExpression)
 		{
-			memberMap.Data.TypeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = reader.Configuration.CultureInfo }, reader.Context.TypeConverterOptionsCache.GetOptions(memberMap.Data.Member.MemberType()), memberMap.Data.TypeConverterOptions);
+			memberMap.Data.TypeConverterOptions = TypeConverterOptions.Merge(
+				new TypeConverterOptions { CultureInfo = reader.Configuration.CultureInfo },
+				reader.Context.TypeConverterOptionsCache.GetOptions(memberMap.Data.Member.MemberType()),
+				memberMap.Data.TypeConverterOptions
+			);
 
-			Expression typeConverterFieldExpression = Expression.Call(Expression.Constant(memberMap.Data.TypeConverter), nameof(ITypeConverter.ConvertFromString), null, fieldExpression, Expression.Constant(reader), Expression.Constant(memberMap.Data));
+			Expression typeConverterFieldExpression = Expression.Call(
+				Expression.Constant(memberMap.Data.TypeConverter),
+				nameof(ITypeConverter.ConvertFromString),
+				null,
+				fieldExpression,
+				Expression.Constant(reader),
+				Expression.Constant(memberMap.Data)
+			);
 			typeConverterFieldExpression = Expression.Convert(typeConverterFieldExpression, memberMap.Data.Member.MemberType());
 
 			return typeConverterFieldExpression;
@@ -406,7 +423,14 @@ namespace CsvHelper.Expressions
 			};
 			memberMapData.Names.AddRange(parameterMap.Data.Names);
 
-			Expression typeConverterFieldExpression = Expression.Call(Expression.Constant(parameterMap.Data.TypeConverter), nameof(ITypeConverter.ConvertFromString), null, fieldExpression, Expression.Constant(reader), Expression.Constant(memberMapData));
+			Expression typeConverterFieldExpression = Expression.Call(
+				Expression.Constant(parameterMap.Data.TypeConverter),
+				nameof(ITypeConverter.ConvertFromString),
+				null,
+				fieldExpression,
+				Expression.Constant(reader),
+				Expression.Constant(memberMapData)
+			);
 			typeConverterFieldExpression = Expression.Convert(typeConverterFieldExpression, parameterMap.Data.Parameter.ParameterType);
 
 			return typeConverterFieldExpression;
@@ -425,8 +449,20 @@ namespace CsvHelper.Expressions
 			Expression defaultValueExpression;
 			if (memberMap.Data.Member.MemberType() != typeof(string) && memberMap.Data.Default != null && memberMap.Data.Default.GetType() == typeof(string))
 			{
+				var toCharArrayMethod = typeof(string).GetMethod(nameof(String.ToCharArray), new Type[0]);
+				var toCharArrayExpression = Expression.Call(Expression.Constant(memberMap.Data.Default), toCharArrayMethod);
+				var spanConstructor = typeof(Span<char>).GetConstructor(new Type[] { typeof(char[]) });
+				var spanExpression = Expression.Convert(Expression.New(spanConstructor, toCharArrayExpression), typeof(ReadOnlySpan<char>));
+
 				// The default is a string but the member type is not. Use a converter.
-				defaultValueExpression = Expression.Call(Expression.Constant(memberMap.Data.TypeConverter), nameof(ITypeConverter.ConvertFromString), null, Expression.Constant(memberMap.Data.Default), Expression.Constant(reader), Expression.Constant(memberMap.Data));
+				defaultValueExpression = Expression.Call(
+					Expression.Constant(memberMap.Data.TypeConverter),
+					nameof(ITypeConverter.ConvertFromString),
+					null,
+					spanExpression,
+					Expression.Constant(reader),
+					Expression.Constant(memberMap.Data)
+				);
 			}
 			else
 			{
@@ -436,11 +472,8 @@ namespace CsvHelper.Expressions
 
 			defaultValueExpression = Expression.Convert(defaultValueExpression, memberMap.Data.Member.MemberType());
 
-			// If null, use string.Empty.
-			var coalesceExpression = Expression.Coalesce(fieldExpression, Expression.Constant(string.Empty));
-
-			// Check if the field is an empty string.
-			var checkFieldEmptyExpression = Expression.Equal(Expression.Convert(coalesceExpression, typeof(string)), Expression.Constant(string.Empty, typeof(string)));
+			// Check of the length of the Span<char> is 0.
+			var checkFieldEmptyExpression = Expression.Equal(Expression.Call(fieldExpression, "get_Length", null), Expression.Constant(0));
 
 			// Use a default value if the field is an empty string.
 			fieldExpression = Expression.Condition(checkFieldEmptyExpression, defaultValueExpression, typeConverterExpression);
@@ -471,11 +504,8 @@ namespace CsvHelper.Expressions
 				defaultValueExpression = Expression.Convert(Expression.Constant(parameterMap.Data.Default), parameterMap.Data.Parameter.ParameterType);
 			}
 
-			// If null, use string.Empty.
-			var coalesceExpression = Expression.Coalesce(fieldExpression, Expression.Constant(string.Empty));
-
-			// Check if the field is an empty string.
-			var checkFieldEmptyExpression = Expression.Equal(Expression.Convert(coalesceExpression, typeof(string)), Expression.Constant(string.Empty, typeof(string)));
+			// Check of the length of the Span<char> is 0.
+			var checkFieldEmptyExpression = Expression.Equal(Expression.Call(fieldExpression, "get_Length", null), Expression.Constant(0));
 
 			// Use a default value if the field is an empty string.
 			fieldExpression = Expression.Condition(checkFieldEmptyExpression, defaultValueExpression, typeConverterExpression);

@@ -32,9 +32,9 @@ namespace CsvHelper.Tests.Parsing
 				parser.Read();
 
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2&3", parser[1]);
-				Assert.AreEqual("4", parser[2]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2&3", parser[1].ToString());
+				Assert.AreEqual("4", parser[2].ToString());
 			}
 		}
 
@@ -53,9 +53,9 @@ namespace CsvHelper.Tests.Parsing
 				parser.Read();
 
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
-				Assert.AreEqual("3", parser[2]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
+				Assert.AreEqual("3", parser[2].ToString());
 			}
 		}
 
@@ -73,8 +73,8 @@ namespace CsvHelper.Tests.Parsing
 			{
 				parser.Read();
 
-				Assert.AreEqual("1!", parser[0]);
-				Assert.AreEqual("2", parser[1]);
+				Assert.AreEqual("1!", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
 			}
 		}
 	}

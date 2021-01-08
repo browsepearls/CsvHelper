@@ -148,7 +148,7 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 
 		private class CustomConverter : DefaultTypeConverter
 		{
-			public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+			public override object ConvertFromString(ReadOnlySpan<char> text, IReaderRow row, MemberMapData memberMapData)
 			{
 				return "Bar";
 			}

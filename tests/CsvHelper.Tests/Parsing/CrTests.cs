@@ -21,7 +21,7 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
+				Assert.AreEqual("1", parser[0].ToString());
 			}
 		}
 
@@ -34,7 +34,7 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
+				Assert.AreEqual("1", parser[0].ToString());
 			}
 		}
 
@@ -48,10 +48,10 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
+				Assert.AreEqual("1", parser[0].ToString());
 
 				parser.Read();
-				Assert.AreEqual("2", parser[0]);
+				Assert.AreEqual("2", parser[0].ToString());
 			}
 		}
 
@@ -65,10 +65,10 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
+				Assert.AreEqual("1", parser[0].ToString());
 
 				parser.Read();
-				Assert.AreEqual("2", parser[0]);
+				Assert.AreEqual("2", parser[0].ToString());
 			}
 		}
 
@@ -82,10 +82,10 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
+				Assert.AreEqual("1", parser[0].ToString());
 
 				parser.Read();
-				Assert.AreEqual("2", parser[0]);
+				Assert.AreEqual("2", parser[0].ToString());
 			}
 		}
 
@@ -99,10 +99,10 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
+				Assert.AreEqual("1", parser[0].ToString());
 
 				parser.Read();
-				Assert.AreEqual("2", parser[0]);
+				Assert.AreEqual("2", parser[0].ToString());
 			}
 		}
 
@@ -116,10 +116,10 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
+				Assert.AreEqual("1", parser[0].ToString());
 
 				parser.Read();
-				Assert.AreEqual("2", parser[0]);
+				Assert.AreEqual("2", parser[0].ToString());
 			}
 		}
 
@@ -132,8 +132,8 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
 			}
 		}
 
@@ -147,12 +147,12 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
 
 				parser.Read();
-				Assert.AreEqual("3", parser[0]);
-				Assert.AreEqual("4", parser[1]);
+				Assert.AreEqual("3", parser[0].ToString());
+				Assert.AreEqual("4", parser[1].ToString());
 			}
 		}
 
@@ -166,12 +166,12 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
 
 				parser.Read();
-				Assert.AreEqual("3", parser[0]);
-				Assert.AreEqual("4", parser[1]);
+				Assert.AreEqual("3", parser[0].ToString());
+				Assert.AreEqual("4", parser[1].ToString());
 			}
 		}
 
@@ -185,12 +185,12 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
 
 				parser.Read();
-				Assert.AreEqual("3", parser[0]);
-				Assert.AreEqual("4", parser[1]);
+				Assert.AreEqual("3", parser[0].ToString());
+				Assert.AreEqual("4", parser[1].ToString());
 			}
 		}
 
@@ -204,12 +204,12 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
 
 				parser.Read();
-				Assert.AreEqual("3", parser[0]);
-				Assert.AreEqual("4", parser[1]);
+				Assert.AreEqual("3", parser[0].ToString());
+				Assert.AreEqual("4", parser[1].ToString());
 			}
 		}
 
@@ -223,12 +223,12 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
 
 				parser.Read();
-				Assert.AreEqual("3", parser[0]);
-				Assert.AreEqual("4", parser[1]);
+				Assert.AreEqual("3", parser[0].ToString());
+				Assert.AreEqual("4", parser[1].ToString());
 			}
 		}
 	}

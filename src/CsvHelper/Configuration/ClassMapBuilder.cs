@@ -279,8 +279,8 @@ namespace CsvHelper.Configuration
 		/// If false is returned, a <see cref="ValidationException"/>
 		/// will be thrown.
 		/// </summary>
-		/// <param name="validateExpression">The validation expression.</param>
-		IHasMap<TClass> Validate(Func<string, bool> validateExpression);
+		/// <param name="validateFunc">The validation function.</param>
+		IHasMap<TClass> Validate(ValidateFunc validateFunc);
 	}
 
 	/// <summary>
@@ -418,7 +418,7 @@ namespace CsvHelper.Configuration
 			return this;
 		}
 
-		public IHasMap<TClass> Validate(Func<string, bool> validateExpression)
+		public IHasMap<TClass> Validate(ValidateFunc validateExpression)
 		{
 			memberMap.Validate(validateExpression);
 			return this;

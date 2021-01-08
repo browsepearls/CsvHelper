@@ -2,6 +2,7 @@
 // This file is a part of CsvHelper and is dual licensed under MS-PL and Apache 2.0.
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
+using System;
 using System.Collections;
 using CsvHelper.Configuration;
 
@@ -22,12 +23,12 @@ namespace CsvHelper.TypeConversion
 		/// <param name="row">The <see cref="IReaderRow"/> for the current record.</param>
 		/// <param name="memberMapData">The <see cref="MemberMapData"/> for the member being created.</param>
 		/// <returns>The object created from the string.</returns>
-		public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+		public override object ConvertFromString(ReadOnlySpan<char> text, IReaderRow row, MemberMapData memberMapData)
 		{
 			var message = "Converting IEnumerable types is not supported for a single field. " +
 						  "If you want to do this, create your own ITypeConverter and register " +
 						  "it in the TypeConverterFactory by calling AddConverter.";
-			throw new TypeConverterException(this, memberMapData, text, row.Context, message);
+			throw new TypeConverterException(this, memberMapData, text.ToString(), row.Context, message);
 		}
 
 		/// <summary>

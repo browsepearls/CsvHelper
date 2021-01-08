@@ -33,8 +33,8 @@ namespace CsvHelper.Tests.Reading
 			csv.Read();
 			csv.ReadHeader();
 			csv.Read();
-			Assert.AreEqual("1", csv.GetField(0));
-			Assert.AreEqual("2", csv.GetField(1));
+			Assert.AreEqual("1", csv.GetField(0).ToString());
+			Assert.AreEqual("2", csv.GetField(1).ToString());
 		}
 
 		[TestMethod]
@@ -56,8 +56,8 @@ namespace CsvHelper.Tests.Reading
 			csv.Read();
 			csv.ReadHeader();
 			csv.Read();
-			Assert.AreEqual("1", csv.GetField(0));
-			Assert.AreEqual("2", csv.GetField(1));
+			Assert.AreEqual("1", csv.GetField(0).ToString());
+			Assert.AreEqual("2", csv.GetField(1).ToString());
 		}
 
 		[TestMethod]
@@ -80,8 +80,8 @@ namespace CsvHelper.Tests.Reading
 
 			csv.Read();
 			csv.Read();
-			Assert.AreEqual("1", csv.GetField(0));
-			Assert.AreEqual("2", csv.GetField(1));
+			Assert.AreEqual("1", csv.GetField(0).ToString());
+			Assert.AreEqual("2", csv.GetField(1).ToString());
 		}
 	}
 }

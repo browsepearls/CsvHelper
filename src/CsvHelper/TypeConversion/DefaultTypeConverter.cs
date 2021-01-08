@@ -43,14 +43,14 @@ namespace CsvHelper.TypeConversion
         /// <param name="row">The <see cref="IReaderRow"/> for the current record.</param>
         /// <param name="memberMapData">The <see cref="MemberMapData"/> for the member being created.</param>
         /// <returns>The object created from the string.</returns>
-        public virtual object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+        public virtual object ConvertFromString(ReadOnlySpan<char> text, IReaderRow row, MemberMapData memberMapData)
         {
             var message =
                 $"The conversion cannot be performed.\r\n" +
-                $"    Text: '{text}'\r\n" +
+                $"    Text: '{text.ToString()}'\r\n" +
                 $"    MemberType: {memberMapData.Member?.MemberType().FullName}\r\n" +
                 $"    TypeConverter: '{memberMapData.TypeConverter?.GetType().FullName}'";
-            throw new TypeConverterException(this, memberMapData, text, (CsvContext)row.Context, message);
+            throw new TypeConverterException(this, memberMapData, text.ToString(), (CsvContext)row.Context, message);
         }
     }
 }

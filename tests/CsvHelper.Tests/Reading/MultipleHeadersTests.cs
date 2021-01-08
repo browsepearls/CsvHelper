@@ -32,13 +32,13 @@ namespace CsvHelper.Tests.Reading
 				csv.Read();
 
 				Assert.AreEqual(1, csv.GetField<int>("A"));
-				Assert.AreEqual("one", csv.GetField("B"));
+				Assert.AreEqual("one", csv.GetField<string>("B"));
 
 				csv.Read();
 				csv.ReadHeader();
 				csv.Read();
 
-				Assert.AreEqual("two", csv.GetField("Y"));
+				Assert.AreEqual("two", csv.GetField<string>("Y"));
 				Assert.AreEqual(2, csv.GetField<int>("Z"));
 			}
 		}

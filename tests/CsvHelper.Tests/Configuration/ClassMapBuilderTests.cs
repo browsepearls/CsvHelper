@@ -15,7 +15,7 @@ namespace CsvHelper.Tests.Configuration
 	public class ClassMapBuilderTests
 	{
 		private static readonly Factory csvFactory = new Factory();
-		private static Func<IReaderRow, FakeInnerClass> ConvertExpression => r => new FakeInnerClass { E = r.GetField(4) };
+		private static Func<IReaderRow, FakeInnerClass> ConvertExpression => r => new FakeInnerClass { E = r.GetField(4).ToString() };
 		private static readonly ClassMap<FakeClass> map = csvFactory.CreateClassMapBuilder<FakeClass>()
 			/*
 			.Map( m => m.A ).Constant( "a" )
@@ -122,23 +122,23 @@ namespace CsvHelper.Tests.Configuration
 
 			public IParser Parser => throw new NotImplementedException();
 
-			string IReaderRow.this[int index] => throw new NotImplementedException();
+			ReadOnlySpan<char> IReaderRow.this[int index] => throw new NotImplementedException();
 
-			string IReaderRow.this[string name] => throw new NotImplementedException();
+			ReadOnlySpan<char> IReaderRow.this[string name] => throw new NotImplementedException();
 
-			string IReaderRow.this[string name, int index] => throw new NotImplementedException();
+			ReadOnlySpan<char> IReaderRow.this[string name, int index] => throw new NotImplementedException();
 
-			public string GetField(int index)
+			public ReadOnlySpan<char> GetField(int index)
 			{
 				return index.ToString();
 			}
 
-			public string GetField(string name)
+			public ReadOnlySpan<char> GetField(string name)
 			{
 				throw new NotImplementedException();
 			}
 
-			public string GetField(string name, int index)
+			public ReadOnlySpan<char> GetField(string name, int index)
 			{
 				throw new NotImplementedException();
 			}

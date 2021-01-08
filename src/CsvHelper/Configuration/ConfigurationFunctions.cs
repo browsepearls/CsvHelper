@@ -175,7 +175,7 @@ namespace CsvHelper.Configuration
 		/// PreDequote -> Dequote -> PostDequote
 		/// </summary>
 		/// <returns>The processed field.</returns>
-		public static Span<char> ProcessField(Span<char> span, ProcessFieldOptions options)
+		public static ReadOnlySpan<char> ProcessField(ReadOnlySpan<char> span, ProcessFieldOptions options)
 		{
 			span = options.PreDequote(span, options);
 			span = options.Dequote(span, options);
@@ -188,7 +188,7 @@ namespace CsvHelper.Configuration
 		/// Trims the field if enabled.
 		/// </summary>
 		/// <returns>The processed field.</returns>
-		public static Span<char> PreDequoteField(Span<char> span, ProcessFieldOptions options)
+		public static ReadOnlySpan<char> PreDequoteField(ReadOnlySpan<char> span, ProcessFieldOptions options)
 		{
 			if ((options.TrimOptions & TrimOptions.Trim) != TrimOptions.Trim)
 			{
@@ -207,7 +207,7 @@ namespace CsvHelper.Configuration
 		/// Removes quoting and escape chars from a field.
 		/// </summary>
 		/// <returns>The processed field.</returns>
-		public static Span<char> DequoteField(Span<char> span, ProcessFieldOptions options)
+		public static ReadOnlySpan<char> DequoteField(ReadOnlySpan<char> span, ProcessFieldOptions options)
 		{
 			if (!options.IsQuoted || options.IgnoreQuotes)
 			{
@@ -312,7 +312,7 @@ namespace CsvHelper.Configuration
 		/// <summary>
 		/// Trims inside the quotes if enabled.
 		/// </summary>
-		public static Span<char> PostDequoteField(Span<char> span, ProcessFieldOptions options)
+		public static ReadOnlySpan<char> PostDequoteField(ReadOnlySpan<char> span, ProcessFieldOptions options)
 		{
 			if (!options.IsQuoted)
 			{

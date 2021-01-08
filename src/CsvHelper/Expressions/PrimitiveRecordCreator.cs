@@ -28,7 +28,7 @@ namespace CsvHelper.Expressions
 		/// <param name="recordType">The record type.</param>
 		protected override Delegate CreateCreateRecordDelegate(Type recordType)
 		{
-			var method = typeof(IReaderRow).GetProperty("Item", typeof(string), new[] { typeof(int) }).GetGetMethod();
+			var method = typeof(IReaderRow).GetProperty("Item", typeof(ReadOnlySpan<char>), new[] { typeof(int) }).GetGetMethod();
 			Expression fieldExpression = Expression.Call(Expression.Constant(Reader), method, Expression.Constant(0, typeof(int)));
 
 			var memberMapData = new MemberMapData(null)

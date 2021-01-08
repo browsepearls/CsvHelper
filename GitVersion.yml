@@ -6,6 +6,7 @@ branches:
     regex: span-parser
     source-branches: [ 'master' ]
     tag: beta
+    mode: ContinuousDeployment
 ignore:
   sha: []
 merge-message-formats: {}

@@ -23,7 +23,7 @@ namespace CsvHelper
 		/// </summary>
 		/// <param name="index">The index.</param>
 		/// <returns>The field.</returns>
-		string this[int index] { get; }
+		ReadOnlySpan<char> this[int index] { get; }
 
 		/// <summary>
 		/// Gets the record for the current row. Note:
@@ -35,7 +35,7 @@ namespace CsvHelper
 		/// <summary>
 		/// Gets the raw record for the current row.
 		/// </summary>
-		Span<char> RawRecord { get; }
+		ReadOnlySpan<char> RawRecord { get; }
 
 		/// <summary>
 		/// Gets the CSV row the parser is currently on.

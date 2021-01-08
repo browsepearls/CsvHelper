@@ -33,8 +33,8 @@ namespace CsvHelper.Tests.Parsing
 
 				parser.Read();
 				parser.Read();
-				Assert.AreEqual("3", parser[0]);
-				Assert.AreEqual("4", parser[1]);
+				Assert.AreEqual("3", parser[0].ToString());
+				Assert.AreEqual("4", parser[1].ToString());
 			}
 		}
 

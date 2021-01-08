@@ -26,7 +26,7 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, config))
 			{
 				parser.Read();
-				Assert.IsFalse(parser[0].EndsWith("\r"));
+				Assert.IsFalse(parser[0].ToString().EndsWith("\r"));
 				Assert.IsFalse(parser.RawRecord.ToString().EndsWith("\r"));
 			}
 		}
@@ -45,7 +45,7 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, config))
 			{
 				parser.Read();
-				Assert.IsFalse(parser[0].EndsWith("\r"));
+				Assert.IsFalse(parser[0].ToString().EndsWith("\r"));
 				Assert.IsFalse(parser.RawRecord.ToString().EndsWith("\r"));
 			}
 		}

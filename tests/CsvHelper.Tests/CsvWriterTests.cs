@@ -955,7 +955,7 @@ namespace CsvHelper.Tests
 				return "test";
 			}
 
-			public object ConvertFromString(string text, IReaderRow row, MemberMapData propertyMapData)
+			public object ConvertFromString(ReadOnlySpan<char> text, IReaderRow row, MemberMapData propertyMapData)
 			{
 				throw new NotImplementedException();
 			}

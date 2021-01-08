@@ -40,9 +40,9 @@ namespace CsvHelper.Tests.TypeConversion
 
 			var row = new CsvReader(new ParserMock());
 
-			Assert.AreEqual('a', converter.ConvertFromString("a", null, propertyMapData));
-			Assert.AreEqual('a', converter.ConvertFromString(" a ", null, propertyMapData));
-			Assert.AreEqual(' ', converter.ConvertFromString(" ", null, propertyMapData));
+			Assert.AreEqual('a', converter.ConvertFromString("a", row, propertyMapData));
+			Assert.AreEqual('a', converter.ConvertFromString(" a ", row, propertyMapData));
+			Assert.AreEqual(' ', converter.ConvertFromString(" ", row, propertyMapData));
 
 			try
 			{

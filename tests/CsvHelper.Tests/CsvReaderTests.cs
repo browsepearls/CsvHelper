@@ -274,7 +274,7 @@ namespace CsvHelper.Tests
 			var reader = new CsvReader(parserMock);
 			reader.Read();
 
-			Assert.IsNull(reader.GetField(2));
+			Assert.AreEqual(0, reader.GetField(2).Length);
 		}
 
 		[TestMethod]
@@ -610,9 +610,9 @@ namespace CsvHelper.Tests
 				csv.ReadHeader();
 				csv.Read();
 
-				Assert.AreEqual("1", csv.GetField("one"));
-				Assert.AreEqual("2", csv.GetField("TWO"));
-				Assert.AreEqual("3", csv.GetField("ThreE"));
+				Assert.AreEqual("1", csv.GetField("one").ToString());
+				Assert.AreEqual("2", csv.GetField("TWO").ToString());
+				Assert.AreEqual("3", csv.GetField("ThreE").ToString());
 			}
 		}
 
@@ -894,9 +894,9 @@ namespace CsvHelper.Tests
 			reader.Read();
 			reader.ReadHeader();
 			reader.Read();
-			Assert.AreEqual("1", reader.GetField("one"));
-			Assert.AreEqual("2", reader.GetField("two three"));
-			Assert.AreEqual(null, reader.GetField("twothree"));
+			Assert.AreEqual("1", reader.GetField("one").ToString());
+			Assert.AreEqual("2", reader.GetField("two three").ToString());
+			Assert.AreEqual(0, reader.GetField("twothree").Length);
 		}
 
 		[TestMethod]
@@ -1174,7 +1174,7 @@ namespace CsvHelper.Tests
 
 		private class TestTypeConverter : DefaultTypeConverter
 		{
-			public override object ConvertFromString(string text, IReaderRow row, MemberMapData propertyMapData)
+			public override object ConvertFromString(ReadOnlySpan<char> text, IReaderRow row, MemberMapData propertyMapData)
 			{
 				return "test";
 			}

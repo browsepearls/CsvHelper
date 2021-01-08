@@ -44,14 +44,14 @@ namespace CsvHelper
 		/// </summary>
 		/// <param name="index">The zero based index of the field.</param>
 		/// <returns>The raw field.</returns>
-		string this[int index] { get; }
+		ReadOnlySpan<char> this[int index] { get; }
 
 		/// <summary>
 		/// Gets the raw field at position (column) name.
 		/// </summary>
 		/// <param name="name">The named index of the field.</param>
 		/// <returns>The raw field.</returns>
-		string this[string name] { get; }
+		ReadOnlySpan<char> this[string name] { get; }
 
 		/// <summary>
 		/// Gets the raw field at position (column) name.
@@ -59,21 +59,21 @@ namespace CsvHelper
 		/// <param name="name">The named index of the field.</param>
 		/// <param name="index">The zero based index of the field.</param>
 		/// <returns>The raw field.</returns>
-		string this[string name, int index] { get; }
+		ReadOnlySpan<char> this[string name, int index] { get; }
 
 		/// <summary>
 		/// Gets the raw field at position (column) index.
 		/// </summary>
 		/// <param name="index">The zero based index of the field.</param>
 		/// <returns>The raw field.</returns>
-		string GetField(int index);
+		ReadOnlySpan<char> GetField(int index);
 
 		/// <summary>
 		/// Gets the raw field at position (column) name.
 		/// </summary>
 		/// <param name="name">The named index of the field.</param>
 		/// <returns>The raw field.</returns>
-		string GetField(string name);
+		ReadOnlySpan<char> GetField(string name);
 
 		/// <summary>
 		/// Gets the raw field at position (column) name and the index
@@ -83,7 +83,7 @@ namespace CsvHelper
 		/// <param name="name">The named index of the field.</param>
 		/// <param name="index">The zero based index of the instance of the field.</param>
 		/// <returns>The raw field.</returns>
-		string GetField(string name, int index);
+		ReadOnlySpan<char> GetField(string name, int index);
 
 		/// <summary>
 		/// Gets the field converted to <see cref="Object"/> using

@@ -26,8 +26,8 @@ namespace CsvHelper.Tests.Parsing
 				stream.Position = 0;
 
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
 				Assert.IsFalse(parser.Read());
 
 				var position = stream.Position;
@@ -36,8 +36,8 @@ namespace CsvHelper.Tests.Parsing
 				stream.Position = position;
 
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual("3", parser[0]);
-				Assert.AreEqual("4", parser[1]);
+				Assert.AreEqual("3", parser[0].ToString());
+				Assert.AreEqual("4", parser[1].ToString());
 				Assert.IsFalse(parser.Read());
 
 				position = stream.Position;
@@ -46,8 +46,8 @@ namespace CsvHelper.Tests.Parsing
 				stream.Position = position;
 
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual("5", parser[0]);
-				Assert.AreEqual("6", parser[1]);
+				Assert.AreEqual("5", parser[0].ToString());
+				Assert.AreEqual("6", parser[1].ToString());
 				Assert.IsFalse(parser.Read());
 			}
 		}

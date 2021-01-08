@@ -306,7 +306,7 @@ namespace CsvHelper
 		/// </summary>
 		/// <param name="index">The zero based index of the field.</param>
 		/// <returns>The raw field.</returns>
-		public virtual string this[int index]
+		public virtual ReadOnlySpan<char> this[int index]
 		{
 			get
 			{
@@ -321,7 +321,7 @@ namespace CsvHelper
 		/// </summary>
 		/// <param name="name">The named index of the field.</param>
 		/// <returns>The raw field.</returns>
-		public virtual string this[string name]
+		public virtual ReadOnlySpan<char> this[string name]
 		{
 			get
 			{
@@ -337,7 +337,7 @@ namespace CsvHelper
 		/// <param name="name">The named index of the field.</param>
 		/// <param name="index">The zero based index of the field.</param>
 		/// <returns>The raw field.</returns>
-		public virtual string this[string name, int index]
+		public virtual ReadOnlySpan<char> this[string name, int index]
 		{
 			get
 			{
@@ -352,7 +352,7 @@ namespace CsvHelper
 		/// </summary>
 		/// <param name="index">The zero based index of the field.</param>
 		/// <returns>The raw field.</returns>
-		public virtual string GetField(int index)
+		public virtual ReadOnlySpan<char> GetField(int index)
 		{
 			CheckHasBeenRead();
 
@@ -381,7 +381,7 @@ namespace CsvHelper
 		/// </summary>
 		/// <param name="name">The named index of the field.</param>
 		/// <returns>The raw field.</returns>
-		public virtual string GetField(string name)
+		public virtual ReadOnlySpan<char> GetField(string name)
 		{
 			CheckHasBeenRead();
 
@@ -402,7 +402,7 @@ namespace CsvHelper
 		/// <param name="name">The named index of the field.</param>
 		/// <param name="index">The zero based index of the instance of the field.</param>
 		/// <returns>The raw field.</returns>
-		public virtual string GetField(string name, int index)
+		public virtual ReadOnlySpan<char> GetField(string name, int index)
 		{
 			CheckHasBeenRead();
 

@@ -12,7 +12,7 @@ namespace CsvHelper
 	/// <param name="span">The raw field.</param>
 	/// <param name="options">Processing options.</param>
 	/// <returns>The processed field.</returns>
-	public delegate Span<char> ProcessFieldFunc(Span<char> span, ProcessFieldOptions options);
+	public delegate ReadOnlySpan<char> ProcessFieldFunc(ReadOnlySpan<char> span, ProcessFieldOptions options);
 
 	/// <summary>
 	/// Processing to run before dequoting a field.
@@ -20,7 +20,7 @@ namespace CsvHelper
 	/// <param name="span">The field.</param>
 	/// <param name="options">Processing options.</param>
 	/// <returns>The processed field.</returns>
-	public delegate Span<char> PreDequoteFieldFunc(Span<char> span, ProcessFieldOptions options);
+	public delegate ReadOnlySpan<char> PreDequoteFieldFunc(ReadOnlySpan<char> span, ProcessFieldOptions options);
 
 	/// <summary>
 	/// Processing that removes quotes.
@@ -28,7 +28,7 @@ namespace CsvHelper
 	/// <param name="span">The field.</param>
 	/// <param name="options">Processing options.</param>
 	/// <returns>The processed field.</returns>
-	public delegate Span<char> DequoteFieldFunc(Span<char> span, ProcessFieldOptions options);
+	public delegate ReadOnlySpan<char> DequoteFieldFunc(ReadOnlySpan<char> span, ProcessFieldOptions options);
 
 	/// <summary>
 	/// Processing to run after dequoting a field.
@@ -36,5 +36,5 @@ namespace CsvHelper
 	/// <param name="span">The field.</param>
 	/// <param name="options">Processing options.</param>
 	/// <returns>The processed field.</returns>
-	public delegate Span<char> PostDequoteFieldFunc(Span<char> span, ProcessFieldOptions options);
+	public delegate ReadOnlySpan<char> PostDequoteFieldFunc(ReadOnlySpan<char> span, ProcessFieldOptions options);
 }

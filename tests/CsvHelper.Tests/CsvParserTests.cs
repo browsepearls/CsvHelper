@@ -99,14 +99,14 @@ namespace CsvHelper.Tests
 			var parser = new CsvParser(reader, CultureInfo.InvariantCulture);
 
 			Assert.IsTrue(parser.Read());
-			Assert.AreEqual("one", parser[0]);
-			Assert.AreEqual("two", parser[1]);
-			Assert.AreEqual("three", parser[2]);
+			Assert.AreEqual("one", parser[0].ToString());
+			Assert.AreEqual("two", parser[1].ToString());
+			Assert.AreEqual("three", parser[2].ToString());
 
 			Assert.IsTrue(parser.Read());
-			Assert.AreEqual("four", parser[0]);
-			Assert.AreEqual("five", parser[1]);
-			Assert.AreEqual("six", parser[2]);
+			Assert.AreEqual("four", parser[0].ToString());
+			Assert.AreEqual("five", parser[1].ToString());
+			Assert.AreEqual("six", parser[2].ToString());
 
 			Assert.IsFalse(parser.Read());
 		}
@@ -126,14 +126,14 @@ namespace CsvHelper.Tests
 			var parser = new CsvParser(reader, config);
 
 			Assert.IsTrue(parser.Read());
-			Assert.AreEqual("one", parser[0]);
-			Assert.AreEqual("two", parser[1]);
-			Assert.AreEqual("three", parser[2]);
+			Assert.AreEqual("one", parser[0].ToString());
+			Assert.AreEqual("two", parser[1].ToString());
+			Assert.AreEqual("three", parser[2].ToString());
 
 			Assert.IsTrue(parser.Read());
-			Assert.AreEqual("four", parser[0]);
-			Assert.AreEqual("\"five\"", parser[1]);
-			Assert.AreEqual("six", parser[2]);
+			Assert.AreEqual("four", parser[0].ToString());
+			Assert.AreEqual("\"five\"", parser[1].ToString());
+			Assert.AreEqual("six", parser[2].ToString());
 
 			Assert.IsFalse(parser.Read());
 		}
@@ -156,12 +156,12 @@ namespace CsvHelper.Tests
 			var parser = new CsvParser(reader, config);
 
 			Assert.IsTrue(parser.Read());
-			Assert.AreEqual(" one ", parser[0]);
-			Assert.AreEqual(" \"two three\" ", parser[1]);
-			Assert.AreEqual(" four ", parser[2]);
+			Assert.AreEqual(" one ", parser[0].ToString());
+			Assert.AreEqual(" \"two three\" ", parser[1].ToString());
+			Assert.AreEqual(" four ", parser[2].ToString());
 
 			Assert.IsTrue(parser.Read());
-			Assert.AreEqual(" \" five \"\" six \"\" seven \" ", parser[0]);
+			Assert.AreEqual(" \" five \"\" six \"\" seven \" ", parser[0].ToString());
 
 			Assert.IsFalse(parser.Read());
 		}
@@ -262,9 +262,9 @@ namespace CsvHelper.Tests
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("one", parser[0]);
-				Assert.AreEqual("two", parser[1]);
-				Assert.AreEqual("three", parser[2]);
+				Assert.AreEqual("one", parser[0].ToString());
+				Assert.AreEqual("two", parser[1].ToString());
+				Assert.AreEqual("three", parser[2].ToString());
 
 				Assert.IsFalse(parser.Read());
 			}
@@ -286,9 +286,9 @@ namespace CsvHelper.Tests
 				parser.Read();
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("four", parser[0]);
-				Assert.AreEqual("five", parser[1]);
-				Assert.AreEqual("six", parser[2]);
+				Assert.AreEqual("four", parser[0].ToString());
+				Assert.AreEqual("five", parser[1].ToString());
+				Assert.AreEqual("six", parser[2].ToString());
 
 				Assert.IsFalse(parser.Read());
 			}
@@ -308,9 +308,9 @@ namespace CsvHelper.Tests
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("", parser[0]);
-				Assert.AreEqual("two", parser[1]);
-				Assert.AreEqual("three", parser[2]);
+				Assert.AreEqual("", parser[0].ToString());
+				Assert.AreEqual("two", parser[1].ToString());
+				Assert.AreEqual("three", parser[2].ToString());
 			}
 		}
 
@@ -328,9 +328,9 @@ namespace CsvHelper.Tests
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("one", parser[0]);
-				Assert.AreEqual("two", parser[1]);
-				Assert.AreEqual("", parser[2]);
+				Assert.AreEqual("one", parser[0].ToString());
+				Assert.AreEqual("two", parser[1].ToString());
+				Assert.AreEqual("", parser[2].ToString());
 			}
 		}
 
@@ -348,9 +348,9 @@ namespace CsvHelper.Tests
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(3, parser.Count);
-				Assert.AreEqual("\"", parser[0]);
-				Assert.AreEqual("two", parser[1]);
-				Assert.AreEqual("three", parser[2]);
+				Assert.AreEqual("\"", parser[0].ToString());
+				Assert.AreEqual("two", parser[1].ToString());
+				Assert.AreEqual("three", parser[2].ToString());
 			}
 		}
 
@@ -370,15 +370,15 @@ namespace CsvHelper.Tests
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(1, parser.Count);
-				Assert.AreEqual("row one", parser[0]);
+				Assert.AreEqual("row one", parser[0].ToString());
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(1, parser.Count);
-				Assert.AreEqual("row two", parser[0]);
+				Assert.AreEqual("row two", parser[0].ToString());
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(1, parser.Count);
-				Assert.AreEqual("row three", parser[0]);
+				Assert.AreEqual("row three", parser[0].ToString());
 			}
 		}
 
@@ -398,18 +398,18 @@ namespace CsvHelper.Tests
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(2, parser.Count);
-				Assert.AreEqual("one", parser[0]);
-				Assert.AreEqual("two", parser[1]);
+				Assert.AreEqual("one", parser[0].ToString());
+				Assert.AreEqual("two", parser[1].ToString());
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(2, parser.Count);
-				Assert.AreEqual("three", parser[0]);
-				Assert.AreEqual("four", parser[1]);
+				Assert.AreEqual("three", parser[0].ToString());
+				Assert.AreEqual("four", parser[1].ToString());
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(2, parser.Count);
-				Assert.AreEqual("five", parser[0]);
-				Assert.AreEqual("six", parser[1]);
+				Assert.AreEqual("five", parser[0].ToString());
+				Assert.AreEqual("six", parser[1].ToString());
 			}
 		}
 
@@ -429,18 +429,18 @@ namespace CsvHelper.Tests
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(2, parser.Count);
-				Assert.AreEqual("one", parser[0]);
-				Assert.AreEqual("two", parser[1]);
+				Assert.AreEqual("one", parser[0].ToString());
+				Assert.AreEqual("two", parser[1].ToString());
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(2, parser.Count);
-				Assert.AreEqual("three", parser[0]);
-				Assert.AreEqual("four", parser[1]);
+				Assert.AreEqual("three", parser[0].ToString());
+				Assert.AreEqual("four", parser[1].ToString());
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(2, parser.Count);
-				Assert.AreEqual("five", parser[0]);
-				Assert.AreEqual("six", parser[1]);
+				Assert.AreEqual("five", parser[0].ToString());
+				Assert.AreEqual("six", parser[1].ToString());
 			}
 		}
 
@@ -464,7 +464,7 @@ namespace CsvHelper.Tests
 
 			parser.Read();
 			parser.Read();
-			Assert.AreEqual("seven", parser[0]);
+			Assert.AreEqual("seven", parser[0].ToString());
 		}
 
 		[TestMethod]
@@ -487,7 +487,7 @@ namespace CsvHelper.Tests
 
 			parser.Read();
 			parser.Read();
-			Assert.AreEqual("#four", parser[0]);
+			Assert.AreEqual("#four", parser[0].ToString());
 		}
 
 		[TestMethod]
@@ -511,7 +511,7 @@ namespace CsvHelper.Tests
 
 			parser.Read();
 			parser.Read();
-			Assert.AreEqual("seven", parser[0]);
+			Assert.AreEqual("seven", parser[0].ToString());
 		}
 
 		[TestMethod]
@@ -531,9 +531,9 @@ namespace CsvHelper.Tests
 			var parser = new CsvParser(reader, config);
 
 			Assert.IsTrue(parser.Read());
-			Assert.AreEqual("one", parser[0]);
-			Assert.AreEqual("two", parser[1]);
-			Assert.AreEqual("three", parser[2]);
+			Assert.AreEqual("one", parser[0].ToString());
+			Assert.AreEqual("two", parser[1].ToString());
+			Assert.AreEqual("three", parser[2].ToString());
 		}
 
 		[TestMethod]
@@ -553,9 +553,9 @@ namespace CsvHelper.Tests
 			var parser = new CsvParser(reader, config);
 
 			Assert.IsTrue(parser.Read());
-			Assert.AreEqual("one", parser[0]);
-			Assert.AreEqual("two", parser[1]);
-			Assert.AreEqual("three", parser[2]);
+			Assert.AreEqual("one", parser[0].ToString());
+			Assert.AreEqual("two", parser[1].ToString());
+			Assert.AreEqual("three", parser[2].ToString());
 		}
 
 		[TestMethod]
@@ -572,10 +572,10 @@ namespace CsvHelper.Tests
 			var parser = new CsvParser(reader, CultureInfo.InvariantCulture);
 
 			Assert.IsTrue(parser.Read());
-			Assert.AreEqual("", parser[2]);
+			Assert.AreEqual("", parser[2].ToString());
 
 			Assert.IsTrue(parser.Read());
-			Assert.AreEqual("", parser[2]);
+			Assert.AreEqual("", parser[2].ToString());
 
 			Assert.IsFalse(parser.Read());
 		}
@@ -593,7 +593,7 @@ namespace CsvHelper.Tests
 			var parser = new CsvParser(reader, CultureInfo.InvariantCulture);
 
 			Assert.IsTrue(parser.Read());
-			Assert.AreEqual("a", parser[0]);
+			Assert.AreEqual("a", parser[0].ToString());
 
 			Assert.IsFalse(parser.Read());
 		}
@@ -700,32 +700,32 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual("Id", parser[0]);
-				Assert.AreEqual("Name", parser[1]);
+				Assert.AreEqual("Id", parser[0].ToString());
+				Assert.AreEqual("Name", parser[1].ToString());
 
 				stream.Position = 0;
 				stream.Seek(parser.CharCount, SeekOrigin.Begin);
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("one", parser[1]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("one", parser[1].ToString());
 
 				stream.Position = 0;
 				stream.Seek(parser.CharCount, SeekOrigin.Begin);
 				parser.Read();
-				Assert.AreEqual("", parser[0]);
-				Assert.AreEqual("", parser[1]);
+				Assert.AreEqual("", parser[0].ToString());
+				Assert.AreEqual("", parser[1].ToString());
 
 				stream.Position = 0;
 				stream.Seek(parser.CharCount, SeekOrigin.Begin);
 				parser.Read();
-				Assert.AreEqual("2", parser[0]);
-				Assert.AreEqual("two", parser[1]);
+				Assert.AreEqual("2", parser[0].ToString());
+				Assert.AreEqual("two", parser[1].ToString());
 
 				stream.Position = 0;
 				stream.Seek(parser.CharCount, SeekOrigin.Begin);
 				parser.Read();
-				Assert.AreEqual("3", parser[0]);
-				Assert.AreEqual("three, four", parser[1]);
+				Assert.AreEqual("3", parser[0].ToString());
+				Assert.AreEqual("three, four", parser[1].ToString());
 			}
 		}
 
@@ -796,11 +796,11 @@ namespace CsvHelper.Tests
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(1, parser.Row);
-				Assert.AreEqual("1", parser[0]);
+				Assert.AreEqual("1", parser[0].ToString());
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(3, parser.Row);
-				Assert.AreEqual("3", parser[0]);
+				Assert.AreEqual("3", parser[0].ToString());
 			}
 		}
 
@@ -824,7 +824,7 @@ namespace CsvHelper.Tests
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(1, parser.Row);
-				Assert.AreEqual("1", parser[0]);
+				Assert.AreEqual("1", parser[0].ToString());
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(2, parser.Row);
@@ -832,7 +832,7 @@ namespace CsvHelper.Tests
 
 				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(3, parser.Row);
-				Assert.AreEqual("3", parser[0]);
+				Assert.AreEqual("3", parser[0].ToString());
 			}
 		}
 
@@ -885,27 +885,27 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2\r\n2 continued\r\nend of 2", parser[1]);
-				Assert.AreEqual("3", parser[2]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2\r\n2 continued\r\nend of 2", parser[1].ToString());
+				Assert.AreEqual("3", parser[2].ToString());
 				Assert.AreEqual(3, parser.RawRow);
 
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual("4", parser[0]);
-				Assert.AreEqual("5", parser[1]);
-				Assert.AreEqual("6", parser[2]);
+				Assert.AreEqual("4", parser[0].ToString());
+				Assert.AreEqual("5", parser[1].ToString());
+				Assert.AreEqual("6", parser[2].ToString());
 				Assert.AreEqual(4, parser.RawRow);
 
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual("7", parser[0]);
-				Assert.AreEqual("8\r\n8 continued\r\nend of 8", parser[1]);
-				Assert.AreEqual("9", parser[2]);
+				Assert.AreEqual("7", parser[0].ToString());
+				Assert.AreEqual("8\r\n8 continued\r\nend of 8", parser[1].ToString());
+				Assert.AreEqual("9", parser[2].ToString());
 				Assert.AreEqual(7, parser.RawRow);
 
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual("10", parser[0]);
-				Assert.AreEqual("11", parser[1]);
-				Assert.AreEqual("12", parser[2]);
+				Assert.AreEqual("10", parser[0].ToString());
+				Assert.AreEqual("11", parser[1].ToString());
+				Assert.AreEqual("12", parser[2].ToString());
 				Assert.AreEqual(8, parser.RawRow);
 			}
 		}
@@ -1127,32 +1127,32 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				var record = parser.Read();
-				Assert.AreEqual("Id", parser[0]);
-				Assert.AreEqual("Name", parser[1]);
+				Assert.AreEqual("Id", parser[0].ToString());
+				Assert.AreEqual("Name", parser[1].ToString());
 
 				stream.Position = 0;
 				stream.Seek(parser.ByteCount, SeekOrigin.Begin);
 				record = parser.Read();
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("one", parser[1]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("one", parser[1].ToString());
 
 				stream.Position = 0;
 				stream.Seek(parser.ByteCount, SeekOrigin.Begin);
 				record = parser.Read();
-				Assert.AreEqual("", parser[0]);
-				Assert.AreEqual("", parser[1]);
+				Assert.AreEqual("", parser[0].ToString());
+				Assert.AreEqual("", parser[1].ToString());
 
 				stream.Position = 0;
 				stream.Seek(parser.ByteCount, SeekOrigin.Begin);
 				record = parser.Read();
-				Assert.AreEqual("2", parser[0]);
-				Assert.AreEqual("two", parser[1]);
+				Assert.AreEqual("2", parser[0].ToString());
+				Assert.AreEqual("two", parser[1].ToString());
 
 				stream.Position = 0;
 				stream.Seek(parser.ByteCount, SeekOrigin.Begin);
 				record = parser.Read();
-				Assert.AreEqual("3", parser[0]);
-				Assert.AreEqual("three, four", parser[1]);
+				Assert.AreEqual("3", parser[0].ToString());
+				Assert.AreEqual("three, four", parser[1].ToString());
 			}
 		}
 
@@ -1173,9 +1173,9 @@ namespace CsvHelper.Tests
 
 				// Make sure this doesn't throw an exception.
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual("4", parser[0]);
-				Assert.AreEqual("5", parser[1]);
-				Assert.AreEqual("6", parser[2]);
+				Assert.AreEqual("4", parser[0].ToString());
+				Assert.AreEqual("5", parser[1].ToString());
+				Assert.AreEqual("6", parser[2].ToString());
 			}
 		}
 
@@ -1192,9 +1192,9 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("\0", parser[1]);
-				Assert.AreEqual("3", parser[2]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("\0", parser[1].ToString());
+				Assert.AreEqual("3", parser[2].ToString());
 			}
 		}
 
@@ -1233,10 +1233,10 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				Assert.IsTrue(parser.Read());
-				Assert.AreEqual("one", parser[0]);
-				Assert.AreEqual("\"two\"", parser[1]);
-				Assert.AreEqual("three \" four", parser[2]);
-				Assert.AreEqual(" \"five\" ", parser[3]);
+				Assert.AreEqual("one", parser[0].ToString());
+				Assert.AreEqual("\"two\"", parser[1].ToString());
+				Assert.AreEqual("three \" four", parser[2].ToString());
+				Assert.AreEqual(" \"five\" ", parser[3].ToString());
 			}
 		}
 
@@ -1300,22 +1300,22 @@ namespace CsvHelper.Tests
 				stream.Position = 0;
 
 				parser.Read();
-				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2", parser[1]);
-				Assert.AreEqual("3", parser[2]);
+				Assert.AreEqual("1", parser[0].ToString());
+				Assert.AreEqual("2", parser[1].ToString());
+				Assert.AreEqual("3", parser[2].ToString());
 
 				parser.Read();
-				Assert.AreEqual("", parser[0]);
-				Assert.AreEqual("", parser[1]);
-				Assert.AreEqual("", parser[2]);
+				Assert.AreEqual("", parser[0].ToString());
+				Assert.AreEqual("", parser[1].ToString());
+				Assert.AreEqual("", parser[2].ToString());
 
 				parser.Read();
 				Assert.AreEqual(1, parser.Count);
 
 				parser.Read();
-				Assert.AreEqual("4", parser[0]);
-				Assert.AreEqual("5", parser[1]);
-				Assert.AreEqual("6", parser[2]);
+				Assert.AreEqual("4", parser[0].ToString());
+				Assert.AreEqual("5", parser[1].ToString());
+				Assert.AreEqual("6", parser[2].ToString());
 			}
 		}
 

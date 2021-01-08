@@ -30,7 +30,7 @@ namespace CsvHelper
 		{
 			get
 			{
-				return csv[i];
+				return csv[i].ToString();
 			}
 		}
 
@@ -46,7 +46,7 @@ namespace CsvHelper
 		{
 			get
 			{
-				return csv[name];
+				return csv[name].ToString();
 			}
 		}
 
@@ -194,7 +194,7 @@ namespace CsvHelper
 		/// </returns>
 		public long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length)
 		{
-			var chars = csv.GetField(i).ToCharArray();
+			var chars = csv.GetField(i).ToArray();
 
 			Array.Copy(chars, fieldoffset, buffer, bufferoffset, length);
 
@@ -462,7 +462,7 @@ namespace CsvHelper
 		/// </returns>
 		public string GetString(int i)
 		{
-			return csv.GetField(i);
+			return csv.GetField(i).ToString();
 		}
 
 		/// <summary>
@@ -474,7 +474,7 @@ namespace CsvHelper
 		/// </returns>
 		public object GetValue(int i)
 		{
-			return IsDBNull(i) ? DBNull.Value : (object)csv.GetField(i);
+			return IsDBNull(i) ? DBNull.Value : (object)csv.GetField(i).ToString();
 		}
 
 		/// <summary>
@@ -488,7 +488,7 @@ namespace CsvHelper
 		{
 			for (var i = 0; i < values.Length; i++)
 			{
-				values[i] = IsDBNull(i) ? DBNull.Value : (object)csv.GetField(i);
+				values[i] = IsDBNull(i) ? DBNull.Value : (object)csv.GetField(i).ToString();
 			}
 
 			return csv.Parser.Count;
@@ -506,7 +506,7 @@ namespace CsvHelper
 			var field = csv.GetField(i);
 			var nullValues = csv.Context.TypeConverterOptionsCache.GetOptions<string>().NullValues;
 
-			return nullValues.Contains(field);
+			return nullValues.Contains(field.ToString());
 		}
 
 		/// <summary>

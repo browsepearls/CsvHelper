@@ -6,6 +6,7 @@ using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
 using CsvHelper.TypeConversion;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -75,7 +76,7 @@ namespace CsvHelper.Tests.AttributeMapping
 
 		private class StringTypeConverter : ITypeConverter
 		{
-			public object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
+			public object ConvertFromString(ReadOnlySpan<char> text, IReaderRow row, MemberMapData memberMapData)
 			{
 				return "two";
 			}
