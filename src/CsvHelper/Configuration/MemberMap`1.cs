@@ -200,20 +200,10 @@ namespace CsvHelper.Configuration
 		}
 
 		/// <summary>
-		/// Ignore the member when reading if no matching field name can be found.
-		/// </summary>
-		public virtual MemberMap<TClass, TMember> Optional()
-		{
-			Data.IsOptional = true;
-
-			return this;
-		}
-
-		/// <summary>
 		/// Specifies an expression to be used to validate a field when reading.
 		/// </summary>
 		/// <param name="validateFunc">The validation function.</param>
-		public virtual new MemberMap<TClass, TMember> Validate(ValidateFunc validateFunc)
+		public virtual new MemberMap Validate(ValidateFunc validateFunc)
 		{
 			var fieldParameter = Expression.Parameter(typeof(ReadOnlySpan<char>), "fieldToValidate");
 			var methodExpression = Expression.Call(
@@ -224,6 +214,16 @@ namespace CsvHelper.Configuration
 			var lambdaExpression = Expression.Lambda<ValidateFunc>(methodExpression, fieldParameter);
 
 			Data.ValidateExpression = lambdaExpression;
+
+			return this;
+		}
+
+		/// <summary>
+		/// Ignore the member when reading if no matching field name can be found.
+		/// </summary>
+		public virtual new MemberMap Optional()
+		{
+			Data.IsOptional = true;
 
 			return this;
 		}

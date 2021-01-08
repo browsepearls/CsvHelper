@@ -147,6 +147,21 @@ namespace CsvHelper.Configuration
 		}
 
 		/// <summary>
+		/// The default value that will be used when reading when
+		/// the CSV field is empty. This value is not type checked
+		/// and will use a <see cref="ITypeConverter"/> to convert
+		/// the field. This could potentially have runtime errors.
+		/// </summary>
+		/// <param name="defaultValue">The default value.</param>
+		public virtual MemberMap Default(string defaultValue)
+		{
+			Data.Default = defaultValue;
+			Data.IsDefaultSet = true;
+
+			return this;
+		}
+
+		/// <summary>
 		/// The constant value that will be used for every record when 
 		/// reading and writing. This value will always be used no matter 
 		/// what other mapping configurations are specified.
@@ -210,6 +225,16 @@ namespace CsvHelper.Configuration
 			var lambdaExpression = Expression.Lambda<ValidateFunc>(methodExpression, fieldParameter);
 
 			Data.ValidateExpression = lambdaExpression;
+
+			return this;
+		}
+
+		/// <summary>
+		/// Ignore the member when reading if no matching field name can be found.
+		/// </summary>
+		public virtual MemberMap Optional()
+		{
+			Data.IsOptional = true;
 
 			return this;
 		}
