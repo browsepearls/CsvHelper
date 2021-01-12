@@ -15,7 +15,7 @@ namespace CsvHelper
 		/// <summary>
 		/// Method to call when bad data is detected.
 		/// </summary>
-		public Action<CsvContext> BadDataFound { get; init; }
+		public BadDataFound BadDataFound { get; init; }
 
 		/// <summary>
 		/// The reading context.

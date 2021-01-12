@@ -64,7 +64,7 @@ namespace CsvHelper.Configuration
 		/// instead of throwing an exception.
 		/// Arguments: context
 		/// </summary>
-		public virtual Action<CsvContext> BadDataFound { get; init; } = ConfigurationFunctions.BadDataFound;
+		public virtual BadDataFound BadDataFound { get; init; } = ConfigurationFunctions.BadDataFound;
 
 		/// <summary>
 		/// Gets or sets the function that is called when a reading exception occurs.
@@ -151,28 +151,6 @@ namespace CsvHelper.Configuration
 		/// Arguments: (readingContext, fieldIndex)
 		/// </summary>
 		public virtual Func<CsvContext, int, string> GetDynamicPropertyName { get; init; } = ConfigurationFunctions.GetDynamicPropertyName;
-
-		/// <summary>
-		/// Processes a raw field.
-		/// This method calls the field parsing pipeline.
-		/// PreDequote -> Dequote -> PostDequote
-		/// </summary>
-		public virtual ProcessFieldFunc ProcessField { get; init; } = ConfigurationFunctions.ProcessField;
-
-		/// <summary>
-		/// Processing that happens to a field before dequoting.
-		/// </summary>
-		public virtual PreDequoteFieldFunc PreDequoteField { get; init; } = ConfigurationFunctions.PreDequoteField;
-
-		/// <summary>
-		/// Removes quoting from a field.
-		/// </summary>
-		public virtual DequoteFieldFunc DequoteField { get; init; } = ConfigurationFunctions.DequoteField;
-
-		/// <summary>
-		/// Processing that happens to a field after dequoting.
-		/// </summary>
-		public virtual PostDequoteFieldFunc PostDequoteField { get; init; } = ConfigurationFunctions.PostDequoteField;
 
 		/// <summary>
 		/// Gets or sets a value indicating whether references

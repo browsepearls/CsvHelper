@@ -2,10 +2,10 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,91 +18,55 @@ namespace CsvHelper
 	public class CsvParser : IParser, IDisposable
 	{
 		private readonly TextReader reader;
-		private readonly string delimiter = ",";
-		private readonly int delimiterFirstChar = ',';
+		private readonly string delimiter;
+		private readonly char delimiterFirstChar;
 		private readonly char quote;
 		private readonly char escape;
+		private readonly bool countBytes;
+		private readonly Encoding encoding;
 		private readonly bool ignoreBlankLines;
 		private readonly char comment;
 		private readonly bool allowComments;
-		private readonly TrimOptions trimOptions;
-		private readonly char[] whiteSpaceChars;
-		private readonly CsvContext context;
-		private readonly Action<CsvContext> badDataFound;
-		private readonly ProcessFieldFunc processField;
-		private readonly PreDequoteFieldFunc preDequoteField;
-		private readonly DequoteFieldFunc dequoteField;
-		private readonly PostDequoteFieldFunc postDequoteField;
-		private readonly bool countBytes;
-		private readonly Encoding encoding;
+		private readonly BadDataFound badDataFound;
 		private readonly bool ignoreQuotes;
-		private readonly bool leaveOpen;
-		private readonly bool lineBreakInQuotedFieldIsBadData;
 
-		private long charCount;
-		private long byteCount;
-		private int bufferSize = -1;
-		private IMemoryOwner<char> memoryOwner;
-		private bool disposed;
-		private readonly List<Field> fields = new List<Field>(128);
-		private int charsRead = -1;
-		private int memoryPosition;
-		private int rowStartPosition; // Position in memory.
-		private int fieldStartPosition; // Position in memory.
+		private char[] buffer;
+		private int bufferSize;
+		private int charsRead;
+		private int bufferPosition;
+		private int rowStartPosition;
+		private int fieldStartPosition;
 		private int row;
 		private int rawRow;
-		private char c;
-		private char cPrev;
-		private int spanPosition;
+		private long charCount;
+		private long byteCount;
 		private bool inQuotes;
-		private bool isQuoted;
+		private Field[] fields;
+		private int fieldsPosition;
+		private bool disposed;
+		private int quoteCount;
+		private char[] processFieldBuffer;
+		private int processFieldBufferSize;
+		private ParserState state;
+		private int delimiterPosition = 1;
 
-		/// <summary>
-		/// Gets the count of how many characters have been read.
-		/// </summary>
+		/// <inheritdoc/>
 		public long CharCount => charCount;
 
-		/// <summary>
-		/// Gets the count of how many bytes have been read.
-		/// <see cref="IParserConfiguration.CountBytes"/> needs
-		/// to be enabled for this value to be populated.
-		/// </summary>
+		/// <inheritdoc/>
 		public long ByteCount => byteCount;
 
-		/// <summary>
-		/// Gets the number of fields for the current row.
-		/// </summary>
-		public int Count => fields.Count;
-
-		/// <summary>
-		/// Gets the CSV row the parser is currently on.
-		/// </summary>
+		/// <inheritdoc/>
 		public int Row => row;
 
-		/// <summary>
-		/// Gets the raw row the parser is currently on.
-		/// </summary>
-		public int RawRow => rawRow;
-
-		/// <summary>
-		/// Gets the record for the current row.
-		/// Note: It is much more efficient to only get the fields you need.
-		/// If you need all fields, then use this.
-		/// </summary>
+		/// <inheritdoc/>
 		public string[] Record
 		{
 			get
 			{
-				// TODO: Cache the current record
+				var record = new string[fieldsPosition];
 
-				if (fields.Count == 0)
-				{
-					return null;
-				}
-
-				var record = new string[fields.Count];
-
-				for (var i = 0; i < fields.Count; i++)
+				for (var i = 0; i < record.Length; i++)
 				{
 					record[i] = this[i];
 				}
@@ -111,144 +75,274 @@ namespace CsvHelper
 			}
 		}
 
-		/// <summary>
-		/// Gets the raw record for the current row.
-		/// </summary>
-		public Span<char> RawRecord
-		{
-			get
-			{
-				if (fields.Count == 0)
-				{
-					return null;
-				}
+		/// <inheritdoc/>
+		public string RawRecord => new string(buffer, rowStartPosition, bufferPosition - rowStartPosition);
 
-				return memoryOwner.Memory.Slice(rowStartPosition, memoryPosition - rowStartPosition).Span;
-			}
-		}
+		/// <inheritdoc/>
+		public int Count => fieldsPosition;
 
-		/// <summary>
-		/// Gets the reading context.
-		/// </summary>
-		public CsvContext Context => context;
+		/// <inheritdoc/>
+		public int RawRow => rawRow;
 
-		/// <summary>
-		/// Gets the configuration.
-		/// </summary>
+		/// <inheritdoc/>
+		public CsvContext Context { get; private set; }
+
+		/// <inheritdoc/>
 		public IParserConfiguration Configuration { get; private set; }
 
-		/// <summary>
-		/// Gets the field at the specified index for the current row.
-		/// </summary>
-		/// <param name="index">The index.</param>
-		/// <returns>The field.</returns>
+		/// <inheritdoc/>
 		public string this[int index]
 		{
 			get
 			{
-				var options = new ProcessFieldOptions
-				{
-					BadDataFound = badDataFound,
-					Context = context,
-					Dequote = dequoteField,
-					Escape = escape,
-					IgnoreQuotes = ignoreQuotes,
-					IsQuoted = fields[index].IsQuoted,
-					LineBreakInQuotedFieldIsBadData = lineBreakInQuotedFieldIsBadData,
-					PreDequote = preDequoteField,
-					PostDequote = postDequoteField,
-					Quote = quote,
-					TrimOptions = trimOptions,
-					WhiteSpaceChars = whiteSpaceChars,
-				};
+				var field = fields[index];
 
-				var span = memoryOwner.Memory.Slice(fields[index].Start + rowStartPosition, fields[index].Length).Span;
-				span = processField(span, options);
+				var processedField = ProcessField(field.Start + rowStartPosition, field.Length, field.QuoteCount);
 
-				return span.ToString();
+				var value = new string(processedField.Buffer, processedField.Start, processedField.Length);
+
+				return value;
 			}
 		}
 
-		/// <summary>
-		/// Creates a new parser using the given <see cref="TextReader" />.
-		/// </summary>
-		/// <param name="reader">The <see cref="TextReader" /> with the CSV file data.</param>
-		/// <param name="culture">The culture.</param>
-		/// <param name="leaveOpen"><c>true</c> to leave the <see cref="TextReader"/> open after the <see cref="CsvParser"/> object is disposed, otherwise <c>false</c>.</param>
+		/// <inheritdoc/>
 		public CsvParser(TextReader reader, CultureInfo culture, bool leaveOpen = false) : this(reader, new CsvConfiguration(culture) { LeaveOpen = leaveOpen }) { }
 
-		/// <summary>
-		/// Creates a new parser using the given <see cref="TextReader"/> and <see cref="Configuration"/>.
-		/// </summary>
-		/// <param name="reader">The <see cref="TextReader"/> with the CSV file data.</param>
-		/// <param name="configuration">The configuration.</param>
+		/// <inheritdoc/>
 		public CsvParser(TextReader reader, CsvConfiguration configuration)
 		{
 			this.reader = reader;
 			Configuration = configuration;
+			Context = new CsvContext(this);
 
 			allowComments = configuration.AllowComments;
 			badDataFound = configuration.BadDataFound;
 			bufferSize = configuration.BufferSize;
 			comment = configuration.Comment;
-			context = new CsvContext(this);
 			countBytes = configuration.CountBytes;
 			delimiter = configuration.Delimiter;
-			delimiterFirstChar = delimiter[0];
-			dequoteField = configuration.DequoteField;
+			delimiterFirstChar = configuration.Delimiter[0];
 			encoding = configuration.Encoding;
 			escape = configuration.Escape;
 			ignoreBlankLines = configuration.IgnoreBlankLines;
 			ignoreQuotes = configuration.IgnoreQuotes;
-			leaveOpen = configuration.LeaveOpen;
-			lineBreakInQuotedFieldIsBadData = configuration.LineBreakInQuotedFieldIsBadData;
-			postDequoteField = configuration.PostDequoteField;
-			preDequoteField = configuration.PreDequoteField;
-			processField = configuration.ProcessField;
+			processFieldBufferSize = 1024;
 			quote = configuration.Quote;
-			trimOptions = configuration.TrimOptions;
-			whiteSpaceChars = configuration.WhiteSpaceChars;
+
+			buffer = ArrayPool<char>.Shared.Rent(bufferSize);
+			processFieldBuffer = ArrayPool<char>.Shared.Rent(processFieldBufferSize);
+			fields = new Field[128];
 		}
 
-		/// <summary>
-		/// Reads a record from the CSV file.
-		/// </summary>
-		/// <returns>
-		/// True if there are more records to read, otherwise false.
-		/// </returns>
-		public bool Read()
+		/// <inheritdoc/>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		protected ProcessedField ProcessField(in int start, in int length, in int quoteCount)
 		{
-			fields.Clear();
-			spanPosition = 0;
-			inQuotes = false;
-			isQuoted = false;
-			rowStartPosition = memoryPosition;
-			fieldStartPosition = rowStartPosition;
-
-			var span = Span<char>.Empty;
-
-			while (true)
+			if (quoteCount == 0)
 			{
-				if (!NextChar(ref span))
+				// Not quoted.
+				// No processing needed.
+
+				return new ProcessedField
 				{
-					return ReadEndOfFile(ref span);
+					Buffer = buffer,
+					Start = start,
+					Length = length,
+				};
+			}
+
+			var newStart = start;
+			var newLength = length;
+
+			// Remove the quotes from the ends.
+			if (buffer[newStart] == quote && buffer[newStart + newLength - 1] == quote && newLength > 1)
+			{
+				newStart += 1;
+				newLength -= 2;
+			}
+			else
+			{
+				badDataFound?.Invoke(Context);
+
+				// If BadDataFound doesn't throw, we don't want to remove the esacpe characters.
+				// Field isn't quoted properly, so leave it as is.
+				// No more processing needed.
+
+				return new ProcessedField
+				{
+					Buffer = buffer,
+					Start = newStart,
+					Length = newLength,
+				};
+			}
+
+			if (quoteCount == 2)
+			{
+				// The only quotes are the ends of the field.
+				// No more processing is needed.
+				return new ProcessedField
+				{
+					Buffer = buffer,
+					Start = newStart,
+					Length = newLength,
+				};
+			}
+
+			if (newLength > processFieldBuffer.Length)
+			{
+				processFieldBufferSize *= 2;
+				ArrayPool<char>.Shared.Return(processFieldBuffer);
+				processFieldBuffer = ArrayPool<char>.Shared.Rent(processFieldBufferSize);
+			}
+
+			// Remove escapes.
+			var inEscape = false;
+			var position = 0;
+			for (var i = newStart; i < newStart + newLength; i++)
+			{
+				var c = buffer[i];
+
+				if (inEscape)
+				{
+					inEscape = false;
 				}
-
-				if (c == comment && allowComments || rowStartPosition == memoryPosition - 1 && (c == '\r' || c == '\n') && ignoreBlankLines)
+				else if (c == escape)
 				{
-					ReadBlankLine(ref span);
-
+					inEscape = true;
 					continue;
 				}
 
-				if (c == quote)
-				{
-					isQuoted = true;
+				processFieldBuffer[position] = c;
+				position++;
+			}
 
-					if (!ignoreQuotes)
+			return new ProcessedField
+			{
+				Buffer = processFieldBuffer,
+				Start = 0,
+				Length = position,
+			};
+		}
+
+		/// <inheritdoc/>
+		public bool Read()
+		{
+			rowStartPosition = bufferPosition;
+			fieldStartPosition = rowStartPosition;
+			fieldsPosition = 0;
+			quoteCount = 0;
+			row++;
+			rawRow++;
+
+			var result = ReadLineResult.None;
+
+			while (true)
+			{
+				if (bufferPosition >= charsRead)
+				{
+					if (!FillBuffer())
 					{
-						inQuotes = !inQuotes;
+						return ReadEndOfFile(result);
 					}
+				}
+
+				if (result == ReadLineResult.Complete)
+				{
+					return true;
+				}
+
+				result = ReadLine();
+			}
+		}
+
+		/// <inheritdoc/>
+		public async Task<bool> ReadAsync()
+		{
+			rowStartPosition = bufferPosition;
+			fieldStartPosition = rowStartPosition;
+			fieldsPosition = 0;
+			quoteCount = 0;
+
+			while (true)
+			{
+				if (bufferPosition >= charsRead)
+				{
+					if (!await FillBufferAsync())
+					{
+						return false;
+					}
+				}
+
+				var result = ReadLine();
+				if (result == ReadLineResult.Complete)
+				{
+					return true;
+				}
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private ReadLineResult ReadLine()
+		{
+			char c = '\0';
+			char cPrev;
+			while (bufferPosition < charsRead)
+			{
+				if (state != ParserState.None)
+				{
+					// Continue the state before doing anything else.
+					ReadLineResult result;
+					switch (state)
+					{
+						case ParserState.BlankLine:
+							result = ReadBlankLine(ref c);
+							break;
+						case ParserState.Delimiter:
+							result = ReadDelimiter(ref c);
+							break;
+						case ParserState.LineEnding:
+							result = ReadLineEnding(ref c);
+							break;
+						default:
+							result = ReadLineResult.None;
+							break;
+					}
+
+					if (result == ReadLineResult.Incomplete)
+					{
+						return result;
+					}
+				}
+
+				cPrev = c;
+				c = buffer[bufferPosition];
+				bufferPosition++;
+				charCount++;
+				if (countBytes)
+				{
+					byteCount += encoding.GetByteCount(new char[] { c });
+				}
+
+				if (allowComments && c == comment || ignoreBlankLines && rowStartPosition == bufferPosition - 1 && (c == '\r' || c == '\n'))
+				{
+					state = ParserState.BlankLine;
+					var result = ReadBlankLine(ref c);
+					if (result == ReadLineResult.Complete)
+					{
+						state = ParserState.None;
+
+						continue;
+					}
+					else
+					{
+						return ReadLineResult.Incomplete;
+					}
+				}
+
+				if (c == quote && !ignoreQuotes)
+				{
+					quoteCount++;
+					inQuotes = !inQuotes;
 				}
 
 				if (inQuotes)
@@ -258,283 +352,250 @@ namespace CsvHelper
 						rawRow++;
 					}
 
-					// White in quotes, we don't care about anything else.
+					// We don't care about anything else if we're in quotes.
 					continue;
 				}
 
 				if (c == delimiterFirstChar)
 				{
-					if (ReadDelimiter(ref span))
+					state = ParserState.Delimiter;
+					var result = ReadDelimiter(ref c);
+					if (result == ReadLineResult.Incomplete)
 					{
-						continue;
+						return result;
 					}
+
+					state = ParserState.None;
+
+					continue;
 				}
 
 				if (c == '\r' || c == '\n')
 				{
-					ReadLineEnding(ref span);
+					state = ParserState.LineEnding;
+					var result = ReadLineEnding(ref c);
+					if (result == ReadLineResult.Complete)
+					{
+						state = ParserState.None;
+					}
 
-					return true;
+					return result;
 				}
 			}
+
+			return ReadLineResult.Incomplete;
 		}
 
-		/// <summary>
-		/// Reads a record from the CSV file asynchronously.
-		/// </summary>
-		/// <returns>
-		/// True if there are more records to read, otherwise false.
-		/// </returns>
-		public Task<bool> ReadAsync()
-		{
-			throw new NotImplementedException();
-		}
-
-		/// <summary>
-		/// Reads the blank line.
-		/// </summary>
-		/// <param name="span">The span.</param>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void ReadBlankLine(ref Span<char> span)
+		private ReadLineResult ReadBlankLine(ref char c)
 		{
-			// Read until a line ending is found.
-			while (true)
+			while (bufferPosition < charsRead)
 			{
 				if (c == '\r' || c == '\n')
 				{
-					NextChar(ref span);
-
-					if (c != '\n')
+					var result = ReadLineEnding(ref c);
+					if (result == ReadLineResult.Complete)
 					{
-						memoryPosition--;
-						spanPosition = spanPosition == 0 ? 0 : spanPosition - 1;
-						charCount--;
-
-						if (countBytes)
-						{
-							byteCount -= encoding.GetByteCount(new[] { c });
-						}
+						fieldsPosition--;
+						rowStartPosition = bufferPosition;
+						fieldStartPosition = rowStartPosition;
+						row++;
+						rawRow++;
 					}
 
-					break; ;
+					return result;
 				}
 
-				if (!NextChar(ref span))
-				{
-					break;
-				}
-			}
-
-			rowStartPosition = memoryPosition;
-			fieldStartPosition = rowStartPosition;
-			row++;
-			rawRow++;
-			isQuoted = false;
-		}
-
-		/// <summary>
-		/// Reads the delimiter.
-		/// </summary>
-		/// <param name="span">The span.</param>
-		/// <returns><c>true</c> if this was a delimiter, othersize <c>false</c>.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private bool ReadDelimiter(ref Span<char> span)
-		{
-			for (var i = 1; i < delimiter.Length; i++)
-			{
-				NextChar(ref span);
-
-				if (c != delimiter[i])
-				{
-					memoryPosition--;
-					spanPosition = spanPosition == 0 ? 0 : spanPosition - 1;
-					charCount--;
-
-					if (countBytes)
-					{
-						byteCount -= encoding.GetByteCount(new[] { c });
-					}
-
-					return false;
-				}
-			}
-
-			AddField(fieldStartPosition, memoryPosition - fieldStartPosition - delimiter.Length);
-
-			fieldStartPosition = memoryPosition;
-			isQuoted = false;
-
-			return true;
-		}
-
-		/// <summary>
-		/// Reads the line ending.
-		/// </summary>
-		/// <param name="span">The span.</param>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void ReadLineEnding(ref Span<char> span)
-		{
-			row++;
-			rawRow++;
-
-			var hasMoreChars = NextChar(ref span);
-			var charsToRemove = hasMoreChars ? 2 : 1;
-
-			AddField(fieldStartPosition, memoryPosition - fieldStartPosition - charsToRemove);
-
-			if (c != '\n' && hasMoreChars)
-			{
-				// The char isn't part of the line ending.
-				// Move positions back one char.
-				memoryPosition--;
-				spanPosition = spanPosition == 0 ? 0 : spanPosition - 1;
-				charCount--;
-
+				c = buffer[bufferPosition];
+				bufferPosition++;
+				charCount++;
 				if (countBytes)
 				{
-					byteCount -= encoding.GetByteCount(new[] { c });
+					byteCount += encoding.GetByteCount(new char[] { c });
 				}
 			}
+
+			return ReadLineResult.Incomplete;
 		}
 
-		/// <summary>
-		/// Reads the end of file.
-		/// </summary>
-		/// <param name="span">The span.</param>
-		/// <returns><c>true</c> if there is more to read, otherwise <c>false</c>.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private bool ReadEndOfFile(ref Span<char> span)
+		private ReadLineResult ReadDelimiter(ref char c)
 		{
-			if (fieldStartPosition < memoryPosition || fields.Count > 0)
+			for (var i = delimiterPosition; i < delimiter.Length; i++)
 			{
-				row++;
-				rawRow++;
+				delimiterPosition++;
 
-				AddField(fieldStartPosition, memoryPosition - fieldStartPosition);
+				c = buffer[bufferPosition];
+				if (c != delimiter[i])
+				{
+					return ReadLineResult.Complete;
+				}
 
-				return true;
+				bufferPosition++;
+				charCount++;
+				if (countBytes)
+				{
+					byteCount += encoding.GetByteCount(new[] { c });
+				}
+
+				if (bufferPosition >= charsRead)
+				{
+					return ReadLineResult.Incomplete;
+				}
 			}
 
-			return false;
+			AddField(fieldStartPosition, bufferPosition - fieldStartPosition - delimiter.Length);
+
+			fieldStartPosition = bufferPosition;
+			delimiterPosition = 1;
+
+			return ReadLineResult.Complete;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void AddField(int start, int length)
+		private ReadLineResult ReadLineEnding(ref char c)
 		{
-			fields.Add(new Field
+			var lessChars = 1;
+
+			if (c == '\r')
 			{
-				Start = start - rowStartPosition,
-				Length = length,
-				IsQuoted = isQuoted,
-			});
+				if (bufferPosition >= charsRead)
+				{
+					return ReadLineResult.Incomplete;
+				}
+
+				c = buffer[bufferPosition];
+				bufferPosition++;
+				charCount++;
+				if (countBytes)
+				{
+					byteCount += encoding.GetByteCount(new char[] { c });
+				}
+
+				if (c == '\n')
+				{
+					lessChars++;
+				}
+				else
+				{
+					bufferPosition--;
+					charCount--; ;
+					if (countBytes)
+					{
+						byteCount += encoding.GetByteCount(new char[] { c });
+					}
+				}
+			}
+
+			AddField(fieldStartPosition, bufferPosition - fieldStartPosition - lessChars);
+
+			return ReadLineResult.Complete;
 		}
 
-		/// <summary>
-		/// Gets the next char and sets it to <see cref="c"/>.
-		/// </summary>
-		/// <param name="span">The span.</param>
-		/// <returns><c>true</c> if there are more characters, otherwise <c>false</c>.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private bool NextChar(ref Span<char> span)
+		private bool ReadEndOfFile(in ReadLineResult result)
 		{
-			if (!FillBuffers(ref span))
+			var state = this.state;
+			this.state = ParserState.None;
+
+			if (state == ParserState.BlankLine)
 			{
 				return false;
 			}
 
-			cPrev = c;
-			c = span[spanPosition];
-
-			memoryPosition++;
-			spanPosition++;
-			charCount++;
-
-			if (countBytes)
+			if (state == ParserState.Delimiter)
 			{
-				byteCount += encoding.GetByteCount(new[] { c });
+				AddField(fieldStartPosition, bufferPosition - fieldStartPosition - delimiter.Length);
+
+				fieldStartPosition = bufferPosition;
+
+				AddField(fieldStartPosition, bufferPosition - fieldStartPosition);
+
+				return true;
 			}
 
-			return true;
+			if (state == ParserState.LineEnding)
+			{
+				AddField(fieldStartPosition, bufferPosition - fieldStartPosition - 1);
+
+				return true;
+			}
+
+			if (rowStartPosition < bufferPosition)
+			{
+				AddField(fieldStartPosition, bufferPosition - fieldStartPosition);
+			}
+
+			return fieldsPosition > 0;
 		}
 
-		/// <summary>
-		/// Fills the memory and span buffers.
-		/// </summary>
-		/// <param name="span">The span to fill.</param>
-		/// <returns><c>true</c> if there is more to read, otherwise <c>false</c>.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private bool FillBuffers(ref Span<char> span)
+		private void AddField(in int start, in int length)
 		{
-			if (memoryPosition >= charsRead)
+			if (fieldsPosition >= fields.Length)
 			{
-				// Fill memory buffer.
-
-				if (charCount == 0)
-				{
-					// First read.
-					memoryOwner = MemoryPool<char>.Shared.Rent(bufferSize);
-					span = memoryOwner.Memory.Slice(0, Math.Min(1024, memoryOwner.Memory.Length)).Span;
-					charsRead = reader.Read(span);
-
-					memoryPosition = 0;
-					spanPosition = 0;
-
-					return charsRead > 0;
-				}
-
-				// If the row is longer than the buffer, make the buffer larger.
-				if (rowStartPosition == 0 && charsRead > 0)
-				{
-					// TODO: maybe use charsread instead of memory.length
-					bufferSize = Math.Max(charsRead, bufferSize) * 2;
-				}
-
-				// Copy the remaining row onto the new memory.
-				var tempMemoryOwner = MemoryPool<char>.Shared.Rent(bufferSize);
-				var charsLeft = Math.Max(charsRead - rowStartPosition, 0);
-				memoryOwner.Memory.Slice(rowStartPosition, charsLeft).CopyTo(tempMemoryOwner.Memory);
-				charsRead = reader.Read(tempMemoryOwner.Memory.Slice(charsLeft).Span);
-				if (charsRead == 0)
-				{
-					return false;
-				}
-
-				charsRead += charsLeft;
-				memoryPosition = charsLeft;
-				fieldStartPosition = fieldStartPosition - rowStartPosition;
-				rowStartPosition = 0;
-
-				memoryOwner.Dispose();
-				memoryOwner = tempMemoryOwner;
+				Array.Resize(ref fields, fields.Length * 2);
 			}
 
-			if (spanPosition >= span.Length)
-			{
-				// Fill span.
-				var start = memoryPosition;
-				var length = Math.Min(1024, charsRead - start);
-				span = memoryOwner.Memory.Slice(start, length).Span;
+			ref var field = ref fields[fieldsPosition];
+			field.Start = start - rowStartPosition;
+			field.Length = length;
+			field.QuoteCount = quoteCount;
 
-				spanPosition = 0;
+			fieldsPosition++;
+			quoteCount = 0;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private Task<bool> FillBufferAsync()
+		{
+			throw new NotImplementedException();
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private bool FillBuffer()
+		{
+			if (rowStartPosition == 0 && charCount > 0 && charsRead == bufferSize)
+			{
+				// The record is longer than the memory buffer. Increase the buffer.
+				bufferSize *= 2;
+				var tempBuffer = ArrayPool<char>.Shared.Rent(bufferSize);
+				buffer.CopyTo(tempBuffer, 0);
+				ArrayPool<char>.Shared.Return(buffer);
+				buffer = this.buffer = tempBuffer;
 			}
+
+			var charsLeft = Math.Max(charsRead - rowStartPosition, 0);
+
+			if (charsLeft > 0 && rowStartPosition > 0)
+			{
+				Array.Copy(buffer, rowStartPosition, buffer, 0, charsLeft);
+			}
+
+			charsRead = reader.Read(buffer, charsLeft, buffer.Length - charsLeft);
+			if (charsRead == 0)
+			{
+				return false;
+			}
+
+			charsRead += charsLeft;
+
+			fieldStartPosition -= rowStartPosition;
+			rowStartPosition = 0;
+			bufferPosition = charsLeft;
 
 			return true;
 		}
 
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		/// <filterpriority>2</filterpriority>
+		/// <inheritdoc/>
 		public void Dispose()
 		{
-			Dispose(true);
+			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+			Dispose(disposing: true);
 			GC.SuppressFinalize(this);
 		}
 
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		/// <param name="disposing">True if the instance needs to be disposed of.</param>
+		/// <inheritdoc/>
 		protected virtual void Dispose(bool disposing)
 		{
 			if (disposed)
@@ -545,12 +606,8 @@ namespace CsvHelper
 			if (disposing)
 			{
 				// Dispose managed state (managed objects)
-				if (!leaveOpen)
-				{
-					reader?.Dispose();
-				}
-
-				memoryOwner?.Dispose();
+				ArrayPool<char>.Shared.Return(buffer);
+				ArrayPool<char>.Shared.Return(processFieldBuffer);
 			}
 
 			// Free unmanaged resources (unmanaged objects) and override finalizer
@@ -559,17 +616,56 @@ namespace CsvHelper
 			disposed = true;
 		}
 
-		private record Field
+		/// <summary>
+		/// Processes a raw field based on configuration.
+		/// This will remove quotes, remove escapes, and trim if configured to.
+		/// </summary>
+		[DebuggerDisplay("Start = {Start}, Length = {Length}, Buffer.Length = {Buffer.Length}")]
+		protected readonly ref struct ProcessedField
 		{
-			public bool IsQuoted { get; init; }
-
 			/// <summary>
-			/// The start position of the field.
-			/// This position is an offset from the <see cref="rowStartPosition"/>.
+			/// The start of the field in the buffer.
 			/// </summary>
 			public int Start { get; init; }
 
+			/// <summary>
+			/// The length of the field in the buffer.
+			/// </summary>
 			public int Length { get; init; }
+
+			/// <summary>
+			/// The buffer that contains the field.
+			/// </summary>
+			public char[] Buffer { get; init; }
+		}
+
+		private enum ReadLineResult
+		{
+			None = 0,
+			Complete = 1,
+			Incomplete = 2
+		}
+
+		private enum ParserState
+		{
+			None = 0,
+			BlankLine = 1,
+			Delimiter = 2,
+			LineEnding = 3
+		}
+
+		[DebuggerDisplay("Start = {Start}, Length = {Length}, QuoteCount = {QuoteCount}")]
+		private struct Field
+		{
+			/// <summary>
+			/// Starting position of the field.
+			/// This is an offset from <see cref="rowStartPosition"/>.
+			/// </summary>
+			public int Start;
+
+			public int Length;
+
+			public int QuoteCount;
 		}
 	}
 }

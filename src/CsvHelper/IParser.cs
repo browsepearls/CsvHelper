@@ -14,6 +14,18 @@ namespace CsvHelper
 	public interface IParser : IDisposable
 	{
 		/// <summary>
+		/// Gets the count of how many bytes have been read.
+		/// <see cref="IParserConfiguration.CountBytes"/> needs
+		/// to be enabled for this value to be populated.
+		/// </summary>
+		long ByteCount { get; }
+
+		/// <summary>
+		/// Gets the count of how many characters have been read.
+		/// </summary>
+		long CharCount { get; }
+
+		/// <summary>
 		/// Gets the number of fields for the current row.
 		/// </summary>
 		int Count { get; }
@@ -35,7 +47,7 @@ namespace CsvHelper
 		/// <summary>
 		/// Gets the raw record for the current row.
 		/// </summary>
-		Span<char> RawRecord { get; }
+		string RawRecord { get; }
 
 		/// <summary>
 		/// Gets the CSV row the parser is currently on.

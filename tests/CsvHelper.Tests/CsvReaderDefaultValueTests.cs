@@ -5,6 +5,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using CsvHelper.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -13,6 +14,22 @@ namespace CsvHelper.Tests
 	[TestClass]
 	public class CsvReaderDefaultValueTests
 	{
+		[TestMethod]
+		public void Foo()
+		{
+			var s = new StringBuilder();
+			s.Append("1,2\r\n");
+			s.Append("3,4\r\n");
+			using (var reader = new StringReader(s.ToString()))
+			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
+			{
+				Assert.IsTrue(parser.Read());
+				Assert.AreEqual("1", parser[0]);
+				Assert.AreEqual("2", parser[1]);
+				Assert.IsFalse(parser.Read());
+			}
+		}
+
 		[TestMethod]
 		public void DefaultValueTest()
 		{

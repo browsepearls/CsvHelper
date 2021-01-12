@@ -39,7 +39,7 @@ namespace CsvHelper.Configuration
 		/// instead of throwing an exception.
 		/// Arguments: context
 		/// </summary>
-		Action<CsvContext> BadDataFound { get; }
+		BadDataFound BadDataFound { get; }
 
 		/// <summary>
 		/// Gets a value indicating if a line break found in a quote field should
@@ -95,28 +95,6 @@ namespace CsvHelper.Configuration
 		/// Gets the field trimming options.
 		/// </summary>
 		TrimOptions TrimOptions { get; }
-
-		/// <summary>
-		/// Processes a raw field.
-		/// This function calls the field parsing pipeline.
-		/// PreDequote -> Dequote -> PostDequote
-		/// </summary>
-		ProcessFieldFunc ProcessField { get; }
-
-		/// <summary>
-		/// Processing that happens to a field before dequoting.
-		/// </summary>
-		PreDequoteFieldFunc PreDequoteField { get; }
-
-		/// <summary>
-		/// Removes quoting from a field.
-		/// </summary>
-		DequoteFieldFunc DequoteField { get; }
-
-		/// <summary>
-		/// Processing that happens to a field after dequoting.
-		/// </summary>
-		PostDequoteFieldFunc PostDequoteField { get; }
 
 		/// <summary>
 		/// Characters considered whitespace.

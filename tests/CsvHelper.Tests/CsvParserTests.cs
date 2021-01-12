@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -76,13 +77,13 @@ namespace CsvHelper.Tests
 
 			var parser = new CsvParser(reader, config);
 
-			var count = 0;
+			var records = new List<string[]>();
 			while (parser.Read())
 			{
-				count++;
+				records.Add(parser.Record);
 			}
 
-			Assert.AreEqual(4, count);
+			Assert.AreEqual(4, records.Count);
 		}
 
 		[TestMethod]
@@ -122,8 +123,7 @@ namespace CsvHelper.Tests
 			stream.Position = 0;
 			var reader = new StreamReader(stream);
 
-			var config = new CsvConfiguration(CultureInfo.InvariantCulture) { BufferSize = 2000 };
-			var parser = new CsvParser(reader, config);
+			var parser = new CsvParser(reader, CultureInfo.InvariantCulture);
 
 			Assert.IsTrue(parser.Read());
 			Assert.AreEqual("one", parser[0]);
@@ -1349,8 +1349,7 @@ namespace CsvHelper.Tests
 			using (var reader = new StringReader("a,b"))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Read();
-
+				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(1, parser.Row);
 			}
 		}
@@ -1361,8 +1360,7 @@ namespace CsvHelper.Tests
 			using (var reader = new StringReader("a,b"))
 			using (var parser = new CsvParser(reader, CultureInfo.InvariantCulture))
 			{
-				parser.Read();
-
+				Assert.IsTrue(parser.Read());
 				Assert.AreEqual(1, parser.RawRow);
 			}
 		}

@@ -27,11 +27,15 @@ namespace CsvHelper.Tests.Mocks
 
 		public string[] Record => record;
 
-		public Span<char> RawRecord => Span<char>.Empty;
+		public string RawRecord => throw new NotImplementedException();
 
 		public int Row => row;
 
 		public int RawRow => row;
+
+		public long ByteCount => throw new NotImplementedException();
+
+		public long CharCount => throw new NotImplementedException();
 
 		public string this[int index] => record[index];
 
