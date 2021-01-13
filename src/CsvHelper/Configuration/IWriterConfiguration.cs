@@ -35,7 +35,7 @@ namespace CsvHelper.Configuration
 		/// when writing.
 		/// Arguments: field, context
 		/// </summary>
-		Func<string, CsvContext, bool> ShouldQuote { get; }
+		ShouldQuote ShouldQuote { get; }
 
 		/// <summary>
 		/// Gets the culture info used to read an write CSV files.
@@ -79,7 +79,7 @@ namespace CsvHelper.Configuration
 		/// Gets a callback that will return the prefix for a reference header.
 		/// Arguments: memberType, memberName
 		/// </summary>
-		Func<Type, string, string> ReferenceHeaderPrefix { get; }
+		ReferenceHeaderPrefix ReferenceHeaderPrefix { get; }
 
 		/// <summary>
 		/// Gets the member types that are used when auto mapping.

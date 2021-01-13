@@ -67,8 +67,6 @@ namespace CsvHelper
 		{
 			get
 			{
-				// TODO: Cache the current record
-
 				if (fieldsPosition == 0)
 				{
 					return null;

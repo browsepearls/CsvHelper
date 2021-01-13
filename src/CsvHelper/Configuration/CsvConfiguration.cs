@@ -47,7 +47,7 @@ namespace CsvHelper.Configuration
 		/// You can supply your own function to do other things like logging the issue instead of throwing an exception.
 		/// Arguments: (isValid, headerNames, headerNameIndex, context)
 		/// </summary>
-		public virtual Action<InvalidHeader[], CsvContext> HeaderValidated { get; init; } = ConfigurationFunctions.HeaderValidated;
+		public virtual HeaderValidated HeaderValidated { get; init; } = ConfigurationFunctions.HeaderValidated;
 
 		/// <summary>
 		/// Gets or sets the function that is called when a missing field is found. The default function will
@@ -55,7 +55,7 @@ namespace CsvHelper.Configuration
 		/// like logging the issue instead of throwing an exception.
 		/// Arguments: (headerNames, index, context)
 		/// </summary>
-		public virtual Action<string[], int, CsvContext> MissingFieldFound { get; init; } = ConfigurationFunctions.MissingFieldFound;
+		public virtual MissingFieldFound MissingFieldFound { get; init; } = ConfigurationFunctions.MissingFieldFound;
 
 		/// <summary>
 		/// Gets or sets the function that is called when bad field data is found. A field
@@ -73,14 +73,14 @@ namespace CsvHelper.Configuration
 		/// logging the issue.
 		/// Arguments: (exception)
 		/// </summary>
-		public virtual Func<CsvHelperException, bool> ReadingExceptionOccurred { get; init; } = ConfigurationFunctions.ReadingExceptionOccurred;
+		public virtual ReadingExceptionOccurred ReadingExceptionOccurred { get; init; } = ConfigurationFunctions.ReadingExceptionOccurred;
 
 		/// <summary>
 		/// Gets or sets the callback that will be called to
 		/// determine whether to skip the given record or not.
 		/// Arguments: (record)
 		/// </summary>
-		public virtual Func<string[], bool> ShouldSkipRecord { get; init; } = ConfigurationFunctions.ShouldSkipRecord;
+		public virtual ShouldSkipRecord ShouldSkipRecord { get; init; } = ConfigurationFunctions.ShouldSkipRecord;
 
 		/// <summary>
 		/// Gets or sets a value indicating if a line break found in a quote field should
@@ -123,20 +123,20 @@ namespace CsvHelper.Configuration
 		/// and making casing changes to ignore case.
 		/// Arguments: (header, fieldIndex)
 		/// </summary>
-		public virtual Func<string, int, string> PrepareHeaderForMatch { get; init; } = ConfigurationFunctions.PrepareHeaderForMatch;
+		public virtual PrepareHeaderForMatch PrepareHeaderForMatch { get; init; } = ConfigurationFunctions.PrepareHeaderForMatch;
 
 		/// <summary>
 		/// Determines if constructor parameters should be used to create
 		/// the class instead of the default constructor and members.
 		/// Arguments: (parameterType)
 		/// </summary>
-		public virtual Func<Type, bool> ShouldUseConstructorParameters { get; init; } = ConfigurationFunctions.ShouldUseConstructorParameters;
+		public virtual ShouldUseConstructorParameters ShouldUseConstructorParameters { get; init; } = ConfigurationFunctions.ShouldUseConstructorParameters;
 
 		/// <summary>
 		/// Chooses the constructor to use for constructor mapping.
 		/// Arguments: (classType)
 		/// </summary>
-		public virtual Func<Type, ConstructorInfo> GetConstructor { get; init; } = ConfigurationFunctions.GetConstructor;
+		public virtual GetConstructor GetConstructor { get; init; } = ConfigurationFunctions.GetConstructor;
 
 		/// <summary>
 		/// Gets or sets the comparer used to order the properties
@@ -150,7 +150,7 @@ namespace CsvHelper.Configuration
 		/// Gets the name to use for the property of the dynamic object.
 		/// Arguments: (readingContext, fieldIndex)
 		/// </summary>
-		public virtual Func<CsvContext, int, string> GetDynamicPropertyName { get; init; } = ConfigurationFunctions.GetDynamicPropertyName;
+		public virtual GetDynamicPropertyName GetDynamicPropertyName { get; init; } = ConfigurationFunctions.GetDynamicPropertyName;
 
 		/// <summary>
 		/// Gets or sets a value indicating whether references
@@ -285,7 +285,7 @@ namespace CsvHelper.Configuration
 		/// when writing.
 		/// Arguments: field, context
 		/// </summary>
-		public Func<string, CsvContext, bool> ShouldQuote { get; init; } = ConfigurationFunctions.ShouldQuote;
+		public ShouldQuote ShouldQuote { get; init; } = ConfigurationFunctions.ShouldQuote;
 
 		/// <summary>
 		/// Gets or sets the character used to denote
@@ -356,7 +356,7 @@ namespace CsvHelper.Configuration
 		/// Gets or sets a callback that will return the prefix for a reference header.
 		/// Arguments: (memberType, memberName)
 		/// </summary>
-		public virtual Func<Type, string, string> ReferenceHeaderPrefix { get; init; }
+		public virtual ReferenceHeaderPrefix ReferenceHeaderPrefix { get; init; }
 
 		/// <summary>
 		/// Gets or sets the newline to use when writing.

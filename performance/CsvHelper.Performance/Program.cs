@@ -211,54 +211,6 @@ namespace CsvHelper.Performance
 			}
 		}
 
-		static void StackParse()
-		{
-			Console.WriteLine("CsvHelper span parsing");
-			var stopwatch = new Stopwatch();
-			stopwatch.Start();
-
-			using (var stream = File.OpenRead(GetFilePath()))
-			using (var reader = new StreamReader(stream))
-			using (var parser = new CsvStackParser(reader, CultureInfo.InvariantCulture))
-			{
-				while (parser.Read())
-				{
-				}
-			}
-
-			stopwatch.Stop();
-			Console.WriteLine(stopwatch.Elapsed);
-		}
-
-		static void StackParse2()
-		{
-			Console.WriteLine("CsvHelper span parsing");
-			var stopwatch = new Stopwatch();
-			stopwatch.Start();
-
-			using (var stream = File.OpenRead(GetFilePath()))
-			using (var reader = new StreamReader(stream))
-			using (var parser = new StackParser2(reader, new CsvConfiguration(CultureInfo.InvariantCulture)))
-			{
-				var i = 0;
-				while (parser.Read())
-				{
-					//var record = parser.Record;
-					Console.WriteLine(string.Join(",", parser.Record));
-					System.Threading.Thread.Sleep(300);
-					//if (i == 1_000_000)
-					//{
-					//	Console.WriteLine(string.Join(",", parser.Record));
-					//}
-
-					i++;
-				}
-			}
-
-			stopwatch.Stop();
-			Console.WriteLine(stopwatch.Elapsed);
-		}
-
 		static void ReadGetField()
 		{
 			Console.WriteLine("Reading using GetField");
@@ -369,26 +321,6 @@ namespace CsvHelper.Performance
 				stopwatch.Stop();
 				Console.WriteLine(stopwatch.Elapsed);
 			}
-		}
-
-		static void StefanBertelsParse()
-		{
-			Console.WriteLine("Stefan Bertels parsing");
-			var stopwatch = new Stopwatch();
-			stopwatch.Start();
-
-			using (var stream = File.OpenRead(GetFilePath()))
-			using (var reader = new StreamReader(stream))
-			{
-				var csv = new StefanBertelsParser(reader, false);
-
-				foreach (var context in csv.Read())
-				{
-				}
-			}
-
-			stopwatch.Stop();
-			Console.WriteLine(stopwatch.Elapsed);
 		}
 
 		private class Data

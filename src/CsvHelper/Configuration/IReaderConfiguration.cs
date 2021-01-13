@@ -28,7 +28,7 @@ namespace CsvHelper.Configuration
 		/// You can supply your own function to do other things like logging the issue instead of throwing an exception.
 		/// Arguments: (isValid, headerNames, headerNameIndex, context)
 		/// </summary>
-		Action<InvalidHeader[], CsvContext> HeaderValidated { get; }
+		HeaderValidated HeaderValidated { get; }
 
 		/// <summary>
 		/// Gets the function that is called when a missing field is found. The default function will
@@ -36,7 +36,7 @@ namespace CsvHelper.Configuration
 		/// like logging the issue instead of throwing an exception.
 		/// Arguments: (headerNames, index, context)
 		/// </summary>
-		Action<string[], int, CsvContext> MissingFieldFound { get; }
+		MissingFieldFound MissingFieldFound { get; }
 
 		/// <summary>
 		/// Gets the function that is called when a reading exception occurs.
@@ -45,7 +45,7 @@ namespace CsvHelper.Configuration
 		/// logging the issue.
 		/// Arguments: (exception)
 		/// </summary>
-		Func<CsvHelperException, bool> ReadingExceptionOccurred { get; }
+		ReadingExceptionOccurred ReadingExceptionOccurred { get; }
 
 		/// <summary>
 		/// Gets the culture info used to read an write CSV files.
@@ -59,26 +59,26 @@ namespace CsvHelper.Configuration
 		/// and making casing changes to ignore case.
 		/// Arguments: (header, fieldIndex)
 		/// </summary>
-		Func<string, int, string> PrepareHeaderForMatch { get; }
+		PrepareHeaderForMatch PrepareHeaderForMatch { get; }
 
 		/// <summary>
 		/// Determines if constructor parameters should be used to create
 		/// the class instead of the default constructor and members.
 		/// Arguments: (parameterType)
 		/// </summary>
-		Func<Type, bool> ShouldUseConstructorParameters { get; }
+		ShouldUseConstructorParameters ShouldUseConstructorParameters { get; }
 
 		/// <summary>
 		/// Chooses the constructor to use for constructor mapping.
 		/// Arguments: (classType)
 		/// </summary>
-		Func<Type, ConstructorInfo> GetConstructor { get; }
+		GetConstructor GetConstructor { get; }
 
 		/// <summary>
 		/// Gets the name to use for the property of the dynamic object.
 		/// Arguments: (readingContext, fieldIndex)
 		/// </summary>
-		Func<CsvContext, int, string> GetDynamicPropertyName { get; }
+		GetDynamicPropertyName GetDynamicPropertyName { get; }
 
 		/// <summary>
 		/// Gets a value indicating whether references
@@ -92,7 +92,7 @@ namespace CsvHelper.Configuration
 		/// determine whether to skip the given record or not.
 		/// Arguments: (record)
 		/// </summary>
-		Func<string[], bool> ShouldSkipRecord { get; }
+		ShouldSkipRecord ShouldSkipRecord { get; }
 
 		/// <summary>
 		/// Gets a value indicating if private
@@ -105,7 +105,7 @@ namespace CsvHelper.Configuration
 		/// Gets a callback that will return the prefix for a reference header.
 		/// Arguments: (memberType, memberName)
 		/// </summary>
-		Func<Type, string, string> ReferenceHeaderPrefix { get; }
+		ReferenceHeaderPrefix ReferenceHeaderPrefix { get; }
 
 		/// <summary>
 		/// Gets a value indicating whether changes in the column

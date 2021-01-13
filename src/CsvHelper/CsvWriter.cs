@@ -32,7 +32,7 @@ namespace CsvHelper
 		private readonly IWriterConfiguration configuration;
 		private readonly TypeConverterCache typeConverterCache;
 		private readonly TrimOptions trimOptions;
-		private readonly Func<string, CsvContext, bool> shouldQuote;
+		private readonly ShouldQuote shouldQuote;
 		private readonly MemberMapData reusableMemberMapData = new MemberMapData(null);
 		private readonly List<string> record = new List<string>();
 		private readonly Dictionary<Type, TypeConverterOptions> typeConverterOptionsCache = new Dictionary<Type, TypeConverterOptions>();
