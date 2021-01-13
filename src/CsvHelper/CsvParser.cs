@@ -113,10 +113,19 @@ namespace CsvHelper
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="CsvParser"/> class.
+		/// </summary>
+		/// <param name="reader">The reader.</param>
+		/// <param name="culture">The culture.</param>
+		/// <param name="leaveOpen">if set to <c>true</c> [leave open].</param>
 		public CsvParser(TextReader reader, CultureInfo culture, bool leaveOpen = false) : this(reader, new CsvConfiguration(culture) { LeaveOpen = leaveOpen }) { }
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="CsvParser"/> class.
+		/// </summary>
+		/// <param name="reader">The reader.</param>
+		/// <param name="configuration">The configuration.</param>
 		public CsvParser(TextReader reader, CsvConfiguration configuration)
 		{
 			this.reader = reader;
@@ -294,6 +303,10 @@ namespace CsvHelper
 			fieldStartPosition = rowStartPosition;
 			fieldsPosition = 0;
 			quoteCount = 0;
+			row++;
+			rawRow++;
+
+			var result = ReadLineResult.None;
 
 			while (true)
 			{
@@ -301,11 +314,12 @@ namespace CsvHelper
 				{
 					if (!await FillBufferAsync())
 					{
-						return false;
+						return ReadEndOfFile(result);
 					}
 				}
 
-				var result = ReadLine();
+				result = ReadLine();
+
 				if (result == ReadLineResult.Complete)
 				{
 					return true;
@@ -580,12 +594,6 @@ namespace CsvHelper
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private Task<bool> FillBufferAsync()
-		{
-			throw new NotImplementedException();
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private bool FillBuffer()
 		{
 			if (rowStartPosition == 0 && charCount > 0 && charsRead == bufferSize)
@@ -607,6 +615,38 @@ namespace CsvHelper
 			bufferPosition = charsLeft;
 
 			charsRead = reader.Read(buffer, charsLeft, buffer.Length - charsLeft);
+			if (charsRead == 0)
+			{
+				return false;
+			}
+
+			charsRead += charsLeft;
+
+			return true;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private async Task<bool> FillBufferAsync()
+		{
+			if (rowStartPosition == 0 && charCount > 0 && charsRead == bufferSize)
+			{
+				// The record is longer than the memory buffer. Increase the buffer.
+				bufferSize *= 2;
+				var tempBuffer = ArrayPool<char>.Shared.Rent(bufferSize);
+				buffer.CopyTo(tempBuffer, 0);
+				ArrayPool<char>.Shared.Return(buffer);
+				buffer = tempBuffer;
+			}
+
+			var charsLeft = Math.Max(charsRead - rowStartPosition, 0);
+
+			Array.Copy(buffer, rowStartPosition, buffer, 0, charsLeft);
+
+			fieldStartPosition -= rowStartPosition;
+			rowStartPosition = 0;
+			bufferPosition = charsLeft;
+
+			charsRead = await reader.ReadAsync(buffer, charsLeft, buffer.Length - charsLeft);
 			if (charsRead == 0)
 			{
 				return false;

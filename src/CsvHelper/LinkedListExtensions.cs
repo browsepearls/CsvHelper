@@ -8,18 +8,18 @@ namespace CsvHelper
 {
 	internal static class LinkedListExtensions
 	{
-		public static void Drop<T>( this LinkedList<T> list, LinkedListNode<T> node )
+		public static void Drop<T>(this LinkedList<T> list, LinkedListNode<T> node)
 		{
-			if( list.Count == 0 )
+			if (list.Count == 0)
 			{
 				return;
 			}
 
-			while( list.Count > 0 )
+			while (list.Count > 0)
 			{
 				var nodeToRemove = list.Last;
 				list.RemoveLast();
-				if( nodeToRemove == node )
+				if (nodeToRemove == node)
 				{
 					break;
 				}

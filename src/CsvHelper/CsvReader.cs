@@ -36,29 +36,19 @@ namespace CsvHelper
 		private bool hasBeenRead;
 		private string[] headerRecord;
 
-		/// <summary>
-		/// Gets the field index the reader is currently on.
-		/// </summary>
+		/// <inheritdoc/>
 		public virtual int CurrentIndex => currentIndex;
 
-		/// <summary>
-		/// Gets the header record.
-		/// </summary>
+		/// <inheritdoc/>
 		public virtual string[] HeaderRecord => headerRecord;
 
-		/// <summary>
-		/// Gets the reading context.
-		/// </summary>
+		/// <inheritdoc/>
 		public virtual CsvContext Context => context;
 
-		/// <summary>
-		/// Gets the configuration.
-		/// </summary>
+		/// <inheritdoc/>
 		public virtual IReaderConfiguration Configuration => configuration;
 
-		/// <summary>
-		/// Gets the parser.
-		/// </summary>
+		/// <inheritdoc/>
 		public virtual IParser Parser => parser;
 
 		/// <summary>
@@ -97,10 +87,7 @@ namespace CsvHelper
 			recordManager = new Lazy<RecordManager>(() => ObjectResolver.Current.Resolve<RecordManager>(this));
 		}
 
-		/// <summary>
-		/// Reads the header record without reading the first row.
-		/// </summary>
-		/// <returns>True if there are more records, otherwise false.</returns>
+		/// <inheritdoc/>
 		public virtual bool ReadHeader()
 		{
 			if (!configuration.HasHeaderRecord)
@@ -114,21 +101,13 @@ namespace CsvHelper
 			return headerRecord != null;
 		}
 
-		/// <summary>
-		/// Validates the header. A header is bad if all the mapped members don't match.
-		/// If the header is not valid, a <see cref="ValidationException"/> will be thrown.
-		/// </summary>
-		/// <typeparam name="T">The type to validate the header against.</typeparam>
+		/// <inheritdoc/>
 		public virtual void ValidateHeader<T>()
 		{
 			ValidateHeader(typeof(T));
 		}
 
-		/// <summary>
-		/// Validates the header. A header is bad if all the mapped members don't match.
-		/// If the header is not valid, a <see cref="ValidationException"/> will be thrown.
-		/// </summary>
-		/// <param name="type">The type to validate the header against.</param>
+		/// <inheritdoc/>
 		public virtual void ValidateHeader(Type type)
 		{
 			if (Configuration.HasHeaderRecord == false)
@@ -155,11 +134,7 @@ namespace CsvHelper
 			Configuration.HeaderValidated?.Invoke(invalidHeaders.ToArray(), context);
 		}
 
-		/// <summary>
-		/// Validates the header against the given map.
-		/// </summary>
-		/// <param name="map">The map to validate against.</param>
-		/// <param name="invalidHeaders">List of invalid headers.</param>
+		/// <inheritdoc/>
 		protected virtual void ValidateHeader(ClassMap map, List<InvalidHeader> invalidHeaders)
 		{
 			foreach (var parameter in map.ParameterMaps)
@@ -232,12 +207,7 @@ namespace CsvHelper
 			}
 		}
 
-		/// <summary>
-		/// Advances the reader to the next record. This will not read headers.
-		/// You need to call <see cref="Read"/> then <see cref="ReadHeader"/> 
-		/// for the headers to be read.
-		/// </summary>
-		/// <returns>True if there are more records, otherwise false.</returns>
+		/// <inheritdoc/>
 		public virtual bool Read()
 		{
 			// Don't forget about the async method below!
@@ -270,12 +240,7 @@ namespace CsvHelper
 			return hasMoreRecords;
 		}
 
-		/// <summary>
-		/// Advances the reader to the next record. This will not read headers.
-		/// You need to call <see cref="ReadAsync"/> then <see cref="ReadHeader"/> 
-		/// for the headers to be read.
-		/// </summary>
-		/// <returns>True if there are more records, otherwise false.</returns>
+		/// <inheritdoc/>
 		public virtual async Task<bool> ReadAsync()
 		{
 			bool hasMoreRecords;
@@ -306,11 +271,7 @@ namespace CsvHelper
 			return hasMoreRecords;
 		}
 
-		/// <summary>
-		/// Gets the raw field at position (column) index.
-		/// </summary>
-		/// <param name="index">The zero based index of the field.</param>
-		/// <returns>The raw field.</returns>
+		/// <inheritdoc/>
 		public virtual string this[int index]
 		{
 			get
@@ -321,11 +282,7 @@ namespace CsvHelper
 			}
 		}
 
-		/// <summary>
-		/// Gets the raw field at position (column) name.
-		/// </summary>
-		/// <param name="name">The named index of the field.</param>
-		/// <returns>The raw field.</returns>
+		/// <inheritdoc/>
 		public virtual string this[string name]
 		{
 			get
@@ -336,12 +293,7 @@ namespace CsvHelper
 			}
 		}
 
-		/// <summary>
-		/// Gets the raw field at position (column) name.
-		/// </summary>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="index">The zero based index of the field.</param>
-		/// <returns>The raw field.</returns>
+		/// <inheritdoc/>
 		public virtual string this[string name, int index]
 		{
 			get
@@ -352,11 +304,7 @@ namespace CsvHelper
 			}
 		}
 
-		/// <summary>
-		/// Gets the raw field at position (column) index.
-		/// </summary>
-		/// <param name="index">The zero based index of the field.</param>
-		/// <returns>The raw field.</returns>
+		/// <inheritdoc/>
 		public virtual string GetField(int index)
 		{
 			CheckHasBeenRead();
@@ -381,11 +329,7 @@ namespace CsvHelper
 			return field;
 		}
 
-		/// <summary>
-		/// Gets the raw field at position (column) name.
-		/// </summary>
-		/// <param name="name">The named index of the field.</param>
-		/// <returns>The raw field.</returns>
+		/// <inheritdoc/>
 		public virtual string GetField(string name)
 		{
 			CheckHasBeenRead();
@@ -399,14 +343,7 @@ namespace CsvHelper
 			return GetField(index);
 		}
 
-		/// <summary>
-		/// Gets the raw field at position (column) name and the index
-		/// instance of that field. The index is used when there are
-		/// multiple columns with the same header name.
-		/// </summary>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="index">The zero based index of the instance of the field.</param>
-		/// <returns>The raw field.</returns>
+		/// <inheritdoc/>
 		public virtual string GetField(string name, int index)
 		{
 			CheckHasBeenRead();
@@ -420,13 +357,7 @@ namespace CsvHelper
 			return GetField(fieldIndex);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="Object"/> using
-		/// the specified <see cref="ITypeConverter"/>.
-		/// </summary>
-		/// <param name="type">The type of the field.</param>
-		/// <param name="index">The index of the field.</param>
-		/// <returns>The field converted to <see cref="Object"/>.</returns>
+		/// <inheritdoc/>
 		public virtual object GetField(Type type, int index)
 		{
 			CheckHasBeenRead();
@@ -435,13 +366,7 @@ namespace CsvHelper
 			return GetField(type, index, converter);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="Object"/> using
-		/// the specified <see cref="ITypeConverter"/>.
-		/// </summary>
-		/// <param name="type">The type of the field.</param>
-		/// <param name="name">The named index of the field.</param>
-		/// <returns>The field converted to <see cref="Object"/>.</returns>
+		/// <inheritdoc/>
 		public virtual object GetField(Type type, string name)
 		{
 			CheckHasBeenRead();
@@ -450,14 +375,7 @@ namespace CsvHelper
 			return GetField(type, name, converter);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="Object"/> using
-		/// the specified <see cref="ITypeConverter"/>.
-		/// </summary>
-		/// <param name="type">The type of the field.</param>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="index">The zero based index of the instance of the field.</param>
-		/// <returns>The field converted to <see cref="Object"/>.</returns>
+		/// <inheritdoc/>
 		public virtual object GetField(Type type, string name, int index)
 		{
 			CheckHasBeenRead();
@@ -466,14 +384,7 @@ namespace CsvHelper
 			return GetField(type, name, index, converter);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="Object"/> using
-		/// the specified <see cref="ITypeConverter"/>.
-		/// </summary>
-		/// <param name="type">The type of the field.</param>
-		/// <param name="index">The index of the field.</param>
-		/// <param name="converter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="Object"/>.</param>
-		/// <returns>The field converted to <see cref="Object"/>.</returns>
+		/// <inheritdoc/>
 		public virtual object GetField(Type type, int index, ITypeConverter converter)
 		{
 			CheckHasBeenRead();
@@ -492,14 +403,7 @@ namespace CsvHelper
 			return converter.ConvertFromString(field, this, reusableMemberMapData);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="Object"/> using
-		/// the specified <see cref="ITypeConverter"/>.
-		/// </summary>
-		/// <param name="type">The type of the field.</param>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="converter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="Object"/>.</param>
-		/// <returns>The field converted to <see cref="Object"/>.</returns>
+		/// <inheritdoc/>
 		public virtual object GetField(Type type, string name, ITypeConverter converter)
 		{
 			CheckHasBeenRead();
@@ -508,15 +412,7 @@ namespace CsvHelper
 			return GetField(type, index, converter);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="Object"/> using
-		/// the specified <see cref="ITypeConverter"/>.
-		/// </summary>
-		/// <param name="type">The type of the field.</param>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="index">The zero based index of the instance of the field.</param>
-		/// <param name="converter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="Object"/>.</param>
-		/// <returns>The field converted to <see cref="Object"/>.</returns>
+		/// <inheritdoc/>
 		public virtual object GetField(Type type, string name, int index, ITypeConverter converter)
 		{
 			CheckHasBeenRead();
@@ -525,12 +421,7 @@ namespace CsvHelper
 			return GetField(type, fieldIndex, converter);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) index.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <param name="index">The zero based index of the field.</param>
-		/// <returns>The field converted to <see cref="System.Type"/> T.</returns>
+		/// <inheritdoc/>
 		public virtual T GetField<T>(int index)
 		{
 			CheckHasBeenRead();
@@ -539,12 +430,7 @@ namespace CsvHelper
 			return GetField<T>(index, converter);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) name.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <param name="name">The named index of the field.</param>
-		/// <returns>The field converted to <see cref="System.Type"/> T.</returns>
+		/// <inheritdoc/>
 		public virtual T GetField<T>(string name)
 		{
 			CheckHasBeenRead();
@@ -553,15 +439,7 @@ namespace CsvHelper
 			return GetField<T>(name, converter);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position 
-		/// (column) name and the index instance of that field. The index 
-		/// is used when there are multiple columns with the same header name.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="index">The zero based index of the instance of the field.</param>
-		/// <returns></returns>
+		/// <inheritdoc/>
 		public virtual T GetField<T>(string name, int index)
 		{
 			CheckHasBeenRead();
@@ -570,14 +448,7 @@ namespace CsvHelper
 			return GetField<T>(name, index, converter);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) index using
-		/// the given <see cref="ITypeConverter" />.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <param name="index">The zero based index of the field.</param>
-		/// <param name="converter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</param>
-		/// <returns>The field converted to <see cref="System.Type"/> T.</returns>
+		/// <inheritdoc/>
 		public virtual T GetField<T>(int index, ITypeConverter converter)
 		{
 			CheckHasBeenRead();
@@ -596,14 +467,7 @@ namespace CsvHelper
 			return (T)GetField(typeof(T), index, converter);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) name using
-		/// the given <see cref="ITypeConverter" />.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="converter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</param>
-		/// <returns>The field converted to <see cref="System.Type"/> T.</returns>
+		/// <inheritdoc/>
 		public virtual T GetField<T>(string name, ITypeConverter converter)
 		{
 			CheckHasBeenRead();
@@ -612,16 +476,7 @@ namespace CsvHelper
 			return GetField<T>(index, converter);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position 
-		/// (column) name and the index instance of that field. The index 
-		/// is used when there are multiple columns with the same header name.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="index">The zero based index of the instance of the field.</param>
-		/// <param name="converter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</param>
-		/// <returns>The field converted to <see cref="System.Type"/> T.</returns>
+		/// <inheritdoc/>
 		public virtual T GetField<T>(string name, int index, ITypeConverter converter)
 		{
 			CheckHasBeenRead();
@@ -630,14 +485,7 @@ namespace CsvHelper
 			return GetField<T>(fieldIndex, converter);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) index using
-		/// the given <see cref="ITypeConverter" />.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <typeparam name="TConverter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</typeparam>
-		/// <param name="index">The zero based index of the field.</param>
-		/// <returns>The field converted to <see cref="System.Type"/> T.</returns>
+		/// <inheritdoc/>
 		public virtual T GetField<T, TConverter>(int index) where TConverter : ITypeConverter
 		{
 			CheckHasBeenRead();
@@ -646,14 +494,7 @@ namespace CsvHelper
 			return GetField<T>(index, converter);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) name using
-		/// the given <see cref="ITypeConverter" />.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <typeparam name="TConverter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</typeparam>
-		/// <param name="name">The named index of the field.</param>
-		/// <returns>The field converted to <see cref="System.Type"/> T.</returns>
+		/// <inheritdoc/>
 		public virtual T GetField<T, TConverter>(string name) where TConverter : ITypeConverter
 		{
 			CheckHasBeenRead();
@@ -662,16 +503,7 @@ namespace CsvHelper
 			return GetField<T>(name, converter);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position 
-		/// (column) name and the index instance of that field. The index 
-		/// is used when there are multiple columns with the same header name.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <typeparam name="TConverter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</typeparam>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="index">The zero based index of the instance of the field.</param>
-		/// <returns>The field converted to <see cref="System.Type"/> T.</returns>
+		/// <inheritdoc/>
 		public virtual T GetField<T, TConverter>(string name, int index) where TConverter : ITypeConverter
 		{
 			CheckHasBeenRead();
@@ -680,13 +512,7 @@ namespace CsvHelper
 			return GetField<T>(name, index, converter);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) index.
-		/// </summary>
-		/// <param name="type">The <see cref="System.Type"/> of the field.</param>
-		/// <param name="index">The zero based index of the field.</param>
-		/// <param name="field">The field converted to type T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField(Type type, int index, out object field)
 		{
 			CheckHasBeenRead();
@@ -695,13 +521,7 @@ namespace CsvHelper
 			return TryGetField(type, index, converter, out field);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) name.
-		/// </summary>
-		/// <param name="type">The <see cref="System.Type"/> of the field.</param>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="field">The field converted to <see cref="System.Type"/> T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField(Type type, string name, out object field)
 		{
 			CheckHasBeenRead();
@@ -710,16 +530,7 @@ namespace CsvHelper
 			return TryGetField(type, name, converter, out field);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position 
-		/// (column) name and the index instance of that field. The index 
-		/// is used when there are multiple columns with the same header name.
-		/// </summary>
-		/// <param name="type">The <see cref="System.Type"/> of the field.</param>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="index">The zero based index of the instance of the field.</param>
-		/// <param name="field">The field converted to <see cref="System.Type"/> T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField(Type type, string name, int index, out object field)
 		{
 			CheckHasBeenRead();
@@ -728,15 +539,7 @@ namespace CsvHelper
 			return TryGetField(type, name, index, converter, out field);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) index
-		/// using the specified <see cref="ITypeConverter" />.
-		/// </summary>
-		/// <param name="type">The <see cref="System.Type"/> of the field.</param>
-		/// <param name="index">The zero based index of the field.</param>
-		/// <param name="converter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</param>
-		/// <param name="field">The field converted to <see cref="System.Type"/> T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField(Type type, int index, ITypeConverter converter, out object field)
 		{
 			CheckHasBeenRead();
@@ -756,15 +559,7 @@ namespace CsvHelper
 			}
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) name
-		/// using the specified <see cref="ITypeConverter"/>.
-		/// </summary>
-		/// <param name="type">The <see cref="System.Type"/> of the field.</param>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="converter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</param>
-		/// <param name="field">The field converted to <see cref="System.Type"/> T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField(Type type, string name, ITypeConverter converter, out object field)
 		{
 			CheckHasBeenRead();
@@ -779,16 +574,7 @@ namespace CsvHelper
 			return TryGetField(type, index, converter, out field);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) name
-		/// using the specified <see cref="ITypeConverter"/>.
-		/// </summary>
-		/// <param name="type">The <see cref="System.Type"/> of the field.</param>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="index">The zero based index of the instance of the field.</param>
-		/// <param name="converter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</param>
-		/// <param name="field">The field converted to <see cref="System.Type"/> T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField(Type type, string name, int index, ITypeConverter converter, out object field)
 		{
 			CheckHasBeenRead();
@@ -803,13 +589,7 @@ namespace CsvHelper
 			return TryGetField(type, fieldIndex, converter, out field);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) index.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <param name="index">The zero based index of the field.</param>
-		/// <param name="field">The field converted to type T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField<T>(int index, out T field)
 		{
 			CheckHasBeenRead();
@@ -818,13 +598,7 @@ namespace CsvHelper
 			return TryGetField(index, converter, out field);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) name.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="field">The field converted to <see cref="System.Type"/> T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField<T>(string name, out T field)
 		{
 			CheckHasBeenRead();
@@ -833,16 +607,7 @@ namespace CsvHelper
 			return TryGetField(name, converter, out field);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position 
-		/// (column) name and the index instance of that field. The index 
-		/// is used when there are multiple columns with the same header name.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="index">The zero based index of the instance of the field.</param>
-		/// <param name="field">The field converted to <see cref="System.Type"/> T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField<T>(string name, int index, out T field)
 		{
 			CheckHasBeenRead();
@@ -851,15 +616,7 @@ namespace CsvHelper
 			return TryGetField(name, index, converter, out field);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) index
-		/// using the specified <see cref="ITypeConverter" />.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <param name="index">The zero based index of the field.</param>
-		/// <param name="converter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</param>
-		/// <param name="field">The field converted to <see cref="System.Type"/> T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField<T>(int index, ITypeConverter converter, out T field)
 		{
 			CheckHasBeenRead();
@@ -879,15 +636,7 @@ namespace CsvHelper
 			}
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) name
-		/// using the specified <see cref="ITypeConverter"/>.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="converter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</param>
-		/// <param name="field">The field converted to <see cref="System.Type"/> T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField<T>(string name, ITypeConverter converter, out T field)
 		{
 			CheckHasBeenRead();
@@ -902,16 +651,7 @@ namespace CsvHelper
 			return TryGetField(index, converter, out field);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) name
-		/// using the specified <see cref="ITypeConverter"/>.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="index">The zero based index of the instance of the field.</param>
-		/// <param name="converter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</param>
-		/// <param name="field">The field converted to <see cref="System.Type"/> T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField<T>(string name, int index, ITypeConverter converter, out T field)
 		{
 			CheckHasBeenRead();
@@ -926,15 +666,7 @@ namespace CsvHelper
 			return TryGetField(fieldIndex, converter, out field);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) index
-		/// using the specified <see cref="ITypeConverter" />.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <typeparam name="TConverter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</typeparam>
-		/// <param name="index">The zero based index of the field.</param>
-		/// <param name="field">The field converted to <see cref="System.Type"/> T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField<T, TConverter>(int index, out T field) where TConverter : ITypeConverter
 		{
 			CheckHasBeenRead();
@@ -943,15 +675,7 @@ namespace CsvHelper
 			return TryGetField(index, converter, out field);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) name
-		/// using the specified <see cref="ITypeConverter"/>.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <typeparam name="TConverter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</typeparam>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="field">The field converted to <see cref="System.Type"/> T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField<T, TConverter>(string name, out T field) where TConverter : ITypeConverter
 		{
 			CheckHasBeenRead();
@@ -960,16 +684,7 @@ namespace CsvHelper
 			return TryGetField(name, converter, out field);
 		}
 
-		/// <summary>
-		/// Gets the field converted to <see cref="System.Type"/> T at position (column) name
-		/// using the specified <see cref="ITypeConverter"/>.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the field.</typeparam>
-		/// <typeparam name="TConverter">The <see cref="ITypeConverter"/> used to convert the field to <see cref="System.Type"/> T.</typeparam>
-		/// <param name="name">The named index of the field.</param>
-		/// <param name="index">The zero based index of the instance of the field.</param>
-		/// <param name="field">The field converted to <see cref="System.Type"/> T.</param>
-		/// <returns>A value indicating if the get was successful.</returns>
+		/// <inheritdoc/>
 		public virtual bool TryGetField<T, TConverter>(string name, int index, out T field) where TConverter : ITypeConverter
 		{
 			CheckHasBeenRead();
@@ -978,11 +693,7 @@ namespace CsvHelper
 			return TryGetField(name, index, converter, out field);
 		}
 
-		/// <summary>
-		/// Gets the record converted into <see cref="System.Type"/> T.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the record.</typeparam>
-		/// <returns>The record converted to <see cref="System.Type"/> T.</returns>
+		/// <inheritdoc/>
 		public virtual T GetRecord<T>()
 		{
 			CheckHasBeenRead();
@@ -1025,12 +736,7 @@ namespace CsvHelper
 			return record;
 		}
 
-		/// <summary>
-		/// Get the record converted into <see cref="System.Type"/> T.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the record.</typeparam>
-		/// <param name="anonymousTypeDefinition">The anonymous type definition to use for the record.</param>
-		/// <returns>The record converted to <see cref="System.Type"/> T.</returns>
+		/// <inheritdoc/>
 		public virtual T GetRecord<T>(T anonymousTypeDefinition)
 		{
 			if (anonymousTypeDefinition == null)
@@ -1046,11 +752,7 @@ namespace CsvHelper
 			return GetRecord<T>();
 		}
 
-		/// <summary>
-		/// Gets the record.
-		/// </summary>
-		/// <param name="type">The <see cref="System.Type"/> of the record.</param>
-		/// <returns>The record.</returns>
+		/// <inheritdoc/>
 		public virtual object GetRecord(Type type)
 		{
 			CheckHasBeenRead();
@@ -1093,13 +795,7 @@ namespace CsvHelper
 			return record;
 		}
 
-		/// <summary>
-		/// Gets all the records in the CSV file and
-		/// converts each to <see cref="System.Type"/> T. The Read method
-		/// should not be used when using this.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the record.</typeparam>
-		/// <returns>An <see cref="IEnumerable{T}" /> of records.</returns>
+		/// <inheritdoc/>
 		public virtual IEnumerable<T> GetRecords<T>()
 		{
 			if (disposed)
@@ -1156,14 +852,7 @@ namespace CsvHelper
 			}
 		}
 
-		/// <summary>
-		/// Gets all the records in the CSV file and converts
-		/// each to <see cref="System.Type"/> T. The read method
-		/// should not be used when using this.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the record.</typeparam>
-		/// <param name="anonymousTypeDefinition">The anonymous type definition to use for the records.</param>
-		/// <returns>An <see cref="IEnumerable{T}"/> of records.</returns>
+		/// <inheritdoc/>
 		public virtual IEnumerable<T> GetRecords<T>(T anonymousTypeDefinition)
 		{
 			if (anonymousTypeDefinition == null)
@@ -1179,13 +868,7 @@ namespace CsvHelper
 			return GetRecords<T>();
 		}
 
-		/// <summary>
-		/// Gets all the records in the CSV file and
-		/// converts each to <see cref="System.Type"/> T. The Read method
-		/// should not be used when using this.
-		/// </summary>
-		/// <param name="type">The <see cref="System.Type"/> of the record.</param>
-		/// <returns>An <see cref="IEnumerable{Object}" /> of records.</returns>
+		/// <inheritdoc/>
 		public virtual IEnumerable<object> GetRecords(Type type)
 		{
 			if (disposed)
@@ -1242,16 +925,7 @@ namespace CsvHelper
 			}
 		}
 
-		/// <summary>
-		/// Enumerates the records hydrating the given record instance with row data.
-		/// The record instance is re-used and not cleared on each enumeration. 
-		/// This only works for streaming rows. If any methods are called on the projection
-		/// that force the evaluation of the IEnumerable, such as ToList(), the entire list
-		/// will contain the same instance of the record, which is the last row.
-		/// </summary>
-		/// <typeparam name="T">The type of the record.</typeparam>
-		/// <param name="record">The record to fill each enumeration.</param>
-		/// <returns>An <see cref="IEnumerable{T}"/> of records.</returns>
+		/// <inheritdoc/>
 		public virtual IEnumerable<T> EnumerateRecords<T>(T record)
 		{
 			if (disposed)
@@ -1308,13 +982,7 @@ namespace CsvHelper
 		}
 
 #if !NET45
-		/// <summary>
-		/// Gets all the records in the CSV file and
-		/// converts each to <see cref="System.Type"/> T. The Read method
-		/// should not be used when using this.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the record.</typeparam>
-		/// <returns>An <see cref="IAsyncEnumerable{T}" /> of records.</returns>
+		/// <inheritdoc/>
 		public virtual async IAsyncEnumerable<T> GetRecordsAsync<T>()
 		{
 			if (disposed)
@@ -1371,14 +1039,7 @@ namespace CsvHelper
 			}
 		}
 
-		/// <summary>
-		/// Gets all the records in the CSV file and converts
-		/// each to <see cref="System.Type"/> T. The read method
-		/// should not be used when using this.
-		/// </summary>
-		/// <typeparam name="T">The <see cref="System.Type"/> of the record.</typeparam>
-		/// <param name="anonymousTypeDefinition">The anonymous type definition to use for the records.</param>
-		/// <returns>An <see cref="IEnumerable{T}"/> of records.</returns>
+		/// <inheritdoc/>
 		public virtual IAsyncEnumerable<T> GetRecordsAsync<T>(T anonymousTypeDefinition)
 		{
 			if (anonymousTypeDefinition == null)
@@ -1394,13 +1055,7 @@ namespace CsvHelper
 			return GetRecordsAsync<T>();
 		}
 
-		/// <summary>
-		/// Gets all the records in the CSV file and
-		/// converts each to <see cref="System.Type"/> T. The Read method
-		/// should not be used when using this.
-		/// </summary>
-		/// <param name="type">The <see cref="System.Type"/> of the record.</param>
-		/// <returns>An <see cref="IAsyncEnumerable{Object}" /> of records.</returns>
+		/// <inheritdoc/>
 		public virtual async IAsyncEnumerable<object> GetRecordsAsync(Type type)
 		{
 			if (disposed)
@@ -1457,16 +1112,7 @@ namespace CsvHelper
 			}
 		}
 
-		/// <summary>
-		/// Enumerates the records hydrating the given record instance with row data.
-		/// The record instance is re-used and not cleared on each enumeration. 
-		/// This only works for streaming rows. If any methods are called on the projection
-		/// that force the evaluation of the IEnumerable, such as ToList(), the entire list
-		/// will contain the same instance of the record, which is the last row.
-		/// </summary>
-		/// <typeparam name="T">The type of the record.</typeparam>
-		/// <param name="record">The record to fill each enumeration.</param>
-		/// <returns>An <see cref="IAsyncEnumerable{T}"/> of records.</returns>
+		/// <inheritdoc/>
 		public virtual async IAsyncEnumerable<T> EnumerateRecordsAsync<T>(T record)
 		{
 			if (disposed)
@@ -1523,30 +1169,13 @@ namespace CsvHelper
 		}
 #endif
 
-		/// <summary>
-		/// Gets the index of the field at name if found.
-		/// </summary>
-		/// <param name="name">The name of the field to get the index for.</param>
-		/// <param name="index">The index of the field if there are multiple fields with the same name.</param>
-		/// <param name="isTryGet">A value indicating if the call was initiated from a TryGet.</param>
-		/// <returns>The index of the field if found, otherwise -1.</returns>
-		/// <exception cref="ReaderException">Thrown if there is no header record.</exception>
-		/// <exception cref="MissingFieldException">Thrown if there isn't a field with name.</exception>
+		/// <inheritdoc/>
 		public virtual int GetFieldIndex(string name, int index = 0, bool isTryGet = false)
 		{
 			return GetFieldIndex(new[] { name }, index, isTryGet);
 		}
 
-		/// <summary>
-		/// Gets the index of the field at name if found.
-		/// </summary>
-		/// <param name="names">The possible names of the field to get the index for.</param>
-		/// <param name="index">The index of the field if there are multiple fields with the same name.</param>
-		/// <param name="isTryGet">A value indicating if the call was initiated from a TryGet.</param>
-		/// <param name="isOptional">A value indicating if the call was initiated for an optional field.</param>
-		/// <returns>The index of the field if found, otherwise -1.</returns>
-		/// <exception cref="ReaderException">Thrown if there is no header record.</exception>
-		/// <exception cref="MissingFieldException">Thrown if there isn't a field with name.</exception>
+		/// <inheritdoc/>
 		public virtual int GetFieldIndex(string[] names, int index = 0, bool isTryGet = false, bool isOptional = false)
 		{
 			if (names == null)
@@ -1603,12 +1232,7 @@ namespace CsvHelper
 			return namedIndexes[name][index];
 		}
 
-		/// <summary>
-		/// Determines if the member for the <see cref="MemberMap"/>
-		/// can be read.
-		/// </summary>
-		/// <param name="memberMap">The member map.</param>
-		/// <returns>A value indicating of the member can be read. True if it can, otherwise false.</returns>
+		/// <inheritdoc/>
 		public virtual bool CanRead(MemberMap memberMap)
 		{
 			var cantRead =
@@ -1629,12 +1253,7 @@ namespace CsvHelper
 			return !cantRead;
 		}
 
-		/// <summary>
-		/// Determines if the member for the <see cref="MemberReferenceMap"/>
-		/// can be read.
-		/// </summary>
-		/// <param name="memberReferenceMap">The reference map.</param>
-		/// <returns>A value indicating of the member can be read. True if it can, otherwise false.</returns>
+		/// <inheritdoc/>
 		public virtual bool CanRead(MemberReferenceMap memberReferenceMap)
 		{
 			var cantRead = false;
@@ -1653,20 +1272,14 @@ namespace CsvHelper
 			return !cantRead;
 		}
 
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		/// <filterpriority>2</filterpriority>
+		/// <inheritdoc/>
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		/// <param name="disposing">True if the instance needs to be disposed of.</param>
+		/// <inheritdoc/>
 		protected virtual void Dispose(bool disposing)
 		{
 			if (disposed)
@@ -1687,10 +1300,7 @@ namespace CsvHelper
 			disposed = true;
 		}
 
-		/// <summary>
-		/// Checks if the reader has been read yet.
-		/// </summary>
-		/// <exception cref="ReaderException" />
+		/// <inheritdoc/>
 		protected virtual void CheckHasBeenRead()
 		{
 			if (!hasBeenRead)
@@ -1699,9 +1309,7 @@ namespace CsvHelper
 			}
 		}
 
-		/// <summary>
-		/// Parses the named indexes from the header record.
-		/// </summary>
+		/// <inheritdoc/>
 		protected virtual void ParseNamedIndexes()
 		{
 			if (headerRecord == null)
