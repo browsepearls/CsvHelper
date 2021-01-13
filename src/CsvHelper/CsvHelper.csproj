@@ -8,8 +8,7 @@
 		
 		<!-- Build -->
 		<AssemblyName>CsvHelper</AssemblyName>
-		<!--<TargetFrameworks>net50;netstandard2.1;netstandard2.0;net45;net47</TargetFrameworks>-->
-		<TargetFrameworks>net50</TargetFrameworks>
+		<TargetFrameworks>net50;netstandard2.1;netstandard2.0;net45;net47</TargetFrameworks>
 		<RootNamespace>CsvHelper</RootNamespace>
 		<DefaultLanguage>en-US</DefaultLanguage>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -38,31 +37,40 @@
 	</ItemGroup>
 
 	<!-- .NET 4.5 -->
-	<!--<ItemGroup Condition="'$(TargetFramework)' == 'net45'">
+	<ItemGroup Condition="'$(TargetFramework)' == 'net45'">
 		<PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+		<PackageReference Include="System.Buffers" Version="4.5.1" />
 		<PackageReference Include="System.ValueTuple" Version="4.4.0" />
-	</ItemGroup>-->
+	</ItemGroup>
 
 	<!-- .NET 4.7 -->
-	<!--<ItemGroup Condition="'$(TargetFramework)' == 'net47'">
+	<ItemGroup Condition="'$(TargetFramework)' == 'net47'">
 		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.0" />
 		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.0" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+		<PackageReference Include="System.Buffers" Version="4.5.1" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
-	</ItemGroup>-->
+	</ItemGroup>
 
 	<!-- .NET Standard 2.0 -->
-	<!--<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
 		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.0" />
 		<PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.0" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+		<PackageReference Include="System.Buffers" Version="4.5.1" />
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
-	</ItemGroup>-->
+	</ItemGroup>
 
 	<!-- .NET Standard 2.1 -->
-	<!--<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
 		<PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-	</ItemGroup>-->
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="IsExternalInit" Version="1.0.0">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+	</ItemGroup>
 	
 	<ItemGroup>
 		<Compile Update="T4Methods.cs">

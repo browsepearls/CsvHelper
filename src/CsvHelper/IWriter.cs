@@ -14,7 +14,7 @@ namespace CsvHelper
 	/// Defines methods used to write to a CSV file.
 	/// </summary>
 	public interface IWriter : IWriterRow, IDisposable
-#if !NET45
+#if !NET45 && !NET47 && !NETSTANDARD2_0
 		, IAsyncDisposable
 #endif
 	{

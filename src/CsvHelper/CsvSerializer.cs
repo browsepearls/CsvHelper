@@ -193,7 +193,7 @@ namespace CsvHelper
 			disposed = true;
 		}
 
-#if !NET45
+#if !NET45 && !NET47 && !NETSTANDARD2_0
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>

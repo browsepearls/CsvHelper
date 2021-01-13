@@ -3,8 +3,8 @@ assembly-versioning-scheme: Major
 assembly-file-versioning-format: '{Major}.{Minor}.{Patch}.{env:BUILD_NUMBER ?? 0}'
 branches:
   span-parser:
-    regex: span-parser
-    source-branches: [ 'master' ]
+    regex: fast-parser
+    source-branches: [ 'span-parser' ]
     tag: beta
 ignore:
   sha: []
