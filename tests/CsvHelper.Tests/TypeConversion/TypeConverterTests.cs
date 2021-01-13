@@ -25,7 +25,6 @@ namespace CsvHelper.Tests.TypeConversion
 			var parserMock = new ParserMock(config)
 			{
 				{ "1" },
-				null
 			};
 			var csv = new CsvReader(parserMock);
 			csv.Context.RegisterClassMap<TestMap>();

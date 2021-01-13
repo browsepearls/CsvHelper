@@ -49,10 +49,15 @@ namespace CsvHelper.Tests.Mocks
 
 		public bool Read()
 		{
+			if (records.Count == 0)
+			{
+				return false;
+			}
+
 			row++;
 			record = records.Dequeue();
 
-			return records.Count > 0;
+			return true;
 		}
 
 		public Task<bool> ReadAsync()

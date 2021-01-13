@@ -601,7 +601,7 @@ namespace CsvHelper.Tests
 		[TestMethod]
 		public void CharReadTotalTest()
 		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				AllowComments = true
 			};

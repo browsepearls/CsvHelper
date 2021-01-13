@@ -23,7 +23,6 @@ namespace CsvHelper.Tests.Reading
 				{ "Id", "Name" },
 				{ "1", "one" },
 				{ "2", "two" },
-				null,
 			};
 
 			var csv = new CsvReader(parser);
@@ -49,7 +48,6 @@ namespace CsvHelper.Tests.Reading
 				{ "Id", "Name" },
 				{ "1", "one" },
 				{ "2", "two" },
-				null,
 			};
 
 			var csv = new CsvReader(parser);

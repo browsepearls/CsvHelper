@@ -61,7 +61,6 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 			{
 				{ "id", "amount" },
 				{ "1", $"({amount})" },
-				null
 			};
 			using (var csv = new CsvReader(parser))
 			{
@@ -84,7 +83,6 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 			var parser = new ParserMock(config)
 			{
 				{ "1", $"({amount})" },
-				null
 			};
 			using (var csv = new CsvReader(parser))
 			{

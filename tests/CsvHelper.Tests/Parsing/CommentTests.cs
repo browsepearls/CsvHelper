@@ -15,10 +15,10 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void CommentThatCrossesBuffersShouldNotAddToFieldTest()
 		{
-			var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
 				AllowComments = true,
-				BufferSize = 10
+				BufferSize = 16
 			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
@@ -26,7 +26,7 @@ namespace CsvHelper.Tests.Parsing
 			using (var parser = new CsvParser(reader, config))
 			{
 				writer.Write("1,2\r\n");
-				writer.Write("#commented line\r\n");
+				writer.Write("#abcdefghijklmnop\r\n");
 				writer.Write("3,4");
 				writer.Flush();
 				stream.Position = 0;

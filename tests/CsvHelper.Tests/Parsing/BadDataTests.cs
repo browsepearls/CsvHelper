@@ -15,38 +15,38 @@ namespace CsvHelper.Tests.Parsing
 		[TestMethod]
 		public void CallbackTest()
 		{
-			string field = null;
+			string rawRecord = null;
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				BadDataFound = context => field = context.Parser.RawRecord.ToString(),
+				BadDataFound = context => rawRecord = context.Parser.RawRecord.ToString(),
 			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
 			using (var parser = new CsvParser(reader, config))
 			{
-				writer.Write(" a\"bc\",d\r\n");        //  a\"bc\",d\r\n
-				writer.Write("\"a\"\"b\"c \" ,d\r\n"); // "a""b"c " ,d\r\n
-				writer.Write("\"a\"\"b\",c\r\n");      // "a""b",c\r\n
+				writer.Write(" a\"bc\",d\r\n");        //   a"bc",d\r\n
+				writer.Write("\"e\"\"f\"g \" ,h\r\n"); // "e""f"g " ,h\r\n
+				writer.Write("\"i\"\"j\",k\r\n");      // "i""j",k\r\n
 				writer.Flush();
 				stream.Position = 0;
 
 				parser.Read();
 				var record = parser.Record;
 
-				Assert.IsNotNull(field);
-				Assert.AreEqual(" a\"bc\",d\r\n", field);
+				Assert.IsNotNull(rawRecord);
+				Assert.AreEqual(" a\"bc\",d\r\n", rawRecord);
 
-				field = null;
+				rawRecord = null;
 				parser.Read();
 				record = parser.Record;
-				Assert.IsNotNull(field);
-				Assert.AreEqual("\"a\"\"b\"c \" ,d\r\n\"a\"\"b\",c\r\n", field);
+				Assert.IsNotNull(rawRecord);
+				Assert.AreEqual("\"e\"\"f\"g \" ,h\r\n\"i\"\"j\",k\r\n", rawRecord);
 
-				field = null;
+				rawRecord = null;
 				parser.Read();
 				record = parser.Record;
-				Assert.IsNull(field);
+				Assert.IsNull(rawRecord);
 			}
 		}
 

@@ -20,7 +20,6 @@ namespace CsvHelper.Tests
 				{ "Id", "Name" },
 				{ "1", "one" },
 				{ "2", "two" },
-				null
 			};
 
 			var csvReader = new MyCsvReader(parserMock);

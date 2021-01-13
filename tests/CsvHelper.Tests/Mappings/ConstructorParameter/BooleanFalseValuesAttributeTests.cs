@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,7 +37,6 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 			{
 				{ "id", "boolean" },
 				{ "1", "Bar" },
-				null
 			};
 			using (var csv = new CsvReader(parser))
 			{
@@ -58,7 +58,6 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 			var parser = new ParserMock(config)
 			{
 				{ "1", "Bar" },
-				null
 			};
 			using (var csv = new CsvReader(parser))
 			{

@@ -36,7 +36,6 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 			{
 				{ "id", "boolean" },
 				{ "1", "Bar" },
-				null
 			};
 			using (var csv = new CsvReader(parser))
 			{
@@ -58,7 +57,6 @@ namespace CsvHelper.Tests.Mappings.ConstructorParameter
 			var parser = new ParserMock(config)
 			{
 				{ "1", "Bar" },
-				null
 			};
 			using (var csv = new CsvReader(parser))
 			{

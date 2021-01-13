@@ -435,7 +435,6 @@ namespace CsvHelper.Tests
 				headerData,
 				{ "1", "string column 1", guid.ToString() },
 				{ "2", "string column 2", guid.ToString() },
-				null,
 			};
 
 			var csv = new CsvReader(csvParserMock);
@@ -475,7 +474,6 @@ namespace CsvHelper.Tests
 				headerData,
 				{ "1", "string column 1", guid.ToString() },
 				{ "2", "string column 2", guid.ToString() },
-				null,
 			};
 
 			var csv = new CsvReader(csvParserMock);
@@ -514,7 +512,6 @@ namespace CsvHelper.Tests
 				headerData,
 				{ "one", "two", "three" },
 				{ "one", "two", "three" },
-				null,
 			};
 
 			var csv = new CsvReader(csvParserMock);
@@ -627,7 +624,6 @@ namespace CsvHelper.Tests
 			{
 				{ " Int Column ", " String Column " },
 				{ "1", "one" },
-				null,
 			};
 			var reader = new CsvReader(parserMock);
 			var data = reader.GetRecords<TestDefaultValues>().ToList();
@@ -687,7 +683,6 @@ namespace CsvHelper.Tests
 				{ "1", "2", "3" },
 				{ "", "", "" },
 				{ "4", "5", "6" },
-				null,
 			};
 
 			var reader = new CsvReader(parserMock);
@@ -719,7 +714,6 @@ namespace CsvHelper.Tests
 				{ "1", "2", "3" },
 				{ " ", "", "" },
 				{ "4", "5", "6" },
-				null
 			};
 
 			var reader = new CsvReader(parserMock);
@@ -783,7 +777,6 @@ namespace CsvHelper.Tests
 				{ "1", "1", "three" },
 				{ "four", "1", "four" },
 				{ "1", "1", "five" },
-				null,
 			};
 			var csv = new CsvReader(parserMock);
 
@@ -805,7 +798,6 @@ namespace CsvHelper.Tests
 				{ "Id", "Name" },
 				{ "1", "one" },
 				{ "2", "two" },
-				null,
 			};
 			var csv = new CsvReader(parserMock);
 			var records = csv.GetRecords<TestStruct>().ToList();
@@ -825,7 +817,6 @@ namespace CsvHelper.Tests
 			{
 				{ "Id", "Name" },
 				{ "1", "one" },
-				null,
 			};
 			var csv = new CsvReader(parserMock);
 			csv.Context.RegisterClassMap<TestStructParentMap>();
@@ -844,7 +835,6 @@ namespace CsvHelper.Tests
 				{ "Id" },
 				{ "1" },
 				{ "2" },
-				null,
 			};
 			var csv = new CsvReader(parserMock);
 			var records = csv.GetRecords<int>().ToList();
@@ -866,7 +856,6 @@ namespace CsvHelper.Tests
 			{
 				{ "1" },
 				{ "2" },
-				null,
 			};
 			var csv = new CsvReader(parserMock);
 			var records = csv.GetRecords<int>().ToList();

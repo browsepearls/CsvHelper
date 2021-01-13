@@ -25,7 +25,6 @@ namespace CsvHelper.Tests.Mappings
 				{ "Id", "Name" },
 				{ "1", "one" },
 				{ "2", "two" },
-				null
 			};
 
 			var csvReader = new CsvReader(parserMock);
@@ -49,7 +48,6 @@ namespace CsvHelper.Tests.Mappings
 				{ "Name" },
 				{ "one" },
 				{ "two" },
-				null
 			};
 
 			var csvReader = new CsvReader(parserMock);
@@ -75,7 +73,6 @@ namespace CsvHelper.Tests.Mappings
 				{ "Name" },
 				{ "one" },
 				{ "two" },
-				null
 			};
 
 			var csvReader = new CsvReader(parserMock);
@@ -101,7 +98,6 @@ namespace CsvHelper.Tests.Mappings
 				{ "Name" },
 				{ "one" },
 				{ "two" },
-				null
 			};
 
 			var csvReader = new CsvReader(parserMock);
@@ -127,7 +123,6 @@ namespace CsvHelper.Tests.Mappings
 				{ "Id" },
 				{ "1" },
 				{ "2" },
-				null
 			};
 
 			var csvReader = new CsvReader(parserMock);
@@ -153,7 +148,6 @@ namespace CsvHelper.Tests.Mappings
 				{ "Id" },
 				{ "1" },
 				{ "2" },
-				null
 			};
 
 			var csvReader = new CsvReader(parserMock);

@@ -25,7 +25,6 @@ namespace CsvHelper.Tests.Mappings
 			{
 				{ "Id" },
 				{ "1" },
-				null
 			};
 			using (var csv = new CsvReader(parserMock))
 			{
@@ -43,7 +42,6 @@ namespace CsvHelper.Tests.Mappings
 			{
 				{ "Id" },
 				{ "1" },
-				null
 			};
 			using (var csv = new CsvReader(parserMock))
 			{

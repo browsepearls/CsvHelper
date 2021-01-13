@@ -35,7 +35,6 @@ namespace CsvHelper
 		private int currentIndex = -1;
 		private bool hasBeenRead;
 		private string[] headerRecord;
-		private string[] record;
 
 		/// <summary>
 		/// Gets the field index the reader is currently on.
@@ -243,14 +242,17 @@ namespace CsvHelper
 		{
 			// Don't forget about the async method below!
 
-			while (parser.Read() && Configuration.ShouldSkipRecord(parser.Record)) { }
-
-			record = parser.Record;
+			bool hasMoreRecords;
+			do
+			{
+				hasMoreRecords = parser.Read();
+			}
+			while (hasMoreRecords && Configuration.ShouldSkipRecord(parser.Record));
 
 			currentIndex = -1;
 			hasBeenRead = true;
 
-			if (detectColumnCountChanges && record != null)
+			if (detectColumnCountChanges && hasMoreRecords)
 			{
 				if (columnCount > 0 && columnCount != parser.Count)
 				{
@@ -265,7 +267,7 @@ namespace CsvHelper
 				columnCount = parser.Count;
 			}
 
-			return record != null;
+			return hasMoreRecords;
 		}
 
 		/// <summary>
@@ -276,16 +278,19 @@ namespace CsvHelper
 		/// <returns>True if there are more records, otherwise false.</returns>
 		public virtual async Task<bool> ReadAsync()
 		{
-			while (await parser.ReadAsync() && Configuration.ShouldSkipRecord(parser.Record)) { }
-
-			record = parser.Record;
+			bool hasMoreRecords;
+			do
+			{
+				hasMoreRecords = await parser.ReadAsync();
+			}
+			while (hasMoreRecords && Configuration.ShouldSkipRecord(parser.Record));
 
 			currentIndex = -1;
 			hasBeenRead = true;
 
-			if (detectColumnCountChanges && record != null)
+			if (detectColumnCountChanges && hasMoreRecords)
 			{
-				if (columnCount > 0 && columnCount != record.Length)
+				if (columnCount > 0 && columnCount != parser.Count)
 				{
 					var csvException = new BadDataException(context, "An inconsistent number of columns has been detected.");
 
@@ -295,10 +300,10 @@ namespace CsvHelper
 					}
 				}
 
-				columnCount = record.Length;
+				columnCount = parser.Count;
 			}
 
-			return record != null;
+			return hasMoreRecords;
 		}
 
 		/// <summary>

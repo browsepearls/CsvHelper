@@ -25,7 +25,6 @@ namespace CsvHelper.Tests
 			{
 				new[] { "0", "1" },
 				new[] { "2", "3" },
-				null,
 			};
 
 			var csv = new CsvReader(parserMock);

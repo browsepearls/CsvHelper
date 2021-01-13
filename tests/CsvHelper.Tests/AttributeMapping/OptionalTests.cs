@@ -19,7 +19,6 @@ namespace CsvHelper.Tests.AttributeMapping
 			{
 				{ "Id" },
 				{ "1" },
-				{ null }
 			};
 
 			using (var csv = new CsvReader(parser))

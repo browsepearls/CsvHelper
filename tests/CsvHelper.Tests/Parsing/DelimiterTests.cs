@@ -18,14 +18,14 @@ namespace CsvHelper.Tests.Parsing
 		{
 			var config = new CsvConfiguration(CultureInfo.InvariantCulture)
 			{
-				Delimiter = "&|$",
+				Delimiter = "<|>",
 			};
 			using (var stream = new MemoryStream())
 			using (var reader = new StreamReader(stream))
 			using (var writer = new StreamWriter(stream))
 			using (var parser = new CsvParser(reader, config))
 			{
-				writer.Write("1&|$2&3&|$4\r\n");
+				writer.Write("1<|>2<3<|>4\r\n");
 				writer.Flush();
 				stream.Position = 0;
 
@@ -33,7 +33,7 @@ namespace CsvHelper.Tests.Parsing
 
 				Assert.AreEqual(3, parser.Count);
 				Assert.AreEqual("1", parser[0]);
-				Assert.AreEqual("2&3", parser[1]);
+				Assert.AreEqual("2<3", parser[1]);
 				Assert.AreEqual("4", parser[2]);
 			}
 		}

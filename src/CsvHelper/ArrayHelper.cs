@@ -13,44 +13,39 @@ namespace CsvHelper
 	public static class ArrayHelper
     {
 		/// <summary>
-		/// Trims the given characters off the start and end of the given span.
+		/// Trims the characters off the start and end of the buffer.
 		/// </summary>
-		/// <param name="span">The span.</param>
+		/// <param name="buffer">The buffer.</param>
+		/// <param name="start">The start.</param>
+		/// <param name="length">The length.</param>
 		/// <param name="trimChars">The characters to trim.</param>
-		/// <returns>The trimmed span.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Span<char> Trim(Span<char> span, params char[] trimChars)
+		public static void Trim(char[] buffer, ref int start, ref int length, char[] trimChars)
 		{
-			var start = 0;
-			var end = span.Length - 1;
-
 			// Trim start.
-			for (var i = start; i <= end; i++)
+			for (var i = start; i < start + length + 1; i++)
 			{
-				if (Contains(trimChars, span[i]))
-				{
-					start++;
-				}
-				else
+				var c = buffer[i];
+				if (!Contains(trimChars, c))
 				{
 					break;
 				}
+
+				start++;
+				length--;
 			}
 
 			// Trim end.
-			for (var i = end; i >= start; i--)
+			for (var i = start + length - 1; i > start; i--)
 			{
-				if (Contains(trimChars, span[i]))
-				{
-					end--;
-				}
-				else
+				var c = buffer[i];
+				if (!Contains(trimChars, c))
 				{
 					break;
 				}
-			}
 
-			return span.Slice(start, end - start + 1);
+				length--;
+			}
 		}
 
 		/// <summary>
@@ -62,7 +57,7 @@ namespace CsvHelper
 		///   <c>true</c> if the array contains the characters, otherwise <c>false</c>.
 		/// </returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool Contains(char[] array, char c)
+		public static bool Contains(char[] array, in char c)
 		{
 			for (var i = 0; i < array.Length; i++)
 			{

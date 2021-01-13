@@ -23,7 +23,6 @@ namespace CsvHelper.Tests.Reading
 			{
 				{ "NullableInt32Field" },
 				{ new string[0] },
-				{ null }
 			};
 
 			using (var csv = new CsvReader(parser))
@@ -63,7 +62,6 @@ namespace CsvHelper.Tests.Reading
 				{ "1" },
 				{ new string[0] },
 				{ "3" },
-				{ null }
 			};
 
 			using (var csv = new CsvReader(parser))
@@ -128,7 +126,6 @@ namespace CsvHelper.Tests.Reading
 				{ "", "Foo" },
 				{ "", "" },
 				{ "4", "Bar" },
-				{ null }
 			};
 
 			using (var csv = new CsvReader(parser))

@@ -29,6 +29,9 @@ namespace CsvHelper
 		private readonly bool allowComments;
 		private readonly BadDataFound badDataFound;
 		private readonly bool ignoreQuotes;
+		private readonly bool lineBreakInQuotedFieldIsBadData;
+		private readonly TrimOptions trimOptions;
+		private readonly char[] whiteSpaceChars;
 
 		private char[] buffer;
 		private int bufferSize;
@@ -64,6 +67,13 @@ namespace CsvHelper
 		{
 			get
 			{
+				// TODO: Cache the current record
+
+				if (fieldsPosition == 0)
+				{
+					return null;
+				}
+
 				var record = new string[fieldsPosition];
 
 				for (var i = 0; i < record.Length; i++)
@@ -126,8 +136,11 @@ namespace CsvHelper
 			escape = configuration.Escape;
 			ignoreBlankLines = configuration.IgnoreBlankLines;
 			ignoreQuotes = configuration.IgnoreQuotes;
+			lineBreakInQuotedFieldIsBadData = configuration.LineBreakInQuotedFieldIsBadData;
 			processFieldBufferSize = 1024;
 			quote = configuration.Quote;
+			whiteSpaceChars = configuration.WhiteSpaceChars;
+			trimOptions = configuration.TrimOptions;
 
 			buffer = ArrayPool<char>.Shared.Rent(bufferSize);
 			processFieldBuffer = ArrayPool<char>.Shared.Rent(processFieldBufferSize);
@@ -138,6 +151,14 @@ namespace CsvHelper
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		protected ProcessedField ProcessField(in int start, in int length, in int quoteCount)
 		{
+			var newStart = start;
+			var newLength = length;
+
+			if ((trimOptions & TrimOptions.Trim) == TrimOptions.Trim)
+			{
+				ArrayHelper.Trim(buffer, ref newStart, ref newLength, whiteSpaceChars);
+			}
+
 			if (quoteCount == 0)
 			{
 				// Not quoted.
@@ -146,13 +167,10 @@ namespace CsvHelper
 				return new ProcessedField
 				{
 					Buffer = buffer,
-					Start = start,
-					Length = length,
+					Start = newStart,
+					Length = newLength,
 				};
 			}
-
-			var newStart = start;
-			var newLength = length;
 
 			// Remove the quotes from the ends.
 			if (buffer[newStart] == quote && buffer[newStart + newLength - 1] == quote && newLength > 1)
@@ -174,6 +192,22 @@ namespace CsvHelper
 					Start = newStart,
 					Length = newLength,
 				};
+			}
+
+			if ((trimOptions & TrimOptions.InsideQuotes) == TrimOptions.InsideQuotes)
+			{
+				ArrayHelper.Trim(buffer, ref newStart, ref newLength, whiteSpaceChars);
+			}
+
+			if (lineBreakInQuotedFieldIsBadData)
+			{
+				for (var i = newStart; i < newStart + newLength; i++)
+				{
+					if (buffer[i] == '\r' || buffer[i] == '\n')
+					{
+						badDataFound?.Invoke(Context);
+					}
+				}
 			}
 
 			if (quoteCount == 2)
@@ -246,12 +280,12 @@ namespace CsvHelper
 					}
 				}
 
+				result = ReadLine();
+
 				if (result == ReadLineResult.Complete)
 				{
 					return true;
 				}
-
-				result = ReadLine();
 			}
 		}
 
@@ -396,7 +430,6 @@ namespace CsvHelper
 					var result = ReadLineEnding(ref c);
 					if (result == ReadLineResult.Complete)
 					{
-						fieldsPosition--;
 						rowStartPosition = bufferPosition;
 						fieldStartPosition = rowStartPosition;
 						row++;
@@ -423,11 +456,19 @@ namespace CsvHelper
 		{
 			for (var i = delimiterPosition; i < delimiter.Length; i++)
 			{
+				if (bufferPosition >= charsRead)
+				{
+					return ReadLineResult.Incomplete;
+				}
+
 				delimiterPosition++;
 
 				c = buffer[bufferPosition];
 				if (c != delimiter[i])
 				{
+					c = buffer[bufferPosition - 1];
+					delimiterPosition = 1;
+
 					return ReadLineResult.Complete;
 				}
 
@@ -465,21 +506,12 @@ namespace CsvHelper
 				}
 
 				c = buffer[bufferPosition];
-				bufferPosition++;
-				charCount++;
-				if (countBytes)
-				{
-					byteCount += encoding.GetByteCount(new char[] { c });
-				}
 
 				if (c == '\n')
 				{
 					lessChars++;
-				}
-				else
-				{
-					bufferPosition--;
-					charCount--; ;
+					bufferPosition++;
+					charCount++;
 					if (countBytes)
 					{
 						byteCount += encoding.GetByteCount(new char[] { c });
@@ -487,7 +519,10 @@ namespace CsvHelper
 				}
 			}
 
-			AddField(fieldStartPosition, bufferPosition - fieldStartPosition - lessChars);
+			if (state == ParserState.LineEnding)
+			{
+				AddField(fieldStartPosition, bufferPosition - fieldStartPosition - lessChars);
+			}
 
 			return ReadLineResult.Complete;
 		}
@@ -562,15 +597,16 @@ namespace CsvHelper
 				var tempBuffer = ArrayPool<char>.Shared.Rent(bufferSize);
 				buffer.CopyTo(tempBuffer, 0);
 				ArrayPool<char>.Shared.Return(buffer);
-				buffer = this.buffer = tempBuffer;
+				buffer = tempBuffer;
 			}
 
 			var charsLeft = Math.Max(charsRead - rowStartPosition, 0);
 
-			if (charsLeft > 0 && rowStartPosition > 0)
-			{
-				Array.Copy(buffer, rowStartPosition, buffer, 0, charsLeft);
-			}
+			Array.Copy(buffer, rowStartPosition, buffer, 0, charsLeft);
+
+			fieldStartPosition -= rowStartPosition;
+			rowStartPosition = 0;
+			bufferPosition = charsLeft;
 
 			charsRead = reader.Read(buffer, charsLeft, buffer.Length - charsLeft);
 			if (charsRead == 0)
@@ -579,10 +615,6 @@ namespace CsvHelper
 			}
 
 			charsRead += charsLeft;
-
-			fieldStartPosition -= rowStartPosition;
-			rowStartPosition = 0;
-			bufferPosition = charsLeft;
 
 			return true;
 		}

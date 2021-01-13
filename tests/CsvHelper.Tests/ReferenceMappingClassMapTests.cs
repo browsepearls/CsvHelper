@@ -17,7 +17,6 @@ namespace CsvHelper.Tests
 		{
 			var parserMock = new ParserMock
 			{
-				new[]
 				{
 					"FirstName",
 					"LastName",

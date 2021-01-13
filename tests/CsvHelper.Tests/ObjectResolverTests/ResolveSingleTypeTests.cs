@@ -19,7 +19,6 @@ namespace CsvHelper.Tests.ObjectResolverTests
 			{
 				{ "Id", "Name" },
 				{ "1", "one" },
-				null
 			};
 
 			using (var csv = new CsvReader(parser))

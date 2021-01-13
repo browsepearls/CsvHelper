@@ -22,7 +22,6 @@ namespace CsvHelper.Tests
 				{ "int2", "string.3" },
 				{ "1", "one" },
 				{ "2", "two" },
-				null
 			};
 
 			var csvReader = new CsvReader(parserMock);
@@ -47,7 +46,6 @@ namespace CsvHelper.Tests
 				{ "int2", "string3" },
 				{ "1", "one" },
 				{ "2", "two" },
-				null
 			};
 
 			var csvReader = new CsvReader(parserMock);
@@ -74,7 +72,6 @@ namespace CsvHelper.Tests
 			{
 				{ "1", "2" },
 				{ "3", "4" },
-				null,
 			};
 
 			var csvReader = new CsvReader(parserMock);
@@ -98,7 +95,6 @@ namespace CsvHelper.Tests
 			var parserMock = new ParserMock(config)
 			{
 				{ "1", "2" },
-				null,
 			};
 
 			var csvReader = new CsvReader(parserMock);
@@ -118,7 +114,6 @@ namespace CsvHelper.Tests
 			{
 				{ "1", "2" },
 				{ "3", "4" },
-				null,
 			};
 
 			var csvReader = new CsvReader(parserMock);
@@ -143,7 +138,6 @@ namespace CsvHelper.Tests
 			{
 				{ "1", "2" },
 				{ "3", "4" },
-				null,
 			};
 
 			var csvReader = new CsvReader(parserMock);
@@ -164,7 +158,6 @@ namespace CsvHelper.Tests
 			{
 				{ "ColumnName", "ColumnName", "ColumnName" },
 				{ "2", "3", "1" },
-				null,
 			};
 
 			var csv = new CsvReader(parserMock);
